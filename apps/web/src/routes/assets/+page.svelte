@@ -5,6 +5,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { filterAssets, type AssetFilter, type IPAsset } from "@ipms/domain";
+  import { ASSET_STATUSES } from "@ipms/shared";
   import { statusConfig, typeLabels, filters, formatDate } from "../../features/assets/helpers";
 
   // --- State ---
@@ -102,22 +103,115 @@
     return sortDirection === "asc" ? " \u2191" : " \u2193";
   }
 
+  // --- Selection state ---
+  let selectedIds = $state(new Set<string>());
+  let bulkMessage = $state<{ type: "success" | "error"; text: string } | null>(null);
+  let bulkLoading = $state(false);
+
+  // Portfolio state for bulk add
+  let portfolios = $state<{ id: string; name: string }[]>([]);
+  let portfoliosLoaded = $state(false);
+
+  // Bulk action state
+  let bulkStatusTarget = $state("");
+  let bulkPortfolioTarget = $state("");
+
+  let allSelected = $derived(sortedAssets.length > 0 && sortedAssets.every((a) => selectedIds.has(a.id)));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      selectedIds = new Set();
+    } else {
+      selectedIds = new Set(sortedAssets.map((a) => a.id));
+    }
+  }
+
+  function toggleSelect(id: string) {
+    const next = new Set(selectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    selectedIds = next;
+  }
+
+  async function fetchAssets() {
+    const res = await fetch("/api/assets");
+    if (!res.ok) return;
+    const data = await res.json();
+    assets = data.map((a: any) => ({
+      ...a,
+      filingDate: a.filingDate ? new Date(a.filingDate) : null,
+      expirationDate: a.expirationDate ? new Date(a.expirationDate) : null,
+      createdAt: a.createdAt ? new Date(a.createdAt) : new Date(),
+      updatedAt: a.updatedAt ? new Date(a.updatedAt) : new Date(),
+    }));
+  }
+
+  async function loadPortfolios() {
+    if (portfoliosLoaded) return;
+    const res = await fetch("/api/portfolios");
+    if (res.ok) {
+      portfolios = await res.json();
+      portfoliosLoaded = true;
+    }
+  }
+
+  async function bulkChangeStatus() {
+    if (!bulkStatusTarget || selectedIds.size === 0) return;
+    bulkLoading = true;
+    bulkMessage = null;
+    try {
+      const res = await fetch("/api/assets/bulk/status", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [...selectedIds], status: bulkStatusTarget }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        bulkMessage = { type: "error", text: result.error };
+      } else {
+        bulkMessage = { type: "success", text: `${result.succeeded} updated, ${result.failed} failed` };
+        await fetchAssets();
+        selectedIds = new Set();
+        bulkStatusTarget = "";
+      }
+    } catch {
+      bulkMessage = { type: "error", text: "Failed to update statuses" };
+    } finally {
+      bulkLoading = false;
+    }
+  }
+
+  async function bulkAddToPortfolio() {
+    if (!bulkPortfolioTarget || selectedIds.size === 0) return;
+    bulkLoading = true;
+    bulkMessage = null;
+    try {
+      const res = await fetch("/api/assets/bulk/portfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [...selectedIds], portfolioId: bulkPortfolioTarget }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        bulkMessage = { type: "error", text: result.error };
+      } else {
+        bulkMessage = { type: "success", text: `${result.succeeded} added, ${result.failed} failed` };
+        selectedIds = new Set();
+        bulkPortfolioTarget = "";
+      }
+    } catch {
+      bulkMessage = { type: "error", text: "Failed to add to portfolio" };
+    } finally {
+      bulkLoading = false;
+    }
+  }
+
   onMount(async () => {
     try {
-      const res = await fetch("/api/assets");
-      if (!res.ok) {
-        error = "Failed to load assets";
-        return;
-      }
-      const data = await res.json();
-      // Parse date strings back into Date objects for filterAssets compatibility
-      assets = data.map((a: any) => ({
-        ...a,
-        filingDate: a.filingDate ? new Date(a.filingDate) : null,
-        expirationDate: a.expirationDate ? new Date(a.expirationDate) : null,
-        createdAt: a.createdAt ? new Date(a.createdAt) : new Date(),
-        updatedAt: a.updatedAt ? new Date(a.updatedAt) : new Date(),
-      }));
+      await fetchAssets();
     } catch (e) {
       error = "Failed to load assets";
     } finally {
@@ -234,6 +328,12 @@
         </div>
       </div>
 
+      {#if bulkMessage}
+        <div class="mt-4 rounded-lg px-4 py-2 text-sm {bulkMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+          {bulkMessage.text}
+        </div>
+      {/if}
+
       <!-- Assets Table -->
       <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center gap-2.5">
@@ -258,6 +358,9 @@
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
+                  <th class="pb-3 w-10">
+                    <input type="checkbox" checked={allSelected} onchange={toggleSelectAll} class="rounded border-[var(--border-color)]" />
+                  </th>
                   <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
                   <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
                   <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("jurisdiction")}>Jurisdiction{sortIndicator("jurisdiction")}</th>
@@ -269,6 +372,9 @@
               <tbody>
                 {#each sortedAssets as asset}
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
+                    <td class="py-3.5 w-10">
+                      <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="rounded border-[var(--border-color)]" />
+                    </td>
                     <td class="py-3.5">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{asset.title}</a>
                     </td>
@@ -288,6 +394,49 @@
           </div>
         {/if}
       </div>
+      {#if selectedIds.size > 0}
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
+          <span class="text-sm font-medium text-[var(--color-neutral-700)]">{selectedIds.size} selected</span>
+
+          <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+          <!-- Change Status -->
+          <div class="flex items-center gap-2">
+            <select bind:value={bulkStatusTarget} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
+              <option value="">Change status...</option>
+              {#each ASSET_STATUSES as status}
+                <option value={status}>{status}</option>
+              {/each}
+            </select>
+            <button
+              onclick={bulkChangeStatus}
+              disabled={!bulkStatusTarget || bulkLoading}
+              class="rounded-lg bg-[var(--color-primary-600)] px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-[var(--color-primary-700)]"
+            >Apply</button>
+          </div>
+
+          <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+          <!-- Add to Portfolio -->
+          <div class="flex items-center gap-2">
+            <select bind:value={bulkPortfolioTarget} onfocus={loadPortfolios} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
+              <option value="">Add to portfolio...</option>
+              {#each portfolios as portfolio}
+                <option value={portfolio.id}>{portfolio.name}</option>
+              {/each}
+            </select>
+            <button
+              onclick={bulkAddToPortfolio}
+              disabled={!bulkPortfolioTarget || bulkLoading}
+              class="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-indigo-700"
+            >Add</button>
+          </div>
+
+          <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+          <button onclick={() => { selectedIds = new Set(); }} class="text-sm text-[var(--color-neutral-500)] hover:text-[var(--color-neutral-700)]">Clear</button>
+        </div>
+      {/if}
     {/if}
   </div>
 </div>
