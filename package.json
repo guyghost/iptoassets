@@ -10,7 +10,8 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit -p packages/shared/tsconfig.json && tsc --noEmit -p packages/domain/tsconfig.json && tsc --noEmit -p packages/application/tsconfig.json && tsc --noEmit -p packages/infrastructure/tsconfig.json && tsc --noEmit -p packages/state-machines/tsconfig.json",
-    "check": "bash scripts/check.sh"
+    "check": "bash scripts/check.sh",
+    "dev:db": "bash scripts/dev-db.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
