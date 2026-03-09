@@ -1,1 +1,9 @@
+node_modules/
+dist/
 .worktrees/
+.svelte-kit/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store

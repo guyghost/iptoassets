@@ -1,0 +1,35 @@
+export type {
+  AssetRepository,
+  DeadlineRepository,
+  DocumentRepository,
+  PortfolioRepository,
+} from "./ports.js";
+
+export {
+  createAssetUseCase,
+  getAssetUseCase,
+  listAssetsUseCase,
+  updateAssetStatusUseCase,
+  deleteAssetUseCase,
+} from "./use-cases/asset.js";
+
+export {
+  createDeadlineUseCase,
+  listDeadlinesByAssetUseCase,
+  completeDeadlineUseCase,
+} from "./use-cases/deadline.js";
+
+export {
+  createDocumentUseCase,
+  updateDocumentStatusUseCase,
+  deleteDocumentUseCase,
+} from "./use-cases/document.js";
+
+export {
+  createPortfolioUseCase,
+  getPortfolioUseCase,
+  listPortfoliosUseCase,
+  addAssetToPortfolioUseCase,
+  removeAssetFromPortfolioUseCase,
+  deletePortfolioUseCase,
+} from "./use-cases/portfolio.js";

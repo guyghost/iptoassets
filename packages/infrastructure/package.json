@@ -1,0 +1,14 @@
+{
+  "name": "@ipms/infrastructure",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ipms/shared": "workspace:*",
+    "@ipms/domain": "workspace:*",
+    "@ipms/application": "workspace:*"
+  }
+}
