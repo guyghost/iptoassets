@@ -7,12 +7,25 @@
     "build": "pnpm --filter @ipms/web build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit -p packages/shared/tsconfig.json && tsc --noEmit -p packages/domain/tsconfig.json && tsc --noEmit -p packages/application/tsconfig.json && tsc --noEmit -p packages/infrastructure/tsconfig.json && tsc --noEmit -p packages/state-machines/tsconfig.json",
+    "check": "bash scripts/check.sh"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/svelte": "^5.3.1",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.15.1",
+    "jsdom": "^28.1.0",
     "prettier": "^3.5.3",
+    "prettier-plugin-svelte": "^3.5.1",
+    "svelte": "^5.53.7",
     "typescript": "^5.7.3",
+    "typescript-eslint": "^8.56.1",
     "vitest": "^3.0.7"
   }
 }
