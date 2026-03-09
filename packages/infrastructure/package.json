@@ -7,8 +7,14 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@ipms/shared": "workspace:*",
+    "@ipms/application": "workspace:*",
     "@ipms/domain": "workspace:*",
-    "@ipms/application": "workspace:*"
+    "@ipms/shared": "workspace:*",
+    "drizzle-orm": "^0.45.1",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.18.0",
+    "drizzle-kit": "^0.31.9"
   }
 }
