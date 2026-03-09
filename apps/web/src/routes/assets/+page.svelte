@@ -209,6 +209,16 @@
     }
   }
 
+  function exportCSV() {
+    const params = new URLSearchParams();
+    if (activeTypeFilter !== "all") params.append("type", activeTypeFilter);
+    if (selectedJurisdiction) params.append("jurisdiction", selectedJurisdiction);
+    if (selectedOwner) params.append("owner", selectedOwner);
+    const queryString = params.toString();
+    const url = `/api/export/assets.csv${queryString ? `?${queryString}` : ""}`;
+    window.location.href = url;
+  }
+
   onMount(async () => {
     try {
       await fetchAssets();
@@ -229,10 +239,19 @@
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">IP Assets</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your intellectual property portfolio</p>
       </div>
-      <button class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-700)] transition-colors">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
-        New Asset
-      </button>
+      <div class="flex items-center gap-3">
+        <button
+          onclick={exportCSV}
+          class="inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Export CSV
+        </button>
+        <button class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-700)] transition-colors">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          New Asset
+        </button>
+      </div>
     </div>
 
     <!-- Search Input -->
