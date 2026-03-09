@@ -6,6 +6,8 @@
   import { page } from "$app/stores";
   import { assetsMap } from "../../../features/assets/data";
   import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../features/assets/helpers";
+  import { fetchAssetTimeline, type TimelineEvent } from "../../../features/timeline/data";
+  import { formatTimelineEntry, formatTimelineDate } from "../../../features/timeline/helpers";
 
   let assetId = $derived($page.params.id);
   let asset = $derived(assetsMap[assetId] ?? {
@@ -23,6 +25,26 @@
   });
 
   let transitions = $derived(statusTransitions[asset.status] ?? []);
+
+  let timelineEvents: TimelineEvent[] = $state([]);
+
+  const timelineDotColors: Record<string, string> = {
+    draft: "bg-[var(--color-neutral-400)]",
+    filed: "bg-blue-500",
+    published: "bg-indigo-500",
+    granted: "bg-emerald-500",
+    expired: "bg-amber-500",
+    abandoned: "bg-red-500",
+  };
+
+  $effect(() => {
+    const id = assetId;
+    fetchAssetTimeline(id).then((events) => {
+      timelineEvents = events;
+    }).catch(() => {
+      timelineEvents = [];
+    });
+  });
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">
@@ -110,6 +132,42 @@
         </div>
       </div>
     {/if}
+
+    <!-- Status Timeline -->
+    <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
+          <svg class="h-4.5 w-4.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Status Timeline</h2>
+      </div>
+
+      {#if timelineEvents.length === 0}
+        <p class="mt-4 text-sm text-[var(--color-neutral-500)]">No status changes recorded yet.</p>
+      {:else}
+        <div class="mt-5 space-y-0">
+          {#each timelineEvents as event, i}
+            <div class="relative flex gap-4">
+              <!-- Timeline line and dot -->
+              <div class="flex flex-col items-center">
+                <div class="h-3 w-3 rounded-full {timelineDotColors[event.toStatus] ?? 'bg-[var(--color-neutral-400)]'} ring-4 ring-white z-10"></div>
+                {#if i < timelineEvents.length - 1}
+                  <div class="w-0.5 flex-1 bg-[var(--color-neutral-200)]"></div>
+                {/if}
+              </div>
+              <!-- Event content -->
+              <div class="pb-6">
+                <p class="text-sm font-medium text-[var(--color-neutral-900)]">{formatTimelineEntry(event.fromStatus, event.toStatus)}</p>
+                <p class="mt-0.5 text-xs text-[var(--color-neutral-500)]">
+                  {formatTimelineDate(event.changedAt)}
+                  <span class="text-[var(--color-neutral-400)]">by {event.changedBy}</span>
+                </p>
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
 
     <!-- Danger Zone -->
     <div class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
