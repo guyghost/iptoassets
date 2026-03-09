@@ -12,6 +12,7 @@ export {
   listAssetsUseCase,
   updateAssetStatusUseCase,
   deleteAssetUseCase,
+  listAssetsFilteredUseCase,
 } from "./use-cases/asset.js";
 
 export {
@@ -34,3 +35,10 @@ export {
   removeAssetFromPortfolioUseCase,
   deletePortfolioUseCase,
 } from "./use-cases/portfolio.js";
+
+export {
+  computePortfolioMetricsUseCase,
+  computeDeadlineMetricsUseCase,
+} from "./use-cases/analytics.js";
+
+export { getAssetTimelineUseCase } from "./use-cases/timeline.js";

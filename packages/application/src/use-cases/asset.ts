@@ -1,6 +1,6 @@
 import type { AssetId, AssetStatus, OrganizationId, Result } from "@ipms/shared";
 import { ok, err } from "@ipms/shared";
-import { type IPAsset, type CreateAssetInput, createAsset, updateAssetStatus } from "@ipms/domain";
+import { type IPAsset, type CreateAssetInput, createAsset, updateAssetStatus, type AssetFilter, filterAssets } from "@ipms/domain";
 import type { AssetRepository } from "../ports.js";
 
 export function createAssetUseCase(repo: AssetRepository) {
@@ -59,5 +59,15 @@ export function deleteAssetUseCase(repo: AssetRepository) {
     const deleted = await repo.delete(id, orgId);
     if (!deleted) return err("Asset not found");
     return ok(true);
+  };
+}
+
+export function listAssetsFilteredUseCase(repo: AssetRepository) {
+  return async (
+    orgId: OrganizationId,
+    filter: AssetFilter,
+  ): Promise<Result<readonly IPAsset[]>> => {
+    const assets = await repo.findAll(orgId);
+    return ok(filterAssets(assets, filter));
   };
 }
