@@ -1,5 +1,5 @@
-import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId } from "@ipms/shared";
-import type { IPAsset, Deadline, Document, Portfolio } from "@ipms/domain";
+import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId } from "@ipms/shared";
+import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent } from "@ipms/domain";
 
 export interface AssetRepository {
   findById(id: AssetId, orgId: OrganizationId): Promise<IPAsset | null>;
@@ -29,4 +29,10 @@ export interface PortfolioRepository {
   findAll(orgId: OrganizationId): Promise<readonly Portfolio[]>;
   save(portfolio: Portfolio): Promise<void>;
   delete(id: PortfolioId, orgId: OrganizationId): Promise<boolean>;
+}
+
+export interface StatusChangeEventRepository {
+  findByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<readonly StatusChangeEvent[]>;
+  findAll(orgId: OrganizationId): Promise<readonly StatusChangeEvent[]>;
+  save(event: StatusChangeEvent): Promise<void>;
 }

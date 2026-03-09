@@ -3,6 +3,7 @@ export type {
   DeadlineRepository,
   DocumentRepository,
   PortfolioRepository,
+  StatusChangeEventRepository,
 } from "./ports.js";
 
 export {
