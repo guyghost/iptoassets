@@ -16,6 +16,10 @@ import {
   createDocumentUseCase,
   updateDocumentStatusUseCase,
   deleteDocumentUseCase,
+  listAssetsFilteredUseCase,
+  computePortfolioMetricsUseCase,
+  computeDeadlineMetricsUseCase,
+  getAssetTimelineUseCase,
 } from "@ipms/application";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
 
@@ -39,3 +43,8 @@ export const deletePortfolio = deletePortfolioUseCase(portfolioRepo);
 export const createDocument = createDocumentUseCase(documentRepo);
 export const updateDocumentStatus = updateDocumentStatusUseCase(documentRepo);
 export const deleteDocument = deleteDocumentUseCase(documentRepo);
+
+export const listAssetsFiltered = listAssetsFilteredUseCase(assetRepo);
+export const computePortfolioMetrics = computePortfolioMetricsUseCase(assetRepo);
+export const computeDeadlineMetrics = computeDeadlineMetricsUseCase(deadlineRepo);
+export const getAssetTimeline = getAssetTimelineUseCase(statusChangeEventRepo);
