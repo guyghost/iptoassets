@@ -25,11 +25,11 @@ Richer portfolio features and operational visibility.
 - [x] Portfolio dashboard with asset counts by status, type, and jurisdiction
 - [x] Deadline compliance tracking (overdue, upcoming, completed rates)
 - [x] Asset timeline view (status change history)
-- [ ] Bulk asset operations (status update, portfolio assignment)
+- [x] Bulk asset operations (status update, portfolio assignment)
 - [x] Advanced filtering and search across assets
-- [ ] Export to CSV/PDF
-- [ ] Persistent storage (PostgreSQL via repository port swap)
-- [ ] Database migrations
+- [x] Export to CSV/PDF
+- [x] Persistent storage (PostgreSQL via repository port swap)
+- [x] Database migrations
 
 ## Phase 3: SaaS
 

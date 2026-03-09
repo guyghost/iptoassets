@@ -160,3 +160,14 @@ Svelte 5 components organized by complexity:
 | **Atoms** | Button, Input, Card, Badge | Primitive UI elements |
 | **Molecules** | AssetCard, FormField, StatusBadge | Composed atoms with domain meaning |
 | **Organisms** | AssetList | Full feature sections |
+
+## Persistent Storage (PostgreSQL)
+
+The infrastructure package includes a PostgreSQL layer alongside the original in-memory repositories.
+
+- **Drizzle ORM** defines the database schema in TypeScript (`packages/infrastructure/src/postgres/schema.ts`), keeping column types aligned with domain branded types.
+- **Connection** is managed via a `DATABASE_URL` environment variable. When set, the app creates a Drizzle client and wires PostgreSQL repository implementations; when absent, the in-memory repositories are used instead.
+- **Migrations** are generated and applied with Drizzle Kit (`drizzle-kit generate` / `drizzle-kit migrate`).
+- **Docker Compose** (`docker-compose.yml`) provides a local PostgreSQL instance for development. Running `pnpm dev` starts both the database and the SvelteKit dev server.
+
+This approach preserves the ports-and-adapters boundary: use cases depend on repository interfaces defined in the application layer, and the concrete implementation (in-memory or PostgreSQL) is selected at startup.
