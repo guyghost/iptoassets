@@ -20,6 +20,8 @@ import {
   computePortfolioMetricsUseCase,
   computeDeadlineMetricsUseCase,
   getAssetTimelineUseCase,
+  bulkUpdateAssetStatusUseCase,
+  bulkAddAssetsToPortfolioUseCase,
 } from "@ipms/application";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
 
@@ -48,3 +50,6 @@ export const listAssetsFiltered = listAssetsFilteredUseCase(assetRepo);
 export const computePortfolioMetrics = computePortfolioMetricsUseCase(assetRepo);
 export const computeDeadlineMetrics = computeDeadlineMetricsUseCase(deadlineRepo);
 export const getAssetTimeline = getAssetTimelineUseCase(statusChangeEventRepo);
+
+export const bulkUpdateAssetStatus = bulkUpdateAssetStatusUseCase(assetRepo, statusChangeEventRepo);
+export const bulkAddAssetsToPortfolio = bulkAddAssetsToPortfolioUseCase(portfolioRepo);
