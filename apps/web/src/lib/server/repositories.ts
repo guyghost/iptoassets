@@ -11,3 +11,6 @@ export const deadlineRepo = createInMemoryDeadlineRepository();
 export const documentRepo = createInMemoryDocumentRepository();
 export const portfolioRepo = createInMemoryPortfolioRepository();
 export const statusChangeEventRepo = createInMemoryStatusChangeEventRepository();
+
+import { seedData } from "./seed.js";
+seedData();
