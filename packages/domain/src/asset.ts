@@ -70,3 +70,40 @@ export function updateAssetStatus(
     updatedAt: new Date(),
   });
 }
+
+export interface AssetFilter {
+  readonly status?: AssetStatus[];
+  readonly type?: IPType[];
+  readonly jurisdiction?: string;
+  readonly owner?: string;
+  readonly search?: string;
+  readonly dateFrom?: Date;
+  readonly dateTo?: Date;
+}
+
+export function filterAssets(assets: readonly IPAsset[], filter: AssetFilter): IPAsset[] {
+  return assets.filter((asset) => {
+    if (filter.status && filter.status.length > 0 && !filter.status.includes(asset.status)) {
+      return false;
+    }
+    if (filter.type && filter.type.length > 0 && !filter.type.includes(asset.type)) {
+      return false;
+    }
+    if (filter.jurisdiction && asset.jurisdiction.code !== filter.jurisdiction) {
+      return false;
+    }
+    if (filter.owner && asset.owner !== filter.owner) {
+      return false;
+    }
+    if (filter.search && !asset.title.toLowerCase().includes(filter.search.toLowerCase())) {
+      return false;
+    }
+    if (filter.dateFrom || filter.dateTo) {
+      const date = asset.filingDate;
+      if (!date) return false;
+      if (filter.dateFrom && date < filter.dateFrom) return false;
+      if (filter.dateTo && date > filter.dateTo) return false;
+    }
+    return true;
+  });
+}
