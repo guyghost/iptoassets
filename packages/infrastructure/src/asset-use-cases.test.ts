@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createAssetUseCase, getAssetUseCase, listAssetsUseCase, updateAssetStatusUseCase, deleteAssetUseCase } from "@ipms/application";
 import { createInMemoryAssetRepository } from "./in-memory-asset-repository.js";
-import type { AssetId, OrganizationId } from "@ipms/shared";
+import { createInMemoryStatusChangeEventRepository } from "./in-memory-status-change-event-repository.js";
+import type { AssetId, OrganizationId, StatusChangeEventId } from "@ipms/shared";
 import type { CreateAssetInput } from "@ipms/domain";
 
 const ORG_ID = "550e8400-e29b-41d4-a716-446655440000" as OrganizationId;
@@ -18,9 +19,11 @@ const validInput: CreateAssetInput = {
 
 describe("asset use cases", () => {
   let repo: ReturnType<typeof createInMemoryAssetRepository>;
+  let eventRepo: ReturnType<typeof createInMemoryStatusChangeEventRepository>;
 
   beforeEach(() => {
     repo = createInMemoryAssetRepository();
+    eventRepo = createInMemoryStatusChangeEventRepository();
   });
 
   it("creates and retrieves an asset", async () => {
@@ -51,14 +54,28 @@ describe("asset use cases", () => {
 
   it("updates asset status", async () => {
     const create = createAssetUseCase(repo);
-    const update = updateAssetStatusUseCase(repo);
+    const update = updateAssetStatusUseCase(repo, eventRepo);
 
     await create(validInput);
-    const result = await update(ASSET_ID, ORG_ID, "filed");
+    const result = await update(ASSET_ID, ORG_ID, "filed", "Alex Chen");
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.status).toBe("filed");
     }
+  });
+
+  it("creates a status change event on status update", async () => {
+    const create = createAssetUseCase(repo);
+    const update = updateAssetStatusUseCase(repo, eventRepo);
+
+    await create(validInput);
+    await update(ASSET_ID, ORG_ID, "filed", "Alex Chen");
+
+    const events = await eventRepo.findByAssetId(ASSET_ID, ORG_ID);
+    expect(events).toHaveLength(1);
+    expect(events[0].fromStatus).toBe("draft");
+    expect(events[0].toStatus).toBe("filed");
+    expect(events[0].changedBy).toBe("Alex Chen");
   });
 
   it("deletes an asset", async () => {

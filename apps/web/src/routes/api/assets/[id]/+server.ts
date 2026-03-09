@@ -18,7 +18,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
   if (!idResult.ok) return json({ error: idResult.error }, { status: 400 });
 
   const body = await request.json();
-  const result = await updateAssetStatus(idResult.value, DEFAULT_ORG_ID, body.status);
+  const result = await updateAssetStatus(idResult.value, DEFAULT_ORG_ID, body.status, body.changedBy ?? "System");
   return resultToResponse(result);
 };
 

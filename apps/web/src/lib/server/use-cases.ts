@@ -17,12 +17,12 @@ import {
   updateDocumentStatusUseCase,
   deleteDocumentUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
 export const listAssets = listAssetsUseCase(assetRepo);
-export const updateAssetStatus = updateAssetStatusUseCase(assetRepo);
+export const updateAssetStatus = updateAssetStatusUseCase(assetRepo, statusChangeEventRepo);
 export const deleteAsset = deleteAssetUseCase(assetRepo);
 
 export const createDeadline = createDeadlineUseCase(deadlineRepo);

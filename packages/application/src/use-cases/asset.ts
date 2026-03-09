@@ -1,7 +1,7 @@
-import type { AssetId, AssetStatus, OrganizationId, Result } from "@ipms/shared";
+import type { AssetId, AssetStatus, OrganizationId, StatusChangeEventId, Result } from "@ipms/shared";
 import { ok, err } from "@ipms/shared";
-import { type IPAsset, type CreateAssetInput, createAsset, updateAssetStatus, type AssetFilter, filterAssets } from "@ipms/domain";
-import type { AssetRepository } from "../ports.js";
+import { type IPAsset, type CreateAssetInput, createAsset, updateAssetStatus, type AssetFilter, filterAssets, createStatusChangeEvent } from "@ipms/domain";
+import type { AssetRepository, StatusChangeEventRepository } from "../ports.js";
 
 export function createAssetUseCase(repo: AssetRepository) {
   return async (
@@ -34,11 +34,12 @@ export function listAssetsUseCase(repo: AssetRepository) {
   };
 }
 
-export function updateAssetStatusUseCase(repo: AssetRepository) {
+export function updateAssetStatusUseCase(repo: AssetRepository, eventRepo: StatusChangeEventRepository) {
   return async (
     id: AssetId,
     orgId: OrganizationId,
     newStatus: AssetStatus,
+    changedBy: string,
   ): Promise<Result<IPAsset>> => {
     const asset = await repo.findById(id, orgId);
     if (!asset) return err("Asset not found");
@@ -46,7 +47,20 @@ export function updateAssetStatusUseCase(repo: AssetRepository) {
     const result = updateAssetStatus(asset, newStatus);
     if (!result.ok) return result;
 
+    const eventResult = createStatusChangeEvent({
+      id: crypto.randomUUID() as StatusChangeEventId,
+      assetId: id,
+      fromStatus: asset.status,
+      toStatus: newStatus,
+      changedBy,
+      organizationId: orgId,
+    });
+
     await repo.save(result.value);
+    if (eventResult.ok) {
+      await eventRepo.save(eventResult.value);
+    }
+
     return result;
   };
 }
