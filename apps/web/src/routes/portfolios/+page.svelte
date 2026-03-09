@@ -3,63 +3,8 @@
 </svelte:head>
 
 <script lang="ts">
-  const portfolios: Array<{
-    id: string;
-    name: string;
-    description: string;
-    assetIds: string[];
-    owner: string;
-    organizationId: string;
-  }> = [
-    {
-      id: "p1",
-      name: "Core Patents",
-      description: "Strategic patent portfolio covering our foundational technologies including neural interfaces, quantum computing architectures, and advanced display systems.",
-      assetIds: ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11", "a12"],
-      owner: "Alex Chen",
-      organizationId: "org1",
-    },
-    {
-      id: "p2",
-      name: "Brand Assets",
-      description: "Trademark registrations and brand identity assets across key markets including US, EU, and APAC regions.",
-      assetIds: ["a20", "a21", "a22", "a23", "a24"],
-      owner: "Maria Lopez",
-      organizationId: "org1",
-    },
-    {
-      id: "p3",
-      name: "Software Copyrights",
-      description: "Copyright registrations for proprietary software, training datasets, and documentation materials.",
-      assetIds: ["a30", "a31", "a32"],
-      owner: "James Park",
-      organizationId: "org1",
-    },
-    {
-      id: "p4",
-      name: "Licensing Portfolio",
-      description: "Assets available for out-licensing or currently under licensing agreements with third parties.",
-      assetIds: ["a1", "a4", "a7", "a10", "a20", "a21", "a30"],
-      owner: "Sarah Kim",
-      organizationId: "org1",
-    },
-    {
-      id: "p5",
-      name: "APAC Filings",
-      description: "Regional portfolio covering all intellectual property filings across Asia-Pacific jurisdictions including Japan, Korea, China, and Australia.",
-      assetIds: ["a40", "a41", "a42", "a43", "a44", "a45", "a46", "a47", "a48"],
-      owner: "Wei Zhang",
-      organizationId: "org1",
-    },
-    {
-      id: "p6",
-      name: "R&D Pipeline",
-      description: "Emerging inventions and provisional patent applications from the research and development team.",
-      assetIds: ["a50", "a51"],
-      owner: "Alex Chen",
-      organizationId: "org1",
-    },
-  ];
+  import { portfolios } from "../../features/portfolios/data";
+  import { truncate } from "../../features/portfolios/helpers";
 
   let searchQuery = $state("");
 
@@ -70,11 +15,6 @@
         p.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
-
-  function truncate(text: string, maxLength: number): string {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength).trimEnd() + "...";
-  }
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">

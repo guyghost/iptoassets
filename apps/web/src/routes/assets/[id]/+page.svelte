@@ -4,59 +4,8 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-
-  const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-    draft: { bg: "bg-[var(--color-neutral-100)]", text: "text-[var(--color-neutral-600)]", label: "Draft" },
-    filed: { bg: "bg-blue-50", text: "text-blue-700", label: "Filed" },
-    published: { bg: "bg-indigo-50", text: "text-indigo-700", label: "Published" },
-    granted: { bg: "bg-emerald-50", text: "text-emerald-700", label: "Granted" },
-    expired: { bg: "bg-amber-50", text: "text-amber-700", label: "Expired" },
-    abandoned: { bg: "bg-red-50", text: "text-red-700", label: "Abandoned" },
-  };
-
-  const typeLabels: Record<string, string> = {
-    patent: "Patent",
-    trademark: "Trademark",
-    copyright: "Copyright",
-    "design-right": "Design Right",
-  };
-
-  // Status transitions: from -> possible next statuses
-  const statusTransitions: Record<string, string[]> = {
-    draft: ["filed"],
-    filed: ["published", "abandoned"],
-    published: ["granted", "abandoned"],
-    granted: ["expired"],
-    expired: [],
-    abandoned: [],
-  };
-
-  interface Asset {
-    id: string;
-    title: string;
-    type: string;
-    jurisdiction: { code: string; name: string };
-    status: string;
-    filingDate: string;
-    expirationDate: string;
-    owner: string;
-    organizationId: string;
-    createdAt: string;
-    updatedAt: string;
-  }
-
-  const assetsMap: Record<string, Asset> = {
-    "1": { id: "1", title: "Neural Interface Patent", type: "patent", jurisdiction: { code: "US", name: "United States" }, status: "filed", filingDate: "2026-01-15", expirationDate: "2046-01-15", owner: "Alex Chen", organizationId: "org-1", createdAt: "2026-01-10", updatedAt: "2026-03-05" },
-    "2": { id: "2", title: "Quantum Logo Mark", type: "trademark", jurisdiction: { code: "EU", name: "European Union" }, status: "granted", filingDate: "2025-06-20", expirationDate: "2035-06-20", owner: "Sarah Kim", organizationId: "org-1", createdAt: "2025-06-18", updatedAt: "2026-03-03" },
-    "3": { id: "3", title: "AI Training Dataset", type: "copyright", jurisdiction: { code: "US", name: "United States" }, status: "draft", filingDate: "", expirationDate: "", owner: "Alex Chen", organizationId: "org-1", createdAt: "2026-03-01", updatedAt: "2026-03-01" },
-    "4": { id: "4", title: "Holographic Display", type: "patent", jurisdiction: { code: "JP", name: "Japan" }, status: "published", filingDate: "2025-09-10", expirationDate: "2045-09-10", owner: "Takeshi Yamamoto", organizationId: "org-1", createdAt: "2025-09-08", updatedAt: "2026-02-28" },
-    "5": { id: "5", title: "BioSync Wearable Design", type: "design-right", jurisdiction: { code: "GB", name: "United Kingdom" }, status: "granted", filingDate: "2025-03-12", expirationDate: "2040-03-12", owner: "Emma Watson", organizationId: "org-1", createdAt: "2025-03-10", updatedAt: "2026-01-15" },
-    "6": { id: "6", title: "SmartGrid Energy Patent", type: "patent", jurisdiction: { code: "DE", name: "Germany" }, status: "expired", filingDate: "2006-04-22", expirationDate: "2026-04-22", owner: "Hans Mueller", organizationId: "org-1", createdAt: "2006-04-20", updatedAt: "2026-02-01" },
-    "7": { id: "7", title: "EcoFlow Brand Identity", type: "trademark", jurisdiction: { code: "US", name: "United States" }, status: "filed", filingDate: "2026-02-10", expirationDate: "2036-02-10", owner: "Sarah Kim", organizationId: "org-1", createdAt: "2026-02-08", updatedAt: "2026-02-28" },
-    "8": { id: "8", title: "Adaptive UI Framework", type: "copyright", jurisdiction: { code: "EU", name: "European Union" }, status: "granted", filingDate: "2025-11-05", expirationDate: "2095-11-05", owner: "Alex Chen", organizationId: "org-1", createdAt: "2025-11-03", updatedAt: "2026-01-20" },
-    "9": { id: "9", title: "NanoFilter Membrane", type: "patent", jurisdiction: { code: "CN", name: "China" }, status: "abandoned", filingDate: "2024-08-15", expirationDate: "", owner: "Li Wei", organizationId: "org-1", createdAt: "2024-08-12", updatedAt: "2025-12-01" },
-    "10": { id: "10", title: "AeroLens Optics Design", type: "design-right", jurisdiction: { code: "KR", name: "South Korea" }, status: "filed", filingDate: "2026-01-28", expirationDate: "2041-01-28", owner: "Ji-Hoon Park", organizationId: "org-1", createdAt: "2026-01-25", updatedAt: "2026-03-02" },
-  };
+  import { assetsMap } from "../../../features/assets/data";
+  import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../features/assets/helpers";
 
   let assetId = $derived($page.params.id);
   let asset = $derived(assetsMap[assetId] ?? {
@@ -74,20 +23,6 @@
   });
 
   let transitions = $derived(statusTransitions[asset.status] ?? []);
-
-  function formatDate(dateStr: string): string {
-    if (!dateStr) return "--";
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  }
-
-  const transitionButtonColors: Record<string, string> = {
-    filed: "bg-blue-600 hover:bg-blue-700 text-white",
-    published: "bg-indigo-600 hover:bg-indigo-700 text-white",
-    granted: "bg-emerald-600 hover:bg-emerald-700 text-white",
-    expired: "bg-amber-600 hover:bg-amber-700 text-white",
-    abandoned: "bg-red-100 hover:bg-red-200 text-red-700",
-  };
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">

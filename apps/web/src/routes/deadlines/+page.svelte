@@ -3,83 +3,11 @@
 </svelte:head>
 
 <script lang="ts">
-  interface Deadline {
-    id: string;
-    assetId: string;
-    type: "renewal" | "response" | "filing" | "review" | "custom";
-    title: string;
-    dueDate: string;
-    completed: boolean;
-    organizationId: string;
-    assetName: string;
-  }
-
-  const today = new Date("2026-03-09");
-
-  const mockDeadlines: Deadline[] = [
-    { id: "1", assetId: "a1", type: "response", title: "Office action response - Neural Interface Patent", dueDate: "2026-03-05", completed: false, organizationId: "org1", assetName: "Neural Interface Patent" },
-    { id: "2", assetId: "a2", type: "renewal", title: "Annual renewal fee - Quantum Logo Mark", dueDate: "2026-03-03", completed: false, organizationId: "org1", assetName: "Quantum Logo Mark" },
-    { id: "3", assetId: "a3", type: "filing", title: "PCT national phase entry - Holographic Display", dueDate: "2026-03-07", completed: false, organizationId: "org1", assetName: "Holographic Display" },
-    { id: "4", assetId: "a4", type: "renewal", title: "Maintenance fee payment - BioSensor Array", dueDate: "2026-03-10", completed: false, organizationId: "org1", assetName: "BioSensor Array" },
-    { id: "5", assetId: "a5", type: "review", title: "Prior art review - Smart Fabric Weave", dueDate: "2026-03-11", completed: false, organizationId: "org1", assetName: "Smart Fabric Weave" },
-    { id: "6", assetId: "a6", type: "response", title: "Examiner interview preparation - MicroLens Array", dueDate: "2026-03-12", completed: false, organizationId: "org1", assetName: "MicroLens Array" },
-    { id: "7", assetId: "a7", type: "filing", title: "Provisional application filing - Edge ML Compiler", dueDate: "2026-03-14", completed: false, organizationId: "org1", assetName: "Edge ML Compiler" },
-    { id: "8", assetId: "a8", type: "custom", title: "Inventor declaration signature - Nano Coating Process", dueDate: "2026-03-15", completed: false, organizationId: "org1", assetName: "Nano Coating Process" },
-    { id: "9", assetId: "a9", type: "renewal", title: "Trademark renewal - CloudSync Brand", dueDate: "2026-03-22", completed: false, organizationId: "org1", assetName: "CloudSync Brand" },
-    { id: "10", assetId: "a10", type: "review", title: "Portfolio review - AI Model Suite", dueDate: "2026-04-05", completed: false, organizationId: "org1", assetName: "AI Model Suite" },
-    { id: "11", assetId: "a11", type: "filing", title: "Design patent application - Ergonomic Controller", dueDate: "2026-04-12", completed: false, organizationId: "org1", assetName: "Ergonomic Controller" },
-    { id: "12", assetId: "a12", type: "renewal", title: "Copyright registration renewal - DataViz Library", dueDate: "2026-02-20", completed: true, organizationId: "org1", assetName: "DataViz Library" },
-    { id: "13", assetId: "a13", type: "response", title: "Opposition response filed - SecureAuth Protocol", dueDate: "2026-03-01", completed: true, organizationId: "org1", assetName: "SecureAuth Protocol" },
-    { id: "14", assetId: "a14", type: "review", title: "Completed IP audit - Thermal Management System", dueDate: "2026-02-28", completed: true, organizationId: "org1", assetName: "Thermal Management System" },
-  ];
+  import { mockDeadlines } from "../../features/deadlines/data";
+  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate } from "../../features/deadlines/helpers";
 
   let activeFilter = $state("all");
   let deadlines = $state(mockDeadlines.map(d => ({ ...d })));
-
-  const filters = [
-    { id: "all", label: "All" },
-    { id: "overdue", label: "Overdue" },
-    { id: "week", label: "This Week" },
-    { id: "month", label: "This Month" },
-    { id: "completed", label: "Completed" },
-  ];
-
-  const typeColors: Record<string, { bg: string; text: string; label: string }> = {
-    renewal: { bg: "bg-amber-100", text: "text-amber-700", label: "Renewal" },
-    response: { bg: "bg-red-100", text: "text-red-700", label: "Response" },
-    filing: { bg: "bg-blue-100", text: "text-blue-700", label: "Filing" },
-    review: { bg: "bg-purple-100", text: "text-purple-700", label: "Review" },
-    custom: { bg: "bg-teal-100", text: "text-teal-700", label: "Custom" },
-  };
-
-  function getDaysUntil(dateStr: string): number {
-    const due = new Date(dateStr);
-    const diffMs = due.getTime() - today.getTime();
-    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  }
-
-  function getRelativeDate(dateStr: string): string {
-    const days = getDaysUntil(dateStr);
-    if (days === 0) return "Today";
-    if (days === 1) return "Tomorrow";
-    if (days === -1) return "Yesterday";
-    if (days < 0) return `${Math.abs(days)} days ago`;
-    return `in ${days} days`;
-  }
-
-  function isOverdue(d: Deadline): boolean {
-    return !d.completed && getDaysUntil(d.dueDate) < 0;
-  }
-
-  function isDueThisWeek(d: Deadline): boolean {
-    const days = getDaysUntil(d.dueDate);
-    return !d.completed && days >= 0 && days <= 6;
-  }
-
-  function isDueThisMonth(d: Deadline): boolean {
-    const due = new Date(d.dueDate);
-    return !d.completed && due.getMonth() === today.getMonth() && due.getFullYear() === today.getFullYear();
-  }
 
   let overdueItems = $derived(deadlines.filter(d => isOverdue(d)));
   let weekItems = $derived(deadlines.filter(d => isDueThisWeek(d)));
@@ -116,10 +44,6 @@
 
   function toggleComplete(id: string) {
     deadlines = deadlines.map(d => d.id === id ? { ...d, completed: !d.completed } : d);
-  }
-
-  function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 </script>
 
