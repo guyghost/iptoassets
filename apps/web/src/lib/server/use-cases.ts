@@ -22,6 +22,7 @@ import {
   getAssetTimelineUseCase,
   bulkUpdateAssetStatusUseCase,
   bulkAddAssetsToPortfolioUseCase,
+  exportAssetsCSVUseCase,
 } from "@ipms/application";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
 
@@ -53,3 +54,5 @@ export const getAssetTimeline = getAssetTimelineUseCase(statusChangeEventRepo);
 
 export const bulkUpdateAssetStatus = bulkUpdateAssetStatusUseCase(assetRepo, statusChangeEventRepo);
 export const bulkAddAssetsToPortfolio = bulkAddAssetsToPortfolioUseCase(portfolioRepo);
+
+export const exportAssetsCSV = exportAssetsCSVUseCase(assetRepo);

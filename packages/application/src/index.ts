@@ -47,3 +47,5 @@ export {
   bulkUpdateAssetStatusUseCase,
   bulkAddAssetsToPortfolioUseCase,
 } from "./use-cases/bulk.js";
+
+export { exportAssetsCSVUseCase } from "./use-cases/export.js";
