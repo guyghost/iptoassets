@@ -1,6 +1,6 @@
-export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent } from "./entities.js";
+export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, BulkOperationResult } from "./entities.js";
 
-export { createAsset, updateAssetStatus, validateStatusTransition, filterAssets } from "./asset.js";
+export { createAsset, updateAssetStatus, validateStatusTransition, filterAssets, bulkValidateStatusTransition } from "./asset.js";
 export type { CreateAssetInput, AssetFilter } from "./asset.js";
 
 export { createDeadline, completeDeadline } from "./deadline.js";

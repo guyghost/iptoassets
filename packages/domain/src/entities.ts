@@ -66,3 +66,9 @@ export interface StatusChangeEvent {
   readonly changedBy: string;
   readonly organizationId: OrganizationId;
 }
+
+export interface BulkOperationResult {
+  readonly succeeded: number;
+  readonly failed: number;
+  readonly errors: readonly { readonly id: string; readonly reason: string }[];
+}

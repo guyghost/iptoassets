@@ -81,6 +81,25 @@ export interface AssetFilter {
   readonly dateTo?: Date;
 }
 
+export function bulkValidateStatusTransition(
+  assets: readonly IPAsset[],
+  newStatus: AssetStatus,
+): { valid: IPAsset[]; errors: { asset: IPAsset; reason: string }[] } {
+  const valid: IPAsset[] = [];
+  const errors: { asset: IPAsset; reason: string }[] = [];
+
+  for (const asset of assets) {
+    const result = validateStatusTransition(asset.status, newStatus);
+    if (result.ok) {
+      valid.push(asset);
+    } else {
+      errors.push({ asset, reason: result.error });
+    }
+  }
+
+  return { valid, errors };
+}
+
 export function filterAssets(assets: readonly IPAsset[], filter: AssetFilter): IPAsset[] {
   return assets.filter((asset) => {
     if (filter.status && filter.status.length > 0 && !filter.status.includes(asset.status)) {

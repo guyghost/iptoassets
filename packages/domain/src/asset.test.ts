@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createAsset, updateAssetStatus, validateStatusTransition, filterAssets } from "./asset.js";
+import { createAsset, updateAssetStatus, validateStatusTransition, filterAssets, bulkValidateStatusTransition } from "./asset.js";
 import type { CreateAssetInput, AssetFilter } from "./asset.js";
 import type { IPAsset } from "./entities.js";
 import type { AssetId, OrganizationId, AssetStatus } from "@ipms/shared";
@@ -172,5 +172,35 @@ describe("filterAssets", () => {
   it("returns empty array when no matches", () => {
     const result = filterAssets(testAssets, { search: "nonexistent" });
     expect(result).toHaveLength(0);
+  });
+});
+
+describe("bulkValidateStatusTransition", () => {
+  it("returns all assets as valid when transition is allowed", () => {
+    const assets = [
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000001" as AssetId, status: "draft" }),
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000002" as AssetId, status: "draft" }),
+    ];
+    const result = bulkValidateStatusTransition(assets, "filed");
+    expect(result.valid).toHaveLength(2);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("separates valid and invalid transitions", () => {
+    const assets = [
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000001" as AssetId, status: "draft" }),
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000002" as AssetId, status: "granted" }),
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000003" as AssetId, status: "expired" }),
+    ];
+    const result = bulkValidateStatusTransition(assets, "filed");
+    expect(result.valid).toHaveLength(1);
+    expect(result.errors).toHaveLength(2);
+    expect(result.errors[0]!.reason).toContain("Invalid status transition");
+  });
+
+  it("handles empty array", () => {
+    const result = bulkValidateStatusTransition([], "filed");
+    expect(result.valid).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
   });
 });
