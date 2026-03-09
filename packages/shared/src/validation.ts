@@ -4,6 +4,7 @@ import type {
   DocumentId,
   OrganizationId,
   PortfolioId,
+  StatusChangeEventId,
 } from "./brand.js";
 import { type Result, ok, err } from "./result.js";
 
@@ -38,4 +39,10 @@ export function parseOrganizationId(input: string): Result<OrganizationId> {
   return UUID_RE.test(input)
     ? ok(input as OrganizationId)
     : err("Invalid OrganizationId: must be UUID format");
+}
+
+export function parseStatusChangeEventId(input: string): Result<StatusChangeEventId> {
+  return UUID_RE.test(input)
+    ? ok(input as StatusChangeEventId)
+    : err("Invalid StatusChangeEventId: must be UUID format");
 }

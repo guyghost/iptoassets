@@ -4,6 +4,7 @@ export type {
   DocumentId,
   PortfolioId,
   OrganizationId,
+  StatusChangeEventId,
 } from "./brand.js";
 
 export {
@@ -31,4 +32,5 @@ export {
   parseDocumentId,
   parsePortfolioId,
   parseOrganizationId,
+  parseStatusChangeEventId,
 } from "./validation.js";
