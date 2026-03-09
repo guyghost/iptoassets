@@ -18,3 +18,6 @@ export type { CreatePortfolioInput } from "./portfolio.js";
 
 export { createStatusChangeEvent } from "./status-change-event.js";
 export type { CreateStatusChangeEventInput } from "./status-change-event.js";
+
+export { computePortfolioMetrics } from "./analytics/index.js";
+export type { PortfolioMetrics } from "./analytics/index.js";
