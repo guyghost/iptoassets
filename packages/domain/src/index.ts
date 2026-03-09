@@ -24,3 +24,5 @@ export type { PortfolioMetrics } from "./analytics/index.js";
 
 export { computeDeadlineMetrics } from "./analytics/index.js";
 export type { DeadlineMetrics } from "./analytics/index.js";
+
+export { assetsToCSVRows, csvRowsToString } from "./export/index.js";
