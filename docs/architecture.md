@@ -28,7 +28,7 @@ IPMS follows **Clean Architecture** with a **Functional Core / Imperative Shell*
                         v
 +------------------------------------------------------+
 |                packages/domain                        |
-|        Pure Entities  +  Domain Functions              |
+|  Pure Entities + Domain Functions + analytics/          |
 +------------------------------------------------------+
                         |
                         v
@@ -53,6 +53,8 @@ Each layer may only depend on layers below it:
 ## Functional Core / Imperative Shell
 
 The domain and application layers form the **functional core**. All domain functions are pure: they take input, return `Result<T>`, and have no side effects.
+
+The domain layer includes an `analytics/` subfolder containing pure metric computation functions: `computePortfolioMetrics` (asset counts by status, type, and jurisdiction) and `computeDeadlineMetrics` (overdue, upcoming, and completed rates). The `filterAssets` function is another pure domain function that applies an `AssetFilter` to a list of assets without side effects.
 
 ### Functional Core Example
 

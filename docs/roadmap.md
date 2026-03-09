@@ -22,11 +22,11 @@ Core domain model and basic application infrastructure.
 
 Richer portfolio features and operational visibility.
 
-- [ ] Portfolio dashboard with asset counts by status, type, and jurisdiction
-- [ ] Deadline compliance tracking (overdue, upcoming, completed rates)
-- [ ] Asset timeline view (status change history)
+- [x] Portfolio dashboard with asset counts by status, type, and jurisdiction
+- [x] Deadline compliance tracking (overdue, upcoming, completed rates)
+- [x] Asset timeline view (status change history)
 - [ ] Bulk asset operations (status update, portfolio assignment)
-- [ ] Advanced filtering and search across assets
+- [x] Advanced filtering and search across assets
 - [ ] Export to CSV/PDF
 - [ ] Persistent storage (PostgreSQL via repository port swap)
 - [ ] Database migrations

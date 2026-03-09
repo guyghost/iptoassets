@@ -8,7 +8,7 @@
 | **Deadlines** | Due date tracking and completion | Deadline |
 | **Documents** | Document storage and approval | Document |
 | **Portfolio** | Logical grouping of assets | Portfolio |
-| **Analytics** | Reporting and metrics (future) | -- |
+| **Analytics** | Reporting and metrics | StatusChangeEvent |
 
 ## Entities
 
@@ -64,13 +64,26 @@
 | `owner` | `string` | Responsible person |
 | `organizationId` | `OrganizationId` | Tenant scope |
 
+### StatusChangeEvent
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `StatusChangeEventId` (branded string) | Unique identifier (UUID) |
+| `assetId` | `AssetId` | Associated asset |
+| `fromStatus` | `AssetStatus` | Previous status |
+| `toStatus` | `AssetStatus` | New status |
+| `changedAt` | `Date` | When the change occurred |
+| `changedBy` | `string` | Who made the change |
+| `organizationId` | `OrganizationId` | Tenant scope |
+
 ## Value Objects
 
 | Value Object | Package | Description |
 |-------------|---------|-------------|
-| `AssetId`, `DeadlineId`, `DocumentId`, `PortfolioId`, `OrganizationId` | `shared/brand.ts` | Branded string types preventing accidental misuse of IDs |
+| `AssetId`, `DeadlineId`, `DocumentId`, `PortfolioId`, `StatusChangeEventId`, `OrganizationId` | `shared/brand.ts` | Branded string types preventing accidental misuse of IDs |
 | `Result<T, E>` | `shared/result.ts` | Discriminated union for success/failure -- replaces exceptions for domain errors |
 | `Jurisdiction` | `shared/types.ts` | `{ code: string, name: string }` -- represents a legal jurisdiction |
+| `AssetFilter` | `domain/src/asset-filter.ts` | Filter criteria for querying assets by status, type, jurisdiction, and owner |
 | `IPType`, `AssetStatus`, `DeadlineType`, `DocumentType`, `DocumentStatus` | `shared/types.ts` | Const-derived union types for exhaustive type checking |
 
 ## Status Transitions
