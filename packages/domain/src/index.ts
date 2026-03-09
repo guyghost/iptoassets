@@ -21,3 +21,6 @@ export type { CreateStatusChangeEventInput } from "./status-change-event.js";
 
 export { computePortfolioMetrics } from "./analytics/index.js";
 export type { PortfolioMetrics } from "./analytics/index.js";
+
+export { computeDeadlineMetrics } from "./analytics/index.js";
+export type { DeadlineMetrics } from "./analytics/index.js";
