@@ -1,4 +1,4 @@
-export type { IPAsset, Deadline, Document, Portfolio } from "./entities.js";
+export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent } from "./entities.js";
 
 export { createAsset, updateAssetStatus, validateStatusTransition } from "./asset.js";
 export type { CreateAssetInput } from "./asset.js";
@@ -15,3 +15,6 @@ export {
   removeAssetFromPortfolio,
 } from "./portfolio.js";
 export type { CreatePortfolioInput } from "./portfolio.js";
+
+export { createStatusChangeEvent } from "./status-change-event.js";
+export type { CreateStatusChangeEventInput } from "./status-change-event.js";

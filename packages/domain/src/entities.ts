@@ -3,6 +3,7 @@ import type {
   DeadlineId,
   DocumentId,
   PortfolioId,
+  StatusChangeEventId,
   OrganizationId,
   IPType,
   AssetStatus,
@@ -53,5 +54,15 @@ export interface Portfolio {
   readonly description: string;
   readonly assetIds: readonly AssetId[];
   readonly owner: string;
+  readonly organizationId: OrganizationId;
+}
+
+export interface StatusChangeEvent {
+  readonly id: StatusChangeEventId;
+  readonly assetId: AssetId;
+  readonly fromStatus: AssetStatus | null;
+  readonly toStatus: AssetStatus;
+  readonly changedAt: Date;
+  readonly changedBy: string;
   readonly organizationId: OrganizationId;
 }
