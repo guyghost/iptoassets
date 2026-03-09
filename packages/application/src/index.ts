@@ -42,3 +42,8 @@ export {
 } from "./use-cases/analytics.js";
 
 export { getAssetTimelineUseCase } from "./use-cases/timeline.js";
+
+export {
+  bulkUpdateAssetStatusUseCase,
+  bulkAddAssetsToPortfolioUseCase,
+} from "./use-cases/bulk.js";
