@@ -1,8 +1,11 @@
 import { defineConfig } from "vitest/config";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import path from "path";
 
 export default defineConfig({
+  plugins: [svelte({ hot: false })],
   resolve: {
+    conditions: ["browser"],
     alias: {
       "@ipms/shared": path.resolve(__dirname, "packages/shared/src/index.ts"),
       "@ipms/domain": path.resolve(__dirname, "packages/domain/src/index.ts"),
@@ -14,5 +17,7 @@ export default defineConfig({
   test: {
     globals: true,
     include: ["packages/*/src/**/*.test.ts"],
+    environment: "jsdom",
+    setupFiles: ["@testing-library/svelte/vitest"],
   },
 });
