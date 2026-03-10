@@ -10,6 +10,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.1",
+    "@auth/sveltekit": "^1.11.1",
     "@ipms/application": "workspace:*",
     "@ipms/design-system": "workspace:*",
     "@ipms/domain": "workspace:*",

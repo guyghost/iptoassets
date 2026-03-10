@@ -23,8 +23,11 @@ import {
   bulkUpdateAssetStatusUseCase,
   bulkAddAssetsToPortfolioUseCase,
   exportAssetsCSVUseCase,
+  signInOrRegisterUseCase,
+  createOrganizationUseCase,
+  listUserOrganizationsUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -56,3 +59,7 @@ export const bulkUpdateAssetStatus = bulkUpdateAssetStatusUseCase(assetRepo, sta
 export const bulkAddAssetsToPortfolio = bulkAddAssetsToPortfolioUseCase(portfolioRepo);
 
 export const exportAssetsCSV = exportAssetsCSVUseCase(assetRepo);
+
+export const signInOrRegister = signInOrRegisterUseCase(userRepo);
+export const createOrg = createOrganizationUseCase(orgRepo, memberRepo);
+export const listUserOrganizations = listUserOrganizationsUseCase(orgRepo, memberRepo);

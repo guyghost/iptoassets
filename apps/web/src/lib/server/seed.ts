@@ -1,7 +1,9 @@
 import { createAsset, createDeadline, createDocument, createPortfolio, createStatusChangeEvent } from "@ipms/domain";
 import type { AssetId, DeadlineId, DocumentId, PortfolioId, StatusChangeEventId, AssetStatus } from "@ipms/shared";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
-import { DEFAULT_ORG_ID } from "./api-utils.js";
+import type { OrganizationId } from "@ipms/shared";
+
+const SEED_ORG_ID = "00000000-0000-0000-0000-000000000001" as OrganizationId;
 
 function uuid() {
   return crypto.randomUUID();
@@ -71,7 +73,7 @@ const statusTransitionPaths: Record<string, { statuses: AssetStatus[]; dates: Da
 };
 
 export async function seedData() {
-  const orgId = DEFAULT_ORG_ID;
+  const orgId = SEED_ORG_ID;
 
   // --- Assets ---
   const assetInputs = [
