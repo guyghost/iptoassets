@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, primaryKey, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const assets = pgTable("assets", {
   id: uuid("id").primaryKey(),
@@ -72,4 +72,35 @@ export const statusChangeEvents = pgTable("status_change_events", {
 }, (table) => [
   index("status_change_events_organization_id_idx").on(table.organizationId),
   index("status_change_events_asset_id_idx").on(table.assetId),
+]);
+
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey(),
+  email: text("email").notNull(),
+  name: text("name").notNull(),
+  avatarUrl: text("avatar_url"),
+  authProviderId: text("auth_provider_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("users_email_idx").on(table.email),
+  uniqueIndex("users_auth_provider_id_idx").on(table.authProviderId),
+]);
+
+export const organizations = pgTable("organizations", {
+  id: uuid("id").primaryKey(),
+  name: text("name").notNull(),
+  ownerId: uuid("owner_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const memberships = pgTable("memberships", {
+  id: uuid("id").primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  role: text("role").notNull(),
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("memberships_user_org_idx").on(table.userId, table.organizationId),
+  index("memberships_user_id_idx").on(table.userId),
+  index("memberships_organization_id_idx").on(table.organizationId),
 ]);

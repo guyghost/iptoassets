@@ -5,3 +5,6 @@ export { createPgDeadlineRepository } from "./pg-deadline-repository.js";
 export { createPgDocumentRepository } from "./pg-document-repository.js";
 export { createPgPortfolioRepository } from "./pg-portfolio-repository.js";
 export { createPgStatusChangeEventRepository } from "./pg-status-change-event-repository.js";
+export { createPgUserRepository } from "./pg-user-repository.js";
+export { createPgOrganizationRepository } from "./pg-organization-repository.js";
+export { createPgMembershipRepository } from "./pg-membership-repository.js";
