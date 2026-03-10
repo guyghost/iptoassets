@@ -35,11 +35,11 @@ Richer portfolio features and operational visibility.
 
 Multi-user, multi-tenant platform.
 
-- [ ] Authentication (OAuth 2.0 / OIDC)
-- [ ] User management and profiles
+- [x] Authentication (OAuth 2.0 / OIDC)
+- [x] User management and profiles
 - [ ] Role-based access control (Admin, Manager, Attorney, Viewer)
-- [ ] Organization/tenant management
-- [ ] Per-tenant data isolation at the database level
+- [x] Organization/tenant management
+- [x] Per-tenant data isolation at the database level
 - [ ] Audit logging (who changed what, when)
 - [ ] Email notifications for deadlines and review requests
 - [ ] In-app notification center
