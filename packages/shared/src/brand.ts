@@ -8,3 +8,5 @@ export type DocumentId = Brand<string, "DocumentId">;
 export type PortfolioId = Brand<string, "PortfolioId">;
 export type OrganizationId = Brand<string, "OrganizationId">;
 export type StatusChangeEventId = Brand<string, "StatusChangeEventId">;
+export type UserId = Brand<string, "UserId">;
+export type MembershipId = Brand<string, "MembershipId">;

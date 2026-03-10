@@ -2,9 +2,11 @@ export type {
   AssetId,
   DeadlineId,
   DocumentId,
+  MembershipId,
   PortfolioId,
   OrganizationId,
   StatusChangeEventId,
+  UserId,
 } from "./brand.js";
 
 export {
@@ -30,7 +32,9 @@ export {
   parseAssetId,
   parseDeadlineId,
   parseDocumentId,
+  parseMembershipId,
   parsePortfolioId,
   parseOrganizationId,
   parseStatusChangeEventId,
+  parseUserId,
 } from "./validation.js";

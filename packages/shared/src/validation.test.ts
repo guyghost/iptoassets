@@ -5,6 +5,8 @@ import {
   parseDocumentId,
   parsePortfolioId,
   parseOrganizationId,
+  parseUserId,
+  parseMembershipId,
 } from "./validation.js";
 
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -47,5 +49,27 @@ describe("parsePortfolioId", () => {
 describe("parseOrganizationId", () => {
   it("accepts a valid UUID", () => {
     expect(parseOrganizationId(VALID_UUID).ok).toBe(true);
+  });
+});
+
+describe("parseUserId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseUserId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseUserId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid UserId: must be UUID format" });
+  });
+});
+
+describe("parseMembershipId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseMembershipId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseMembershipId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid MembershipId: must be UUID format" });
   });
 });
