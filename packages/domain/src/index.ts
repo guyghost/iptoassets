@@ -50,3 +50,6 @@ export type { CreateNotificationInput } from "./notification.js";
 
 export { createInvitation, acceptInvitation } from "./invitation.js";
 export type { CreateInvitationInput } from "./invitation.js";
+
+export { renderEmailTemplate } from "./email-templates.js";
+export type { EmailTemplateType, EmailTemplateData, DeadlineEmailData, DocumentEmailData, InvitationEmailData } from "./email-templates.js";
