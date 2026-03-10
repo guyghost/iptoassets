@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository } from "@ipms/application";
+import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService } from "@ipms/application";
 
 let assetRepo: AssetRepository;
 let deadlineRepo: DeadlineRepository;
@@ -12,6 +12,7 @@ let memberRepo: MembershipRepository;
 let auditEventRepo: AuditEventRepository;
 let notificationRepo: NotificationRepository;
 let invitationRepo: InvitationRepository;
+let emailService: EmailService;
 
 if (env.DATABASE_URL) {
   const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
@@ -27,6 +28,14 @@ if (env.DATABASE_URL) {
   auditEventRepo = createPgAuditEventRepository(db);
   notificationRepo = createPgNotificationRepository(db);
   invitationRepo = createPgInvitationRepository(db);
+
+  if (env.RESEND_API_KEY && env.RESEND_FROM_ADDRESS) {
+    const { createResendEmailService } = await import("@ipms/infrastructure");
+    emailService = createResendEmailService(env.RESEND_API_KEY, env.RESEND_FROM_ADDRESS);
+  } else {
+    const { createNoOpEmailService } = await import("@ipms/infrastructure");
+    emailService = createNoOpEmailService();
+  }
 } else {
   const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository, createInMemoryAuditEventRepository, createInMemoryNotificationRepository, createInMemoryInvitationRepository } = await import("@ipms/infrastructure");
   assetRepo = createInMemoryAssetRepository();
@@ -41,8 +50,11 @@ if (env.DATABASE_URL) {
   notificationRepo = createInMemoryNotificationRepository();
   invitationRepo = createInMemoryInvitationRepository();
 
+  const { createNoOpEmailService: createNoOp } = await import("@ipms/infrastructure");
+  emailService = createNoOp();
+
   const { seedData } = await import("./seed.js");
   seedData();
 }
 
-export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo };
+export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService };

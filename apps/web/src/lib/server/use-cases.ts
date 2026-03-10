@@ -37,7 +37,7 @@ import {
   deleteInvitationUseCase,
   acceptPendingInvitationsUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -57,7 +57,7 @@ export const removeAssetFromPortfolio = removeAssetFromPortfolioUseCase(portfoli
 export const deletePortfolio = deletePortfolioUseCase(portfolioRepo);
 
 export const createDocument = createDocumentUseCase(documentRepo);
-export const updateDocumentStatus = updateDocumentStatusUseCase(documentRepo);
+export const updateDocumentStatus = updateDocumentStatusUseCase(documentRepo, emailService, notificationRepo, memberRepo, userRepo);
 export const deleteDocument = deleteDocumentUseCase(documentRepo);
 
 export const listAssetsFiltered = listAssetsFilteredUseCase(assetRepo);
@@ -80,9 +80,9 @@ export const listAuditEvents = listAuditEventsUseCase(auditEventRepo);
 export const listNotifications = listNotificationsUseCase(notificationRepo);
 export const markNotificationRead = markNotificationReadUseCase(notificationRepo);
 export const markAllNotificationsRead = markAllNotificationsReadUseCase(notificationRepo);
-export const checkDeadlineNotifications = checkDeadlineNotificationsUseCase(deadlineRepo, notificationRepo, memberRepo);
+export const checkDeadlineNotifications = checkDeadlineNotificationsUseCase(deadlineRepo, notificationRepo, memberRepo, emailService, userRepo);
 
-export const createInvitation = createInvitationUseCase(invitationRepo);
+export const createInvitation = createInvitationUseCase(invitationRepo, emailService, orgRepo, userRepo);
 export const listInvitations = listInvitationsUseCase(invitationRepo);
 export const deleteInvitation = deleteInvitationUseCase(invitationRepo);
 export const acceptPendingInvitations = acceptPendingInvitationsUseCase(invitationRepo, memberRepo);
