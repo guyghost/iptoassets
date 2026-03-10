@@ -70,7 +70,7 @@ describe("createOrganizationUseCase", () => {
     }
     const memberships = await memberRepo.findByUserId(USER_ID);
     expect(memberships).toHaveLength(1);
-    expect(memberships[0].role).toBe("owner");
+    expect(memberships[0].role).toBe("admin");
   });
 
   it("rejects empty organization name", async () => {

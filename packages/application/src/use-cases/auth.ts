@@ -50,7 +50,7 @@ export function createOrganizationUseCase(
       id: crypto.randomUUID() as MembershipId,
       userId: input.ownerId,
       organizationId: orgResult.value.id,
-      role: "owner",
+      role: "admin",
     });
     if (!memberResult.ok) return err(memberResult.error);
 

@@ -35,3 +35,7 @@ export type { CreateOrganizationInput } from "./organization.js";
 
 export { createMembership } from "./membership.js";
 export type { CreateMembershipInput } from "./membership.js";
+
+export { hasPermission, ROLE_HIERARCHY, PERMISSION_ACTIONS } from "./rbac.js";
+export type { PermissionAction } from "./rbac.js";
+export { MEMBER_ROLES } from "./entities.js";

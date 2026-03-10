@@ -75,7 +75,8 @@ export interface BulkOperationResult {
   readonly errors: readonly { readonly id: string; readonly reason: string }[];
 }
 
-export type MemberRole = "owner" | "member";
+export const MEMBER_ROLES = ["viewer", "attorney", "manager", "admin"] as const;
+export type MemberRole = (typeof MEMBER_ROLES)[number];
 
 export interface User {
   readonly id: UserId;
