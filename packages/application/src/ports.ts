@@ -1,5 +1,5 @@
-import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId, UserId, MembershipId } from "@ipms/shared";
-import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership } from "@ipms/domain";
+import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId, UserId, MembershipId, AuditEventId, NotificationId, InvitationId } from "@ipms/shared";
+import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership, AuditEvent, Notification, Invitation } from "@ipms/domain";
 
 export interface AssetRepository {
   findById(id: AssetId, orgId: OrganizationId): Promise<IPAsset | null>;
@@ -55,4 +55,24 @@ export interface MembershipRepository {
   findByOrganizationId(orgId: OrganizationId): Promise<readonly Membership[]>;
   findByUserAndOrg(userId: UserId, orgId: OrganizationId): Promise<Membership | null>;
   save(membership: Membership): Promise<void>;
+}
+
+export interface AuditEventRepository {
+  findByOrganizationId(orgId: OrganizationId, options?: { entityType?: string; actorId?: UserId; limit?: number }): Promise<readonly AuditEvent[]>;
+  save(event: AuditEvent): Promise<void>;
+}
+
+export interface NotificationRepository {
+  findByRecipientId(recipientId: UserId, orgId: OrganizationId): Promise<readonly Notification[]>;
+  findById(id: NotificationId, recipientId: UserId): Promise<Notification | null>;
+  save(notification: Notification): Promise<void>;
+  markAllRead(recipientId: UserId, orgId: OrganizationId): Promise<void>;
+}
+
+export interface InvitationRepository {
+  findById(id: InvitationId, orgId: OrganizationId): Promise<Invitation | null>;
+  findByEmail(email: string): Promise<readonly Invitation[]>;
+  findByOrganizationId(orgId: OrganizationId): Promise<readonly Invitation[]>;
+  save(invitation: Invitation): Promise<void>;
+  delete(id: InvitationId, orgId: OrganizationId): Promise<boolean>;
 }

@@ -7,6 +7,9 @@ export type {
   UserRepository,
   OrganizationRepository,
   MembershipRepository,
+  AuditEventRepository,
+  NotificationRepository,
+  InvitationRepository,
 } from "./ports.js";
 
 export {
