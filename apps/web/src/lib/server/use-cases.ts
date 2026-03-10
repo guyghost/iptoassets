@@ -26,8 +26,18 @@ import {
   signInOrRegisterUseCase,
   createOrganizationUseCase,
   listUserOrganizationsUseCase,
+  logAuditEventUseCase,
+  listAuditEventsUseCase,
+  listNotificationsUseCase,
+  markNotificationReadUseCase,
+  markAllNotificationsReadUseCase,
+  checkDeadlineNotificationsUseCase,
+  createInvitationUseCase,
+  listInvitationsUseCase,
+  deleteInvitationUseCase,
+  acceptPendingInvitationsUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -63,3 +73,16 @@ export const exportAssetsCSV = exportAssetsCSVUseCase(assetRepo);
 export const signInOrRegister = signInOrRegisterUseCase(userRepo);
 export const createOrg = createOrganizationUseCase(orgRepo, memberRepo);
 export const listUserOrganizations = listUserOrganizationsUseCase(orgRepo, memberRepo);
+
+export const logAuditEvent = logAuditEventUseCase(auditEventRepo);
+export const listAuditEvents = listAuditEventsUseCase(auditEventRepo);
+
+export const listNotifications = listNotificationsUseCase(notificationRepo);
+export const markNotificationRead = markNotificationReadUseCase(notificationRepo);
+export const markAllNotificationsRead = markAllNotificationsReadUseCase(notificationRepo);
+export const checkDeadlineNotifications = checkDeadlineNotificationsUseCase(deadlineRepo, notificationRepo, memberRepo);
+
+export const createInvitation = createInvitationUseCase(invitationRepo);
+export const listInvitations = listInvitationsUseCase(invitationRepo);
+export const deleteInvitation = deleteInvitationUseCase(invitationRepo);
+export const acceptPendingInvitations = acceptPendingInvitationsUseCase(invitationRepo, memberRepo);

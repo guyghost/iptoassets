@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository } from "@ipms/application";
+import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository } from "@ipms/application";
 
 let assetRepo: AssetRepository;
 let deadlineRepo: DeadlineRepository;
@@ -9,9 +9,12 @@ let statusChangeEventRepo: StatusChangeEventRepository;
 let userRepo: UserRepository;
 let orgRepo: OrganizationRepository;
 let memberRepo: MembershipRepository;
+let auditEventRepo: AuditEventRepository;
+let notificationRepo: NotificationRepository;
+let invitationRepo: InvitationRepository;
 
 if (env.DATABASE_URL) {
-  const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository } = await import("@ipms/infrastructure/postgres");
+  const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
   const db = createDatabase(env.DATABASE_URL);
   assetRepo = createPgAssetRepository(db);
   deadlineRepo = createPgDeadlineRepository(db);
@@ -21,8 +24,11 @@ if (env.DATABASE_URL) {
   userRepo = createPgUserRepository(db);
   orgRepo = createPgOrganizationRepository(db);
   memberRepo = createPgMembershipRepository(db);
+  auditEventRepo = createPgAuditEventRepository(db);
+  notificationRepo = createPgNotificationRepository(db);
+  invitationRepo = createPgInvitationRepository(db);
 } else {
-  const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository } = await import("@ipms/infrastructure");
+  const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository, createInMemoryAuditEventRepository, createInMemoryNotificationRepository, createInMemoryInvitationRepository } = await import("@ipms/infrastructure");
   assetRepo = createInMemoryAssetRepository();
   deadlineRepo = createInMemoryDeadlineRepository();
   documentRepo = createInMemoryDocumentRepository();
@@ -31,9 +37,12 @@ if (env.DATABASE_URL) {
   userRepo = createInMemoryUserRepository();
   orgRepo = createInMemoryOrganizationRepository();
   memberRepo = createInMemoryMembershipRepository();
+  auditEventRepo = createInMemoryAuditEventRepository();
+  notificationRepo = createInMemoryNotificationRepository();
+  invitationRepo = createInMemoryInvitationRepository();
 
   const { seedData } = await import("./seed.js");
   seedData();
 }
 
-export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo };
+export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo };

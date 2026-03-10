@@ -4,8 +4,8 @@ import MicrosoftEntraId from "@auth/sveltekit/providers/microsoft-entra-id";
 import { env } from "$env/dynamic/private";
 
 export const { handle, signIn, signOut } = SvelteKitAuth(async () => {
-  const { signInOrRegister, listUserOrganizations } = await import("$lib/server/use-cases");
-  const { userRepo } = await import("$lib/server/repositories");
+  const { signInOrRegister, listUserOrganizations, acceptPendingInvitations } = await import("$lib/server/use-cases");
+  const { userRepo, memberRepo } = await import("$lib/server/repositories");
 
   return {
     providers: [
@@ -30,6 +30,10 @@ export const { handle, signIn, signOut } = SvelteKitAuth(async () => {
           avatarUrl: user.image ?? null,
         });
 
+        if (result.ok) {
+          await acceptPendingInvitations(user.email, result.value.id);
+        }
+
         return result.ok;
       },
       async session({ session }) {
@@ -42,6 +46,11 @@ export const { handle, signIn, signOut } = SvelteKitAuth(async () => {
           const orgsResult = await listUserOrganizations(domainUser.id);
           if (orgsResult.ok && orgsResult.value.length > 0) {
             (session as any).activeOrganizationId = orgsResult.value[0].id;
+
+            const membership = await memberRepo.findByUserAndOrg(domainUser.id, orgsResult.value[0].id);
+            if (membership) {
+              (session as any).role = membership.role;
+            }
           }
         }
 
