@@ -1,8 +1,11 @@
 import type {
   AssetId,
+  AuditEventId,
   DeadlineId,
   DocumentId,
+  InvitationId,
   MembershipId,
+  NotificationId,
   PortfolioId,
   StatusChangeEventId,
   OrganizationId,
@@ -100,4 +103,60 @@ export interface Membership {
   readonly organizationId: OrganizationId;
   readonly role: MemberRole;
   readonly joinedAt: Date;
+}
+
+export const AUDIT_ACTIONS = [
+  "asset:create", "asset:update-status", "asset:delete",
+  "deadline:create", "deadline:complete",
+  "document:create", "document:update-status", "document:delete",
+  "portfolio:create", "portfolio:add-asset", "portfolio:remove-asset", "portfolio:delete",
+  "membership:invite", "membership:change-role", "membership:remove",
+] as const;
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+
+export const ENTITY_TYPES = ["asset", "deadline", "document", "portfolio", "membership"] as const;
+export type EntityType = (typeof ENTITY_TYPES)[number];
+
+export interface AuditEvent {
+  readonly id: AuditEventId;
+  readonly organizationId: OrganizationId;
+  readonly actorId: UserId;
+  readonly action: AuditAction;
+  readonly entityType: EntityType;
+  readonly entityId: string;
+  readonly metadata: Record<string, string> | null;
+  readonly timestamp: Date;
+}
+
+export const NOTIFICATION_TYPES = [
+  "deadline:upcoming", "deadline:overdue",
+  "document:review", "document:approved", "document:rejected",
+] as const;
+export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
+
+export interface Notification {
+  readonly id: NotificationId;
+  readonly organizationId: OrganizationId;
+  readonly recipientId: UserId;
+  readonly type: NotificationType;
+  readonly title: string;
+  readonly message: string;
+  readonly entityType: EntityType;
+  readonly entityId: string;
+  readonly read: boolean;
+  readonly createdAt: Date;
+}
+
+export const INVITATION_STATUSES = ["pending", "accepted", "expired"] as const;
+export type InvitationStatus = (typeof INVITATION_STATUSES)[number];
+
+export interface Invitation {
+  readonly id: InvitationId;
+  readonly organizationId: OrganizationId;
+  readonly invitedByUserId: UserId;
+  readonly email: string;
+  readonly role: MemberRole;
+  readonly status: InvitationStatus;
+  readonly createdAt: Date;
+  readonly expiresAt: Date;
 }

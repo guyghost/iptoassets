@@ -1,4 +1,6 @@
 export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, BulkOperationResult, User, Organization, Membership, MemberRole } from "./entities.js";
+export type { AuditEvent, AuditAction, EntityType, Notification, NotificationType, Invitation, InvitationStatus } from "./entities.js";
+export { AUDIT_ACTIONS, ENTITY_TYPES, NOTIFICATION_TYPES, INVITATION_STATUSES } from "./entities.js";
 
 export { createAsset, updateAssetStatus, validateStatusTransition, filterAssets, bulkValidateStatusTransition } from "./asset.js";
 export type { CreateAssetInput, AssetFilter } from "./asset.js";
@@ -39,3 +41,12 @@ export type { CreateMembershipInput } from "./membership.js";
 export { hasPermission, ROLE_HIERARCHY, PERMISSION_ACTIONS } from "./rbac.js";
 export type { PermissionAction } from "./rbac.js";
 export { MEMBER_ROLES } from "./entities.js";
+
+export { createAuditEvent } from "./audit-event.js";
+export type { CreateAuditEventInput } from "./audit-event.js";
+
+export { createNotification, markNotificationRead } from "./notification.js";
+export type { CreateNotificationInput } from "./notification.js";
+
+export { createInvitation, acceptInvitation } from "./invitation.js";
+export type { CreateInvitationInput } from "./invitation.js";
