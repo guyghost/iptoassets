@@ -1,10 +1,14 @@
 import type { RequestHandler } from "./$types";
 import { exportAssetsCSV } from "$lib/server/use-cases";
-import { DEFAULT_ORG_ID } from "$lib/server/api-utils";
+import { requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
 import type { AssetFilter } from "@ipms/domain";
 import type { AssetStatus, IPType } from "@ipms/shared";
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const { url } = event;
   const status = url.searchParams.getAll("status");
   const type = url.searchParams.getAll("type");
   const jurisdiction = url.searchParams.get("jurisdiction");
@@ -17,7 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
     ...(owner ? { owner } : {}),
   };
 
-  const result = await exportAssetsCSV(DEFAULT_ORG_ID, assetFilter);
+  const result = await exportAssetsCSV(auth.value.organizationId, assetFilter);
   if (!result.ok) return new Response(result.error, { status: 400 });
 
   return new Response(result.value, {

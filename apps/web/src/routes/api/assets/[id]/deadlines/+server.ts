@@ -1,18 +1,26 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { listDeadlinesByAsset, createDeadline } from "$lib/server/use-cases";
-import { resultToResponse, DEFAULT_ORG_ID } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
 import { parseAssetId, parseDeadlineId } from "@ipms/shared";
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const { params } = event;
   const idResult = parseAssetId(params.id);
   if (!idResult.ok) return json({ error: idResult.error }, { status: 400 });
 
-  const result = await listDeadlinesByAsset(idResult.value, DEFAULT_ORG_ID);
+  const result = await listDeadlinesByAsset(idResult.value, auth.value.organizationId);
   return resultToResponse(result);
 };
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const { params, request } = event;
   const assetIdResult = parseAssetId(params.id);
   if (!assetIdResult.ok) return json({ error: assetIdResult.error }, { status: 400 });
 
@@ -26,7 +34,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     type: body.type,
     title: body.title,
     dueDate: new Date(body.dueDate),
-    organizationId: DEFAULT_ORG_ID,
+    organizationId: auth.value.organizationId,
   });
 
   return resultToResponse(result, 201);

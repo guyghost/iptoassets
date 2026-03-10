@@ -1,15 +1,22 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { listPortfolios, createPortfolio } from "$lib/server/use-cases";
-import { resultToResponse, DEFAULT_ORG_ID } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
 import { parsePortfolioId } from "@ipms/shared";
 
-export const GET: RequestHandler = async () => {
-  const result = await listPortfolios(DEFAULT_ORG_ID);
+export const GET: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const result = await listPortfolios(auth.value.organizationId);
   return resultToResponse(result);
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const { request } = event;
   const body = await request.json();
 
   const idResult = parsePortfolioId(body.id);
@@ -20,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
     name: body.name,
     description: body.description ?? "",
     owner: body.owner,
-    organizationId: DEFAULT_ORG_ID,
+    organizationId: auth.value.organizationId,
   });
 
   return resultToResponse(result, 201);

@@ -1,15 +1,22 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { listAssets, createAsset } from "$lib/server/use-cases";
-import { resultToResponse, DEFAULT_ORG_ID } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
 import { parseAssetId } from "@ipms/shared";
 
-export const GET: RequestHandler = async () => {
-  const result = await listAssets(DEFAULT_ORG_ID);
+export const GET: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const result = await listAssets(auth.value.organizationId);
   return resultToResponse(result);
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  const auth = await requireAuth(event);
+  if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const { request } = event;
   const body = await request.json();
 
   const idResult = parseAssetId(body.id);
@@ -21,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
     type: body.type,
     jurisdiction: body.jurisdiction,
     owner: body.owner,
-    organizationId: DEFAULT_ORG_ID,
+    organizationId: auth.value.organizationId,
   });
 
   return resultToResponse(result, 201);
