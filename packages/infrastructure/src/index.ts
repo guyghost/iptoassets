@@ -6,3 +6,6 @@ export { createInMemoryStatusChangeEventRepository } from "./in-memory-status-ch
 export { createInMemoryUserRepository } from "./in-memory-user-repository.js";
 export { createInMemoryOrganizationRepository } from "./in-memory-organization-repository.js";
 export { createInMemoryMembershipRepository } from "./in-memory-membership-repository.js";
+export { createInMemoryAuditEventRepository } from "./in-memory-audit-event-repository.js";
+export { createInMemoryNotificationRepository } from "./in-memory-notification-repository.js";
+export { createInMemoryInvitationRepository } from "./in-memory-invitation-repository.js";
