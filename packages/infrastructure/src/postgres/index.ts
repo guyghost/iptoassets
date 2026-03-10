@@ -8,3 +8,6 @@ export { createPgStatusChangeEventRepository } from "./pg-status-change-event-re
 export { createPgUserRepository } from "./pg-user-repository.js";
 export { createPgOrganizationRepository } from "./pg-organization-repository.js";
 export { createPgMembershipRepository } from "./pg-membership-repository.js";
+export { createPgAuditEventRepository } from "./pg-audit-event-repository.js";
+export { createPgNotificationRepository } from "./pg-notification-repository.js";
+export { createPgInvitationRepository } from "./pg-invitation-repository.js";

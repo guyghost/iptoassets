@@ -104,3 +104,47 @@ export const memberships = pgTable("memberships", {
   index("memberships_user_id_idx").on(table.userId),
   index("memberships_organization_id_idx").on(table.organizationId),
 ]);
+
+export const auditEvents = pgTable("audit_events", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull(),
+  actorId: uuid("actor_id").notNull().references(() => users.id),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id").notNull(),
+  metadata: text("metadata"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+}, (table) => [
+  index("audit_events_organization_id_idx").on(table.organizationId),
+  index("audit_events_entity_type_idx").on(table.organizationId, table.entityType),
+  index("audit_events_actor_id_idx").on(table.actorId),
+]);
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull(),
+  recipientId: uuid("recipient_id").notNull().references(() => users.id),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id").notNull(),
+  read: boolean("read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("notifications_recipient_id_idx").on(table.recipientId, table.organizationId),
+]);
+
+export const invitations = pgTable("invitations", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  invitedByUserId: uuid("invited_by_user_id").notNull().references(() => users.id),
+  email: text("email").notNull(),
+  role: text("role").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+}, (table) => [
+  index("invitations_email_idx").on(table.email),
+  index("invitations_organization_id_idx").on(table.organizationId),
+]);

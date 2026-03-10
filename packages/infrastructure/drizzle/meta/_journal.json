@@ -15,6 +15,13 @@
       "when": 1773133069067,
       "tag": "0001_purple_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773136070911,
+      "tag": "0002_fluffy_nightshade",
+      "breakpoints": true
     }
   ]
 }
