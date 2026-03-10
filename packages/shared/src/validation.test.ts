@@ -7,6 +7,9 @@ import {
   parseOrganizationId,
   parseUserId,
   parseMembershipId,
+  parseAuditEventId,
+  parseNotificationId,
+  parseInvitationId,
 } from "./validation.js";
 
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -71,5 +74,38 @@ describe("parseMembershipId", () => {
   it("rejects invalid UUID", () => {
     const result = parseMembershipId("not-a-uuid");
     expect(result).toEqual({ ok: false, error: "Invalid MembershipId: must be UUID format" });
+  });
+});
+
+describe("parseAuditEventId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseAuditEventId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseAuditEventId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid AuditEventId: must be UUID format" });
+  });
+});
+
+describe("parseNotificationId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseNotificationId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseNotificationId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid NotificationId: must be UUID format" });
+  });
+});
+
+describe("parseInvitationId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseInvitationId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseInvitationId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid InvitationId: must be UUID format" });
   });
 });

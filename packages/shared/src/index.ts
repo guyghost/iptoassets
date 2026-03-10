@@ -7,6 +7,9 @@ export type {
   OrganizationId,
   StatusChangeEventId,
   UserId,
+  AuditEventId,
+  NotificationId,
+  InvitationId,
 } from "./brand.js";
 
 export {
@@ -37,4 +40,7 @@ export {
   parseOrganizationId,
   parseStatusChangeEventId,
   parseUserId,
+  parseAuditEventId,
+  parseNotificationId,
+  parseInvitationId,
 } from "./validation.js";

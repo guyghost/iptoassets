@@ -1,8 +1,11 @@
 import type {
   AssetId,
+  AuditEventId,
   DeadlineId,
   DocumentId,
+  InvitationId,
   MembershipId,
+  NotificationId,
   OrganizationId,
   PortfolioId,
   StatusChangeEventId,
@@ -59,4 +62,22 @@ export function parseMembershipId(input: string): Result<MembershipId> {
   return UUID_RE.test(input)
     ? ok(input as MembershipId)
     : err("Invalid MembershipId: must be UUID format");
+}
+
+export function parseAuditEventId(input: string): Result<AuditEventId> {
+  return UUID_RE.test(input)
+    ? ok(input as AuditEventId)
+    : err("Invalid AuditEventId: must be UUID format");
+}
+
+export function parseNotificationId(input: string): Result<NotificationId> {
+  return UUID_RE.test(input)
+    ? ok(input as NotificationId)
+    : err("Invalid NotificationId: must be UUID format");
+}
+
+export function parseInvitationId(input: string): Result<InvitationId> {
+  return UUID_RE.test(input)
+    ? ok(input as InvitationId)
+    : err("Invalid InvitationId: must be UUID format");
 }

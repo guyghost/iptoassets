@@ -10,3 +10,6 @@ export type OrganizationId = Brand<string, "OrganizationId">;
 export type StatusChangeEventId = Brand<string, "StatusChangeEventId">;
 export type UserId = Brand<string, "UserId">;
 export type MembershipId = Brand<string, "MembershipId">;
+export type AuditEventId = Brand<string, "AuditEventId">;
+export type NotificationId = Brand<string, "NotificationId">;
+export type InvitationId = Brand<string, "InvitationId">;
