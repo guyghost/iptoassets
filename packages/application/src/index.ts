@@ -62,3 +62,21 @@ export {
   listUserOrganizationsUseCase,
 } from "./use-cases/auth.js";
 export type { SignInInput, CreateOrgInput } from "./use-cases/auth.js";
+
+export { logAuditEventUseCase, listAuditEventsUseCase } from "./use-cases/audit.js";
+export type { LogAuditInput } from "./use-cases/audit.js";
+
+export {
+  listNotificationsUseCase,
+  markNotificationReadUseCase,
+  markAllNotificationsReadUseCase,
+  checkDeadlineNotificationsUseCase,
+} from "./use-cases/notification.js";
+
+export {
+  createInvitationUseCase,
+  listInvitationsUseCase,
+  deleteInvitationUseCase,
+  acceptPendingInvitationsUseCase,
+} from "./use-cases/invitation.js";
+export type { CreateInvitationUseCaseInput } from "./use-cases/invitation.js";
