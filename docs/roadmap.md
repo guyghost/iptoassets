@@ -37,12 +37,12 @@ Multi-user, multi-tenant platform.
 
 - [x] Authentication (OAuth 2.0 / OIDC)
 - [x] User management and profiles
-- [ ] Role-based access control (Admin, Manager, Attorney, Viewer)
+- [x] Role-based access control (Admin, Manager, Attorney, Viewer)
 - [x] Organization/tenant management
 - [x] Per-tenant data isolation at the database level
-- [ ] Audit logging (who changed what, when)
+- [x] Audit logging (who changed what, when)
 - [ ] Email notifications for deadlines and review requests
-- [ ] In-app notification center
+- [x] In-app notification center
 
 ## Phase 4: AI Intelligence
 
