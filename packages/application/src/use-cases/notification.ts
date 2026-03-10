@@ -1,8 +1,8 @@
 import type { NotificationId, OrganizationId, UserId, Result } from "@ipms/shared";
 import { ok, err } from "@ipms/shared";
-import type { Notification } from "@ipms/domain";
-import { createNotification, markNotificationRead } from "@ipms/domain";
-import type { NotificationRepository, MembershipRepository, DeadlineRepository } from "../ports.js";
+import type { Notification, DeadlineEmailData } from "@ipms/domain";
+import { createNotification, markNotificationRead, renderEmailTemplate } from "@ipms/domain";
+import type { NotificationRepository, MembershipRepository, DeadlineRepository, EmailService, UserRepository } from "../ports.js";
 
 export function listNotificationsUseCase(repo: NotificationRepository) {
   return async (recipientId: UserId, orgId: OrganizationId): Promise<Result<readonly Notification[]>> => {
@@ -32,6 +32,8 @@ export function checkDeadlineNotificationsUseCase(
   deadlineRepo: DeadlineRepository,
   notificationRepo: NotificationRepository,
   memberRepo: MembershipRepository,
+  emailService: EmailService,
+  userRepo: UserRepository,
 ) {
   return async (orgId: OrganizationId): Promise<Result<number>> => {
     const deadlines = await deadlineRepo.findAll(orgId);
@@ -65,6 +67,20 @@ export function checkDeadlineNotificationsUseCase(
         if (result.ok) {
           await notificationRepo.save(result.value);
           count++;
+          try {
+            const user = await userRepo.findById(member.userId);
+            if (user) {
+              const email = renderEmailTemplate(type, {
+                title: deadline.title,
+                dueDate: deadline.dueDate.toISOString().split("T")[0],
+                assetTitle: deadline.assetId,
+                appUrl: "",
+              } as DeadlineEmailData);
+              await emailService.send(user.email, email.subject, email.html);
+            }
+          } catch {
+            // Email failure is non-blocking
+          }
         }
       }
     }
