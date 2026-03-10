@@ -1,12 +1,15 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { getAsset, updateAssetStatus, deleteAsset } from "$lib/server/use-cases";
-import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import { parseAssetId } from "@ipms/shared";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "asset:read");
+  if (forbidden) return forbidden;
 
   const { params } = event;
   const idResult = parseAssetId(params.id);
@@ -21,6 +24,9 @@ export const PUT: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
 
+  const forbidden = requirePermission(auth.value, "asset:update-status");
+  if (forbidden) return forbidden;
+
   const { params, request } = event;
   const idResult = parseAssetId(params.id);
   if (!idResult.ok) return json({ error: idResult.error }, { status: 400 });
@@ -33,6 +39,9 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "asset:delete");
+  if (forbidden) return forbidden;
 
   const { params } = event;
   const idResult = parseAssetId(params.id);

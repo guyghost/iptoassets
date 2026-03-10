@@ -1,12 +1,15 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { listPortfolios, createPortfolio } from "$lib/server/use-cases";
-import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import { parsePortfolioId } from "@ipms/shared";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "portfolio:read");
+  if (forbidden) return forbidden;
 
   const result = await listPortfolios(auth.value.organizationId);
   return resultToResponse(result);
@@ -15,6 +18,9 @@ export const GET: RequestHandler = async (event) => {
 export const POST: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "portfolio:create");
+  if (forbidden) return forbidden;
 
   const { request } = event;
   const body = await request.json();

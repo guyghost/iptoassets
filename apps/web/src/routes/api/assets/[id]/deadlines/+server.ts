@@ -1,12 +1,15 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { listDeadlinesByAsset, createDeadline } from "$lib/server/use-cases";
-import { resultToResponse, requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
+import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import { parseAssetId, parseDeadlineId } from "@ipms/shared";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "deadline:read");
+  if (forbidden) return forbidden;
 
   const { params } = event;
   const idResult = parseAssetId(params.id);
@@ -19,6 +22,9 @@ export const GET: RequestHandler = async (event) => {
 export const POST: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "deadline:create");
+  if (forbidden) return forbidden;
 
   const { params, request } = event;
   const assetIdResult = parseAssetId(params.id);

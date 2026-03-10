@@ -1,12 +1,15 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { bulkUpdateAssetStatus } from "$lib/server/use-cases";
-import { requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
+import { requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import type { AssetId } from "@ipms/shared";
 
 export const PUT: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "bulk:operate");
+  if (forbidden) return forbidden;
 
   const { request } = event;
   const body = await request.json();

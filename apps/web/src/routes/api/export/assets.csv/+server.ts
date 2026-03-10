@@ -1,12 +1,15 @@
 import type { RequestHandler } from "./$types";
 import { exportAssetsCSV } from "$lib/server/use-cases";
-import { requireAuth, unauthorizedResponse } from "$lib/server/api-utils";
+import { requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import type { AssetFilter } from "@ipms/domain";
 import type { AssetStatus, IPType } from "@ipms/shared";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
   if (!auth.ok) return unauthorizedResponse(auth.error);
+
+  const forbidden = requirePermission(auth.value, "export:csv");
+  if (forbidden) return forbidden;
 
   const { url } = event;
   const status = url.searchParams.getAll("status");
