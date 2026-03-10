@@ -9,3 +9,5 @@ export { createInMemoryMembershipRepository } from "./in-memory-membership-repos
 export { createInMemoryAuditEventRepository } from "./in-memory-audit-event-repository.js";
 export { createInMemoryNotificationRepository } from "./in-memory-notification-repository.js";
 export { createInMemoryInvitationRepository } from "./in-memory-invitation-repository.js";
+export { createNoOpEmailService } from "./noop-email-service.js";
+export { createResendEmailService } from "./resend-email-service.js";

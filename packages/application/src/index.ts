@@ -10,6 +10,7 @@ export type {
   AuditEventRepository,
   NotificationRepository,
   InvitationRepository,
+  EmailService,
 } from "./ports.js";
 
 export {
