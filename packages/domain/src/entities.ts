@@ -2,9 +2,11 @@ import type {
   AssetId,
   DeadlineId,
   DocumentId,
+  MembershipId,
   PortfolioId,
   StatusChangeEventId,
   OrganizationId,
+  UserId,
   IPType,
   AssetStatus,
   DeadlineType,
@@ -71,4 +73,30 @@ export interface BulkOperationResult {
   readonly succeeded: number;
   readonly failed: number;
   readonly errors: readonly { readonly id: string; readonly reason: string }[];
+}
+
+export type MemberRole = "owner" | "member";
+
+export interface User {
+  readonly id: UserId;
+  readonly email: string;
+  readonly name: string;
+  readonly avatarUrl: string | null;
+  readonly authProviderId: string;
+  readonly createdAt: Date;
+}
+
+export interface Organization {
+  readonly id: OrganizationId;
+  readonly name: string;
+  readonly ownerId: UserId;
+  readonly createdAt: Date;
+}
+
+export interface Membership {
+  readonly id: MembershipId;
+  readonly userId: UserId;
+  readonly organizationId: OrganizationId;
+  readonly role: MemberRole;
+  readonly joinedAt: Date;
 }
