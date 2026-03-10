@@ -1,8 +1,8 @@
 import type { InvitationId, OrganizationId, UserId, MembershipId, Result } from "@ipms/shared";
 import { ok, err } from "@ipms/shared";
-import type { Invitation, MemberRole } from "@ipms/domain";
-import { createInvitation, acceptInvitation, createMembership } from "@ipms/domain";
-import type { InvitationRepository, MembershipRepository } from "../ports.js";
+import type { Invitation, MemberRole, InvitationEmailData } from "@ipms/domain";
+import { createInvitation, acceptInvitation, createMembership, renderEmailTemplate } from "@ipms/domain";
+import type { InvitationRepository, MembershipRepository, EmailService, OrganizationRepository, UserRepository } from "../ports.js";
 
 export interface CreateInvitationUseCaseInput {
   readonly organizationId: OrganizationId;
@@ -11,7 +11,12 @@ export interface CreateInvitationUseCaseInput {
   readonly role: MemberRole;
 }
 
-export function createInvitationUseCase(repo: InvitationRepository) {
+export function createInvitationUseCase(
+  repo: InvitationRepository,
+  emailService: EmailService,
+  orgRepo: OrganizationRepository,
+  userRepo: UserRepository,
+) {
   return async (input: CreateInvitationUseCaseInput): Promise<Result<Invitation>> => {
     const result = createInvitation({
       id: crypto.randomUUID() as InvitationId,
@@ -22,6 +27,24 @@ export function createInvitationUseCase(repo: InvitationRepository) {
     });
     if (!result.ok) return result;
     await repo.save(result.value);
+
+    // Send invitation email (best-effort)
+    try {
+      const org = await orgRepo.findById(input.organizationId);
+      const inviter = await userRepo.findById(input.invitedByUserId);
+      if (org && inviter) {
+        const email = renderEmailTemplate("invitation", {
+          organizationName: org.name,
+          role: input.role,
+          invitedByName: inviter.name,
+          appUrl: "",
+        } as InvitationEmailData);
+        await emailService.send(input.email, email.subject, email.html);
+      }
+    } catch {
+      // Email failure is non-blocking
+    }
+
     return result;
   };
 }
