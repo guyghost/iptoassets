@@ -45,6 +45,7 @@ export interface UserRepository {
 }
 
 export interface OrganizationRepository {
+  findAll(): Promise<readonly Organization[]>;
   findById(id: OrganizationId): Promise<Organization | null>;
   findByOwnerId(ownerId: UserId): Promise<readonly Organization[]>;
   save(org: Organization): Promise<void>;
@@ -75,4 +76,8 @@ export interface InvitationRepository {
   findByOrganizationId(orgId: OrganizationId): Promise<readonly Invitation[]>;
   save(invitation: Invitation): Promise<void>;
   delete(id: InvitationId, orgId: OrganizationId): Promise<boolean>;
+}
+
+export interface EmailService {
+  send(to: string, subject: string, html: string): Promise<void>;
 }

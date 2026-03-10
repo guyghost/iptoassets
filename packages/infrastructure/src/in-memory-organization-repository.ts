@@ -5,6 +5,10 @@ export function createInMemoryOrganizationRepository(): OrganizationRepository {
   const store = new Map<string, Organization>();
 
   return {
+    async findAll() {
+      return [...store.values()];
+    },
+
     async findById(id) {
       return store.get(id) ?? null;
     },

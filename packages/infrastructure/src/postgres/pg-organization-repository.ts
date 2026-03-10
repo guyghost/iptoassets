@@ -18,6 +18,10 @@ function toEntity(row: OrgRow): Organization {
 
 export function createPgOrganizationRepository(db: Database): OrganizationRepository {
   return {
+    async findAll() {
+      const rows = await db.select().from(organizations);
+      return rows.map(toEntity);
+    },
     async findById(id) {
       const rows = await db.select().from(organizations).where(eq(organizations.id, id));
       return rows[0] ? toEntity(rows[0]) : null;
