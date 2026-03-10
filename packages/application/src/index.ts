@@ -52,3 +52,10 @@ export {
 } from "./use-cases/bulk.js";
 
 export { exportAssetsCSVUseCase } from "./use-cases/export.js";
+
+export {
+  signInOrRegisterUseCase,
+  createOrganizationUseCase,
+  listUserOrganizationsUseCase,
+} from "./use-cases/auth.js";
+export type { SignInInput, CreateOrgInput } from "./use-cases/auth.js";
