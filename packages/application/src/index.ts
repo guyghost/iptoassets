@@ -4,6 +4,9 @@ export type {
   DocumentRepository,
   PortfolioRepository,
   StatusChangeEventRepository,
+  UserRepository,
+  OrganizationRepository,
+  MembershipRepository,
 } from "./ports.js";
 
 export {
