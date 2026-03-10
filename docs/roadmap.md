@@ -41,7 +41,7 @@ Multi-user, multi-tenant platform.
 - [x] Organization/tenant management
 - [x] Per-tenant data isolation at the database level
 - [x] Audit logging (who changed what, when)
-- [ ] Email notifications for deadlines and review requests
+- [x] Email notifications for deadlines and review requests
 - [x] In-app notification center
 
 ## Phase 4: AI Intelligence
