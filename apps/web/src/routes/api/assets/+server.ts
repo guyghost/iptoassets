@@ -3,6 +3,8 @@ import type { RequestHandler } from "./$types";
 import { listAssets, createAsset } from "$lib/server/use-cases";
 import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
 import { parseAssetId } from "@ipms/shared";
+import type { AssetStatus } from "@ipms/shared";
+import { assetRepo } from "$lib/server/repositories";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
@@ -38,5 +40,19 @@ export const POST: RequestHandler = async (event) => {
     metadata: body.metadata ?? null,
   });
 
-  return resultToResponse(result, 201);
+  if (!result.ok) return resultToResponse(result, 201);
+
+  // Apply optional import overrides (filing date, expiration date, status)
+  let asset = result.value;
+  if (body.filingDate || body.expirationDate || body.status) {
+    asset = {
+      ...asset,
+      ...(body.filingDate ? { filingDate: new Date(body.filingDate) } : {}),
+      ...(body.expirationDate ? { expirationDate: new Date(body.expirationDate) } : {}),
+      ...(body.status ? { status: body.status as AssetStatus } : {}),
+    };
+    await assetRepo.save(asset);
+  }
+
+  return json(asset, { status: 201 });
 };

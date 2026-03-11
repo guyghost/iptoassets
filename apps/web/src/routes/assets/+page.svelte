@@ -162,9 +162,10 @@
           if (val) metadata[key] = val;
         }
 
-        // Parse filing date from application data
-        const appDateMatch = String(row["Application data including date"] ?? "").match(/(\d{4}-\d{2}-\d{2})/);
-        const filingDate = appDateMatch ? appDateMatch[1] : null;
+        // Parse filing date from earliest priority date
+        const priorityDateRaw = String(row["Earliest priority date"] ?? "").trim();
+        const priorityMatch = priorityDateRaw.match(/(\d{4}-\d{2}-\d{2})/);
+        const filingDate = priorityMatch ? priorityMatch[1] : null;
 
         // Parse expiry date
         const expiryRaw = String(row["Expected expiry dates"] ?? "").trim();
@@ -183,7 +184,6 @@
         } else if (/Legal state=ALIVE/i.test(legalActions)) {
           status = "filed";
         }
-        metadata.derivedStatus = status;
 
         const res = await fetch("/api/assets", {
           method: "POST",
@@ -195,6 +195,9 @@
             jurisdiction,
             owner,
             metadata,
+            filingDate,
+            expirationDate,
+            status,
           }),
         });
         if (res.ok) succeeded++;
