@@ -60,6 +60,8 @@ export {
 
 export { exportAssetsCSVUseCase } from "./use-cases/export.js";
 
+export { computeDeadlineRiskUseCase } from "./use-cases/deadline-risk.js";
+
 export { classifyDocumentUseCase } from "./use-cases/classify.js";
 
 export { analyzeClaimsUseCase, assessPatentabilityUseCase } from "./use-cases/patent-analysis.js";

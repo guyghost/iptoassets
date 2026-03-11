@@ -42,6 +42,7 @@ import {
   classifyDocumentUseCase,
   analyzeClaimsUseCase,
   assessPatentabilityUseCase,
+  computeDeadlineRiskUseCase,
 } from "@ipms/application";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo } from "./repositories.js";
 
@@ -99,3 +100,5 @@ export const searchAssets = searchAssetsUseCase(assetRepo, assetEmbeddingRepo, e
 export const classifyDocument = classifyDocumentUseCase(documentRepo, assetRepo, aiService);
 export const analyzeClaims = analyzeClaimsUseCase(assetRepo, aiService);
 export const assessPatentability = assessPatentabilityUseCase(assetRepo, aiService);
+
+export const computeDeadlineRisk = computeDeadlineRiskUseCase(deadlineRepo);
