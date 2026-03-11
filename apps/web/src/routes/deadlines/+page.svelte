@@ -140,6 +140,7 @@
             {#each groupedOverdue as deadline}
               <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-red-400 pl-4 {deadline.completed ? 'opacity-50' : ''}">
                 <button
+                  aria-label="Toggle complete"
                   class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
                   onclick={() => toggleComplete(deadline.id)}
                 >
@@ -180,6 +181,7 @@
             {#each groupedWeek as deadline}
               <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-amber-400 pl-4 {deadline.completed ? 'opacity-50' : ''}">
                 <button
+                  aria-label="Toggle complete"
                   class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
                   onclick={() => toggleComplete(deadline.id)}
                 >
@@ -220,6 +222,7 @@
             {#each groupedUpcoming as deadline}
               <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {deadline.completed ? 'opacity-50' : ''}">
                 <button
+                  aria-label="Toggle complete"
                   class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
                   onclick={() => toggleComplete(deadline.id)}
                 >
@@ -260,6 +263,7 @@
             {#each groupedCompleted as deadline}
               <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 opacity-50">
                 <button
+                  aria-label="Toggle complete"
                   class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 border-emerald-500 bg-emerald-500 transition-colors"
                   onclick={() => toggleComplete(deadline.id)}
                 >
@@ -312,6 +316,7 @@
               {@const dateColor = deadline.completed ? 'text-[var(--color-neutral-400)]' : days < 0 ? 'text-red-600' : days <= 6 ? 'text-amber-600' : 'text-[var(--color-neutral-500)]'}
               <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {borderColor} {deadline.completed ? 'opacity-50' : ''}">
                 <button
+                  aria-label="Toggle complete"
                   class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
                   onclick={() => toggleComplete(deadline.id)}
                 >
