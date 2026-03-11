@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { analyzeClaimsUseCase } from "@ipms/application";
+import { analyzeClaimsUseCase, assessPatentabilityUseCase } from "@ipms/application";
 import { createInMemoryAssetRepository } from "./in-memory-asset-repository.js";
 import type { AssetId, OrganizationId } from "@ipms/shared";
 import type { IPAsset } from "@ipms/domain";
@@ -86,6 +86,74 @@ describe("analyzeClaimsUseCase", () => {
 
     const analyze = analyzeClaimsUseCase(assetRepo, aiService);
     const result = await analyze(ASSET_ID, ORG_ID, "claims text");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("AI service unavailable");
+  });
+});
+
+describe("assessPatentabilityUseCase", () => {
+  it("assesses patentability and returns structured result", async () => {
+    const assetRepo = createInMemoryAssetRepository();
+    await assetRepo.save(ASSET);
+
+    const aiService = {
+      async complete() {
+        return JSON.stringify({
+          overallScore: 8,
+          novelty: { score: 9, reasoning: "Highly novel approach" },
+          nonObviousness: { score: 7, reasoning: "Some prior art exists" },
+          utility: { score: 8, reasoning: "Clear practical application" },
+          risks: ["Similar prior art in adjacent field"],
+          recommendations: ["Conduct prior art search"],
+        });
+      },
+    };
+
+    const assess = assessPatentabilityUseCase(assetRepo, aiService);
+    const result = await assess(ASSET_ID, ORG_ID, "This invention relates to...");
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.overallScore).toBe(8);
+      expect(result.value.novelty.score).toBe(9);
+      expect(result.value.nonObviousness.reasoning).toBe("Some prior art exists");
+      expect(result.value.risks).toEqual(["Similar prior art in adjacent field"]);
+    }
+  });
+
+  it("returns error for non-existent asset", async () => {
+    const assetRepo = createInMemoryAssetRepository();
+    const aiService = { async complete() { return ""; } };
+
+    const assess = assessPatentabilityUseCase(assetRepo, aiService);
+    const result = await assess(ASSET_ID, ORG_ID, "disclosure text");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("Asset not found");
+  });
+
+  it("handles malformed AI response", async () => {
+    const assetRepo = createInMemoryAssetRepository();
+    await assetRepo.save(ASSET);
+
+    const aiService = { async complete() { return "invalid"; } };
+
+    const assess = assessPatentabilityUseCase(assetRepo, aiService);
+    const result = await assess(ASSET_ID, ORG_ID, "disclosure text");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("Failed to parse AI response");
+  });
+
+  it("handles AI service failure", async () => {
+    const assetRepo = createInMemoryAssetRepository();
+    await assetRepo.save(ASSET);
+
+    const aiService = { async complete() { throw new Error("API down"); } };
+
+    const assess = assessPatentabilityUseCase(assetRepo, aiService);
+    const result = await assess(ASSET_ID, ORG_ID, "disclosure text");
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBe("AI service unavailable");
