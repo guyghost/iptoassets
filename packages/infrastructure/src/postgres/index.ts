@@ -12,3 +12,4 @@ export { createPgAuditEventRepository } from "./pg-audit-event-repository.js";
 export { createPgNotificationRepository } from "./pg-notification-repository.js";
 export { createPgInvitationRepository } from "./pg-invitation-repository.js";
 export { createPgAssetEmbeddingRepository } from "./pg-asset-embedding-repository.js";
+export { createPgPriorArtResultRepository } from "./pg-prior-art-result-repository.js";

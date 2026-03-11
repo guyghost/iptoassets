@@ -164,3 +164,18 @@ export const assetEmbeddings = pgTable("asset_embeddings", {
 }, (table) => [
   index("asset_embeddings_organization_id_idx").on(table.organizationId),
 ]);
+
+export const priorArtResults = pgTable("prior_art_results", {
+  id: uuid("id").primaryKey(),
+  assetId: uuid("asset_id").notNull().references(() => assets.id),
+  organizationId: uuid("organization_id").notNull(),
+  patentNumber: text("patent_number").notNull(),
+  title: text("title").notNull(),
+  abstractText: text("abstract_text").notNull(),
+  relevanceScore: text("relevance_score").notNull(),
+  relevanceReasoning: text("relevance_reasoning").notNull(),
+  source: text("source").notNull().default("uspto"),
+  searchedAt: timestamp("searched_at").notNull().defaultNow(),
+}, (table) => [
+  index("prior_art_results_asset_id_idx").on(table.assetId, table.organizationId),
+]);
