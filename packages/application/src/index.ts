@@ -99,3 +99,5 @@ export {
   acceptPendingInvitationsUseCase,
 } from "./use-cases/invitation.js";
 export type { CreateInvitationUseCaseInput } from "./use-cases/invitation.js";
+
+export { searchPriorArtUseCase, listPriorArtUseCase } from "./use-cases/prior-art.js";
