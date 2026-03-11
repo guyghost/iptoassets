@@ -8,6 +8,7 @@
   import { ASSET_STATUSES, IP_TYPES } from "@ipms/shared";
   import { statusConfig, typeLabels, filters, formatDate } from "../../features/assets/helpers";
   import * as XLSX from "xlsx";
+  import { parseLegalActions } from "../../features/assets/parse-legal-actions";
 
   // --- State ---
   let assets = $state<IPAsset[]>([]);
@@ -160,6 +161,11 @@
         for (const [xlsx, key] of Object.entries(fieldMap)) {
           const val = String(row[xlsx] ?? "").trim();
           if (val) metadata[key] = val;
+        }
+
+        // Parse legal actions into structured data
+        if (metadata.legalActions) {
+          metadata.parsedLegalActions = parseLegalActions(String(metadata.legalActions));
         }
 
         // Parse filing date from earliest priority date

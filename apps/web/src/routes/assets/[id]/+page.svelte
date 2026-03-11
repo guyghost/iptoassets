@@ -3,6 +3,7 @@
   import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../features/assets/helpers";
   import { fetchAssetTimeline, type TimelineEvent } from "../../../features/timeline/data";
   import { formatTimelineEntry, formatTimelineDate } from "../../../features/timeline/helpers";
+  import LegalStatus from "../../../features/assets/LegalStatus.svelte";
 
   let assetId = $derived($page.params.id);
 
@@ -184,7 +185,7 @@
       {/if}
 
       <!-- Publication & Classification Details -->
-      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && v && String(v).trim())}
+      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && k !== "legalActions" && k !== "parsedLegalActions" && v && String(v).trim())}
       {#if detailed.length > 0}
         <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
           <div class="flex items-center gap-2.5">
@@ -214,6 +215,11 @@
           </div>
         </div>
       {/if}
+    {/if}
+
+    <!-- Legal Status (parsed from legal actions) -->
+    {#if asset.metadata?.legalActions || asset.metadata?.parsedLegalActions}
+      <LegalStatus metadata={asset.metadata} />
     {/if}
 
     <!-- Status Transitions -->
