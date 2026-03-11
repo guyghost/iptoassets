@@ -1,9 +1,10 @@
-import { createAsset, createDeadline, createDocument, createPortfolio, createStatusChangeEvent } from "@ipms/domain";
-import type { AssetId, DeadlineId, DocumentId, PortfolioId, StatusChangeEventId, AssetStatus } from "@ipms/shared";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo } from "./repositories.js";
+import { createAsset, createDeadline, createDocument, createPortfolio, createStatusChangeEvent, createUser, createOrganization, createMembership } from "@ipms/domain";
+import type { AssetId, DeadlineId, DocumentId, PortfolioId, StatusChangeEventId, AssetStatus, UserId, MembershipId } from "@ipms/shared";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo } from "./repositories.js";
 import type { OrganizationId } from "@ipms/shared";
 
 const SEED_ORG_ID = "00000000-0000-0000-0000-000000000001" as OrganizationId;
+const SEED_USER_ID = "00000000-0000-0000-0000-000000000099" as UserId;
 
 function uuid() {
   return crypto.randomUUID();
@@ -74,6 +75,31 @@ const statusTransitionPaths: Record<string, { statuses: AssetStatus[]; dates: Da
 
 export async function seedData() {
   const orgId = SEED_ORG_ID;
+
+  // --- Dev User + Organization ---
+  const userResult = createUser({
+    id: SEED_USER_ID,
+    email: "dev@ipms.local",
+    name: "Dev User",
+    avatarUrl: null,
+    authProviderId: "dev-login:dev@ipms.local",
+  });
+  if (userResult.ok) await userRepo.save(userResult.value);
+
+  const orgResult = createOrganization({
+    id: orgId,
+    name: "Dev Organization",
+    ownerId: SEED_USER_ID,
+  });
+  if (orgResult.ok) await orgRepo.save(orgResult.value);
+
+  const memberResult = createMembership({
+    id: uuid() as MembershipId,
+    userId: SEED_USER_ID,
+    organizationId: orgId,
+    role: "admin",
+  });
+  if (memberResult.ok) await memberRepo.save(memberResult.value);
 
   // --- Assets ---
   const assetInputs = [

@@ -5,6 +5,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 const protectRoutes: Handle = async ({ event, resolve }) => {
   if (
     event.url.pathname.startsWith("/auth") ||
+    event.url.pathname.startsWith("/login") ||
     event.url.pathname === "/" ||
     event.url.pathname.startsWith("/api/auth") ||
     event.url.pathname.startsWith("/api/cron")
@@ -14,7 +15,7 @@ const protectRoutes: Handle = async ({ event, resolve }) => {
 
   const session = await event.locals.auth();
   if (!session?.user) {
-    throw redirect(303, "/auth/signin");
+    throw redirect(303, "/login");
   }
 
   return resolve(event);
