@@ -184,8 +184,44 @@
         </div>
       {/if}
 
+      <!-- Publications table -->
+      {#if Array.isArray(asset.metadata.publications) && asset.metadata.publications.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
+              <svg class="h-4.5 w-4.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Publications</h2>
+            <span class="text-xs text-[var(--color-neutral-400)]">{asset.metadata.publications.length} members</span>
+          </div>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border-color)]">
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Country</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Publication Number</th>
+                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each asset.metadata.publications as pub}
+                  <tr class="border-b border-[var(--border-color)] last:border-0">
+                    <td class="py-2.5 pr-4">
+                      <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-bold text-[var(--color-neutral-600)]">{pub.country}</span>
+                    </td>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-[var(--color-neutral-700)]">{pub.number}</td>
+                    <td class="py-2.5 text-[var(--color-neutral-700)]">{pub.title}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {/if}
+
       <!-- Publication & Classification Details -->
-      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && k !== "legalActions" && k !== "parsedLegalActions" && v && String(v).trim())}
+      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && k !== "legalActions" && k !== "parsedLegalActions" && k !== "publications" && v && String(v).trim())}
       {#if detailed.length > 0}
         <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
           <div class="flex items-center gap-2.5">

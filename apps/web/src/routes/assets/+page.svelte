@@ -163,6 +163,25 @@
           if (val) metadata[key] = val;
         }
 
+        // Parse publications from English title field
+        const rawTitle = String(row["English title"] ?? "").trim();
+        if (rawTitle) {
+          // Format: "Title text (PATENT_NUMBER) Title text (PATENT_NUMBER) ... Title text"
+          // Split by patent numbers in parens, capturing the number
+          const pubRegex = /\(([A-Z]{2}[\w\/-]+)\)/g;
+          const publications: { number: string; country: string; title: string }[] = [];
+          let lastIdx = 0;
+          let match;
+          while ((match = pubRegex.exec(rawTitle)) !== null) {
+            const titleText = rawTitle.slice(lastIdx, match.index).replace(/^\)\s*/, "").trim();
+            const number = match[1];
+            const country = number.match(/^([A-Z]{2})/)?.[1] ?? "";
+            if (titleText) publications.push({ number, country, title: titleText });
+            lastIdx = match.index + match[0].length;
+          }
+          if (publications.length > 0) metadata.publications = publications;
+        }
+
         // Parse legal actions into structured data
         if (metadata.legalActions) {
           metadata.parsedLegalActions = parseLegalActions(String(metadata.legalActions));
