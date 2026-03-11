@@ -52,6 +52,6 @@ AI-powered features for IP professionals.
 - [ ] Patent claim analysis and strength scoring
 - [ ] Patentability assessment from invention disclosures
 - [ ] Deadline risk prediction (likelihood of missing based on workload)
-- [ ] Document classification and auto-tagging
-- [ ] Natural language search across portfolio
+- [x] Document classification and auto-tagging
+- [x] Natural language search across portfolio
 - [ ] Integration with patent office APIs (USPTO, EPO, WIPO)
