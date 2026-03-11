@@ -8,12 +8,14 @@
     "./postgres": "./src/postgres/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@ipms/application": "workspace:*",
     "@ipms/domain": "workspace:*",
     "@ipms/shared": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "pg": "^8.20.0",
-    "resend": "^6.9.3"
+    "resend": "^6.9.3",
+    "voyageai": "^0.2.1"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

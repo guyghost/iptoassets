@@ -11,3 +11,8 @@ export { createInMemoryNotificationRepository } from "./in-memory-notification-r
 export { createInMemoryInvitationRepository } from "./in-memory-invitation-repository.js";
 export { createNoOpEmailService } from "./noop-email-service.js";
 export { createResendEmailService } from "./resend-email-service.js";
+export { createNoOpAIService } from "./noop-ai-service.js";
+export { createNoOpEmbeddingService } from "./noop-embedding-service.js";
+export { createClaudeAIService } from "./claude-ai-service.js";
+export { createVoyageEmbeddingService } from "./voyage-embedding-service.js";
+export { createInMemoryAssetEmbeddingRepository } from "./in-memory-asset-embedding-repository.js";
