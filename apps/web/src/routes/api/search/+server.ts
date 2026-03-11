@@ -12,7 +12,8 @@ export const GET: RequestHandler = async (event) => {
   const query = event.url.searchParams.get("q") ?? "";
   if (!query.trim()) return resultToResponse({ ok: true, value: [] });
 
-  const limit = event.url.searchParams.has("limit") ? Number(event.url.searchParams.get("limit")) : 20;
+  const rawLimit = Number(event.url.searchParams.get("limit"));
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 20;
   const result = await searchAssets(auth.value.organizationId, query, limit);
   return resultToResponse(result);
 };

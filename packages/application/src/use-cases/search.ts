@@ -17,7 +17,12 @@ export function indexAssetEmbeddingUseCase(
     if (!asset) return err("Asset not found");
 
     const text = assetToText(asset);
-    const [embedding] = await embeddingService.embed([text]);
+    let embedding: number[];
+    try {
+      [embedding] = await embeddingService.embed([text]);
+    } catch {
+      return err("Embedding service unavailable");
+    }
     await embeddingRepo.save(assetId, orgId, embedding);
     return ok(true);
   };
@@ -33,7 +38,12 @@ export function reindexAllAssetsUseCase(
     if (assets.length === 0) return ok(0);
 
     const texts = assets.map(assetToText);
-    const embeddings = await embeddingService.embed(texts);
+    let embeddings: number[][];
+    try {
+      embeddings = await embeddingService.embed(texts);
+    } catch {
+      return err("Embedding service unavailable");
+    }
 
     for (let i = 0; i < assets.length; i++) {
       await embeddingRepo.save(assets[i].id, orgId, embeddings[i]);
@@ -49,7 +59,12 @@ export function searchAssetsUseCase(
   embeddingService: EmbeddingService,
 ) {
   return async (orgId: OrganizationId, query: string, limit = 20): Promise<Result<readonly IPAsset[]>> => {
-    const [queryEmbedding] = await embeddingService.embed([query]);
+    let queryEmbedding: number[];
+    try {
+      [queryEmbedding] = await embeddingService.embed([query]);
+    } catch {
+      return err("Embedding service unavailable");
+    }
     const assetIds = await embeddingRepo.searchByVector(orgId, queryEmbedding, limit);
 
     const assets: IPAsset[] = [];

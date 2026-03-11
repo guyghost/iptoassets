@@ -16,10 +16,15 @@ export function classifyDocumentUseCase(
     const asset = await assetRepo.findById(doc.assetId, orgId);
     const assetTitle = asset ? asset.title : "Unknown";
 
-    const response = await aiService.complete(
-      "You are an IP document classifier. Given a document name, type, and its associated patent/asset title, suggest 3-5 classification tags. Return ONLY a JSON array of lowercase strings, nothing else. Example: [\"patent\", \"claims\", \"draft\"]",
-      `Document name: "${doc.name}"\nDocument type: ${doc.type}\nAsset: "${assetTitle}"`,
-    );
+    let response: string;
+    try {
+      response = await aiService.complete(
+        "You are an IP document classifier. Given a document name, type, and its associated patent/asset title, suggest 3-5 classification tags. Return ONLY a JSON array of lowercase strings, nothing else. Example: [\"patent\", \"claims\", \"draft\"]",
+        `Document name: "${doc.name}"\nDocument type: ${doc.type}\nAsset: "${assetTitle}"`,
+      );
+    } catch {
+      return err("AI service unavailable");
+    }
 
     let tags: string[];
     try {
