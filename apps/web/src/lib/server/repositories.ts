@@ -51,7 +51,7 @@ if (env.DATABASE_URL) {
   }
 
   if (env.VOYAGE_API_KEY) {
-    const { createVoyageEmbeddingService } = await import("@ipms/infrastructure");
+    const { createVoyageEmbeddingService } = await import("@ipms/infrastructure/voyage");
     embeddingService = createVoyageEmbeddingService(env.VOYAGE_API_KEY);
   } else {
     const { createNoOpEmbeddingService } = await import("@ipms/infrastructure");

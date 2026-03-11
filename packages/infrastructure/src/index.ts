@@ -14,7 +14,7 @@ export { createResendEmailService } from "./resend-email-service.js";
 export { createNoOpAIService } from "./noop-ai-service.js";
 export { createNoOpEmbeddingService } from "./noop-embedding-service.js";
 export { createClaudeAIService } from "./claude-ai-service.js";
-export { createVoyageEmbeddingService } from "./voyage-embedding-service.js";
+
 export { createInMemoryAssetEmbeddingRepository } from "./in-memory-asset-embedding-repository.js";
 export { createNoOpPatentSearchService } from "./noop-patent-search-service.js";
 export { createUSPTOPatentSearchService } from "./uspto-patent-search-service.js";
