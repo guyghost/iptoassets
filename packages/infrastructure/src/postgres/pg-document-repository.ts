@@ -17,7 +17,7 @@ function toEntity(row: DocumentRow): Document {
     uploadedAt: row.uploadedAt,
     status: row.status as DocumentStatus,
     organizationId: row.organizationId as OrganizationId,
-    tags: (row as any).tags ?? [],
+    tags: row.tags ?? [],
   };
 }
 
@@ -52,7 +52,7 @@ export function createPgDocumentRepository(db: Database): DocumentRepository {
         status: doc.status,
         organizationId: doc.organizationId,
         tags: doc.tags,
-      } as any).onConflictDoUpdate({
+      }).onConflictDoUpdate({
         target: documents.id,
         set: {
           assetId: doc.assetId,
@@ -62,7 +62,7 @@ export function createPgDocumentRepository(db: Database): DocumentRepository {
           uploadedAt: doc.uploadedAt,
           status: doc.status,
           tags: doc.tags,
-        } as any,
+        },
       });
     },
 

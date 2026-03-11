@@ -1,4 +1,11 @@
-import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex, customType } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+
+const vector = customType<{ data: string }>({
+  dataType() {
+    return "vector(1024)";
+  },
+});
 
 export const assets = pgTable("assets", {
   id: uuid("id").primaryKey(),
@@ -39,6 +46,7 @@ export const documents = pgTable("documents", {
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
   status: text("status").notNull().default("uploaded"),
   organizationId: uuid("organization_id").notNull(),
+  tags: text("tags").array().notNull().default(sql`'{}'`),
 }, (table) => [
   index("documents_organization_id_idx").on(table.organizationId),
   index("documents_asset_id_idx").on(table.assetId),
@@ -147,4 +155,12 @@ export const invitations = pgTable("invitations", {
 }, (table) => [
   index("invitations_email_idx").on(table.email),
   index("invitations_organization_id_idx").on(table.organizationId),
+]);
+
+export const assetEmbeddings = pgTable("asset_embeddings", {
+  assetId: uuid("asset_id").primaryKey().references(() => assets.id),
+  organizationId: uuid("organization_id").notNull(),
+  embedding: vector("embedding").notNull(),
+}, (table) => [
+  index("asset_embeddings_organization_id_idx").on(table.organizationId),
 ]);
