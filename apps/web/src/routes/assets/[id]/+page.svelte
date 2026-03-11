@@ -52,13 +52,148 @@
 
   // Fields shown in prominent cards (top section)
   const prominentFields = new Set([
-    "fanId", "priorityNumber", "priorityDate", "grantDates",
-    "expectedExpiryDates", "inventors", "standardizedAssignees",
+    "fanId", "priorityNumber", "priorityDate", "inventors", "standardizedAssignees",
+  ]);
+
+  // Fields with dedicated display sections (excluded from Additional Details)
+  const dedicatedFields = new Set([
+    "derivedStatus", "legalActions", "parsedLegalActions", "publications",
+    "expiryDates", "grantDatesMap", "grantDates", "expectedExpiryDates",
+    "applicationData", "publicationDetails", "publicationNumbers",
+    "ipcClassification", "cpcClassification", "citingPatents",
   ]);
 
   function parseMultiLine(val: string): string[] {
     return val.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   }
+
+  // Date formatting for publication columns
+  function formatShortDate(d: string | undefined): string | null {
+    if (!d) return null;
+    try {
+      return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    } catch { return d; }
+  }
+
+  // Expiry date helpers
+  function getExpiryBadge(expiry: string | undefined): { label: string; classes: string } | null {
+    if (!expiry) return null;
+    const expiryDate = new Date(expiry);
+    const now = new Date();
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+    const formatted = formatShortDate(expiry)!;
+
+    if (expiryDate < now) {
+      return { label: `Expired ${formatted}`, classes: "bg-red-50 text-red-700 border-red-200" };
+    }
+    if (expiryDate < oneYearFromNow) {
+      return { label: `Expiring ${formatted}`, classes: "bg-amber-50 text-amber-700 border-amber-200" };
+    }
+    return { label: formatted, classes: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+  }
+
+  // Parse date from raw metadata on the fly (fallback for expiry/grant)
+  function lookupDateFromMetadata(pubNumber: string, mapKey: string, rawKey: string): string | undefined {
+    if (!asset?.metadata) return undefined;
+    const map = asset.metadata[mapKey] as Record<string, string> | undefined;
+    if (map?.[pubNumber]) return map[pubNumber];
+    const raw = asset.metadata[rawKey] as string | undefined;
+    if (!raw) return undefined;
+    const regex = new RegExp(`\\(${pubNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)\\s*(\\d{4}-\\d{2}-\\d{2})`);
+    const match = raw.match(regex);
+    return match?.[1];
+  }
+
+  function getPublicationExpiry(pubNumber: string): string | undefined {
+    return lookupDateFromMetadata(pubNumber, "expiryDates", "expectedExpiryDates");
+  }
+
+  function getPublicationGrantDate(pubNumber: string): string | undefined {
+    return lookupDateFromMetadata(pubNumber, "grantDatesMap", "grantDates");
+  }
+
+  // Parsed application data
+  let applications = $derived.by((): { country: string; number: string; date: string; ref: string }[] => {
+    const raw = String(asset?.metadata?.applicationData ?? "");
+    if (!raw.trim()) return [];
+    const results: { country: string; number: string; date: string; ref: string }[] = [];
+    for (const line of raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean)) {
+      const match = line.match(/^(\S+)\s+(\d{4}-\d{2}-\d{2})\s+\[([^\]]+)\]$/);
+      if (!match) continue;
+      const number = match[1]!;
+      const country = number.match(/^([A-Z]{2})/)?.[1] ?? number.slice(0, 2);
+      results.push({ country, number, date: match[2]!, ref: match[3]! });
+    }
+    return results;
+  });
+
+  // Publication events map: number → { kindCode, date } (prefer grant over application)
+  let pubEventMap = $derived.by(() => {
+    const raw = String(asset?.metadata?.publicationNumbers ?? asset?.metadata?.publicationDetails ?? "");
+    if (!raw.trim()) return new Map<string, { kindCode: string; date: string }>();
+    const map = new Map<string, { kindCode: string; date: string }>();
+    for (const line of raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean)) {
+      const match = line.match(/^(\S+)\s+([A-Z]\d?)\s+(\d{4}-\d{2}-\d{2})/);
+      if (!match) continue;
+      const num = match[1]!;
+      const entry = { kindCode: match[2]!, date: match[3]! };
+      const existing = map.get(num);
+      if (!existing || entry.kindCode.startsWith('B') || (!existing.kindCode.startsWith('B') && entry.date > existing.date)) {
+        map.set(num, entry);
+      }
+    }
+    return map;
+  });
+
+  // Classification codes
+  let ipcCodes = $derived.by(() => {
+    const raw = String(asset?.metadata?.ipcClassification ?? "");
+    return raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  });
+
+  let cpcCodes = $derived.by(() => {
+    const raw = String(asset?.metadata?.cpcClassification ?? "");
+    return raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  });
+
+  // Citing patents
+  interface Citation { number: string; country: string; familyId: string; who: string; self: boolean; categories: string[] }
+  let citations = $derived.by((): { citedPatent: string; citations: Citation[] } => {
+    const raw = String(asset?.metadata?.citingPatents ?? "");
+    if (!raw.trim()) return { citedPatent: "", citations: [] };
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    let citedPatent = "";
+    const cits: Citation[] = [];
+    for (const line of lines) {
+      const citedMatch = line.match(/^\(([^)]+)\)$/);
+      if (citedMatch) { citedPatent = citedMatch[1]!; continue; }
+      const parts = line.split(/\s+/);
+      if (parts.length < 3) continue;
+      const number = parts[0]!;
+      const familyId = parts[1]!;
+      const country = number.match(/^([A-Z]{2})/)?.[1] ?? "";
+      let who = "";
+      let self = false;
+      const categories: string[] = [];
+      for (const part of parts.slice(2)) {
+        if (part.startsWith("WHO=")) who = part.slice(4);
+        else if (part.startsWith("SELF=")) self = part.slice(5) === "Y";
+        else if (part.startsWith("CAT=")) categories.push(part.slice(4));
+      }
+      cits.push({ number, country, familyId, who, self, categories });
+    }
+    return { citedPatent, citations: cits };
+  });
+
+  // Citation category labels
+  const catLabels: Record<string, string> = {
+    X: "Particularly relevant (alone)",
+    Y: "Particularly relevant (combined)",
+    A: "Technological background",
+    D: "Cited in application",
+  };
 
   $effect(() => {
     const id = assetId;
@@ -184,6 +319,42 @@
         </div>
       {/if}
 
+      <!-- Applications table -->
+      {#if applications.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+              <svg class="h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Applications</h2>
+            <span class="text-xs text-[var(--color-neutral-400)]">{applications.length} jurisdictions</span>
+          </div>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border-color)]">
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Country</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Application Number</th>
+                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Filing Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each applications as app}
+                  <tr class="border-b border-[var(--border-color)] last:border-0">
+                    <td class="py-2.5 pr-4">
+                      <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-bold text-[var(--color-neutral-600)]">{app.country}</span>
+                    </td>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-[var(--color-neutral-700)]">{app.number}</td>
+                    <td class="py-2.5 text-xs text-[var(--color-neutral-700)]">{formatShortDate(app.date)}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {/if}
+
       <!-- Publications table -->
       {#if Array.isArray(asset.metadata.publications) && asset.metadata.publications.length > 0}
         <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
@@ -201,17 +372,53 @@
                 <tr class="border-b border-[var(--border-color)]">
                   <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Country</th>
                   <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Publication Number</th>
-                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Title</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Kind</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub Date</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Title</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Grant Date</th>
+                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Expiry</th>
                 </tr>
               </thead>
               <tbody>
                 {#each asset.metadata.publications as pub}
+                  {@const expiry = pub.expiry ?? getPublicationExpiry(pub.number)}
+                  {@const badge = getExpiryBadge(expiry)}
+                  {@const grantDate = pub.grantDate ?? getPublicationGrantDate(pub.number)}
+                  {@const pubEvent = pubEventMap.get(pub.number)}
                   <tr class="border-b border-[var(--border-color)] last:border-0">
                     <td class="py-2.5 pr-4">
                       <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-bold text-[var(--color-neutral-600)]">{pub.country}</span>
                     </td>
                     <td class="py-2.5 pr-4 font-mono text-xs text-[var(--color-neutral-700)]">{pub.number}</td>
-                    <td class="py-2.5 text-[var(--color-neutral-700)]">{pub.title}</td>
+                    <td class="py-2.5 pr-4">
+                      {#if pubEvent}
+                        <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-[10px] font-mono font-medium text-[var(--color-neutral-600)]">{pubEvent.kindCode}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
+                    <td class="py-2.5 pr-4">
+                      {#if pubEvent}
+                        <span class="text-xs text-[var(--color-neutral-700)]">{formatShortDate(pubEvent.date)}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
+                    <td class="py-2.5 pr-4 text-[var(--color-neutral-700)]">{pub.title}</td>
+                    <td class="py-2.5 pr-4">
+                      {#if grantDate}
+                        <span class="text-xs text-[var(--color-neutral-700)]">{formatShortDate(grantDate)}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
+                    <td class="py-2.5">
+                      {#if badge}
+                        <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium {badge.classes}">{badge.label}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
                   </tr>
                 {/each}
               </tbody>
@@ -220,8 +427,120 @@
         </div>
       {/if}
 
-      <!-- Publication & Classification Details -->
-      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && k !== "legalActions" && k !== "parsedLegalActions" && k !== "publications" && v && String(v).trim())}
+      <!-- Classifications -->
+      {#if ipcCodes.length > 0 || cpcCodes.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+              <svg class="h-4.5 w-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Classifications</h2>
+          </div>
+
+          {#if ipcCodes.length > 0}
+            <div class="mt-4">
+              <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] mb-2">IPC — International Classification</p>
+              <div class="flex flex-wrap gap-1.5">
+                {#each ipcCodes as code}
+                  <span class="inline-flex items-center rounded-lg border border-[var(--border-color)] bg-[var(--color-neutral-50)] px-2.5 py-1 text-xs font-mono text-[var(--color-neutral-700)]">{code}</span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if cpcCodes.length > 0}
+            <div class="mt-4">
+              <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] mb-2">CPC — Cooperative Classification</p>
+              <div class="flex flex-wrap gap-1.5">
+                {#each cpcCodes as code}
+                  <span class="inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-mono text-indigo-700">{code}</span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+        </div>
+      {/if}
+
+      <!-- Citing Patents -->
+      {#if citations.citations.length > 0}
+        {@const examinerCits = citations.citations.filter(c => c.who === "Examiner")}
+        {@const applicantCits = citations.citations.filter(c => c.who === "Applicant")}
+        {@const selfCits = citations.citations.filter(c => c.self)}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
+              <svg class="h-4.5 w-4.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.37a4.5 4.5 0 00-6.364-6.364L4.5 8.257"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Citing Patents</h2>
+            <span class="text-xs text-[var(--color-neutral-400)]">{citations.citations.length} citations</span>
+          </div>
+
+          <!-- Summary badges -->
+          <div class="mt-4 flex flex-wrap gap-3">
+            <div class="rounded-xl border border-[var(--border-color)] px-4 py-3">
+              <p class="text-xs text-[var(--color-neutral-500)]">Total</p>
+              <p class="mt-1 text-2xl font-bold text-[var(--color-neutral-900)]">{citations.citations.length}</p>
+            </div>
+            <div class="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3">
+              <p class="text-xs font-medium text-blue-600">By Examiner</p>
+              <p class="mt-1 text-2xl font-bold text-[var(--color-neutral-900)]">{examinerCits.length}</p>
+            </div>
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3">
+              <p class="text-xs font-medium text-emerald-600">By Applicant</p>
+              <p class="mt-1 text-2xl font-bold text-[var(--color-neutral-900)]">{applicantCits.length}</p>
+            </div>
+            <div class="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3">
+              <p class="text-xs font-medium text-amber-600">Self-citations</p>
+              <p class="mt-1 text-2xl font-bold text-[var(--color-neutral-900)]">{selfCits.length}</p>
+            </div>
+          </div>
+
+          <!-- Citations table -->
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border-color)]">
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Country</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Patent Number</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Source</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Self</th>
+                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Categories</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each citations.citations as cit}
+                  <tr class="border-b border-[var(--border-color)] last:border-0">
+                    <td class="py-2.5 pr-4">
+                      <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-bold text-[var(--color-neutral-600)]">{cit.country}</span>
+                    </td>
+                    <td class="py-2.5 pr-4 font-mono text-xs text-[var(--color-neutral-700)]">{cit.number}</td>
+                    <td class="py-2.5 pr-4">
+                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium {cit.who === 'Examiner' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">{cit.who}</span>
+                    </td>
+                    <td class="py-2.5 pr-4">
+                      {#if cit.self}
+                        <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">Self</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
+                    <td class="py-2.5">
+                      <div class="flex gap-1">
+                        {#each cit.categories as cat}
+                          <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-neutral-600)]" title={catLabels[cat] ?? cat}>{cat}</span>
+                        {/each}
+                      </div>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Additional Details -->
+      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && !dedicatedFields.has(k) && v && String(v).trim())}
       {#if detailed.length > 0}
         <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
           <div class="flex items-center gap-2.5">

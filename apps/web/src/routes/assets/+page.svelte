@@ -182,6 +182,47 @@
           if (publications.length > 0) metadata.publications = publications;
         }
 
+        // Parse (PATENT_NUMBER) DATE pairs from a raw string
+        function parseDatePairs(raw: string): Map<string, string> {
+          const map = new Map<string, string>();
+          const regex = /\(([A-Z][\w\/-]+)\)\s*(\d{4}-\d{2}-\d{2})/g;
+          let m;
+          while ((m = regex.exec(raw)) !== null) {
+            map.set(m[1], m[2]);
+          }
+          return map;
+        }
+
+        // Parse expected expiry dates and merge into publications
+        const expiryDatesRaw = String(row["Expected expiry dates"] ?? "").trim();
+        if (expiryDatesRaw) {
+          const expiryMap = parseDatePairs(expiryDatesRaw);
+          if (expiryMap.size > 0) {
+            metadata.expiryDates = Object.fromEntries(expiryMap);
+            if (Array.isArray(metadata.publications)) {
+              for (const pub of metadata.publications as any[]) {
+                const expiry = expiryMap.get(pub.number);
+                if (expiry) pub.expiry = expiry;
+              }
+            }
+          }
+        }
+
+        // Parse grant dates and merge into publications
+        const grantDatesRaw = String(row["Grant dates"] ?? "").trim();
+        if (grantDatesRaw) {
+          const grantMap = parseDatePairs(grantDatesRaw);
+          if (grantMap.size > 0) {
+            metadata.grantDatesMap = Object.fromEntries(grantMap);
+            if (Array.isArray(metadata.publications)) {
+              for (const pub of metadata.publications as any[]) {
+                const grant = grantMap.get(pub.number);
+                if (grant) pub.grantDate = grant;
+              }
+            }
+          }
+        }
+
         // Parse legal actions into structured data
         if (metadata.legalActions) {
           metadata.parsedLegalActions = parseLegalActions(String(metadata.legalActions));
