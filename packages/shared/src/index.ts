@@ -10,6 +10,7 @@ export type {
   AuditEventId,
   NotificationId,
   InvitationId,
+  PriorArtResultId,
 } from "./brand.js";
 
 export {
@@ -43,4 +44,5 @@ export {
   parseAuditEventId,
   parseNotificationId,
   parseInvitationId,
+  parsePriorArtResultId,
 } from "./validation.js";

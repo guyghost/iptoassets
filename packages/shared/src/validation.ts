@@ -7,6 +7,7 @@ import type {
   MembershipId,
   NotificationId,
   OrganizationId,
+  PriorArtResultId,
   PortfolioId,
   StatusChangeEventId,
   UserId,
@@ -80,4 +81,10 @@ export function parseInvitationId(input: string): Result<InvitationId> {
   return UUID_RE.test(input)
     ? ok(input as InvitationId)
     : err("Invalid InvitationId: must be UUID format");
+}
+
+export function parsePriorArtResultId(input: string): Result<PriorArtResultId> {
+  return UUID_RE.test(input)
+    ? ok(input as PriorArtResultId)
+    : err("Invalid PriorArtResultId: must be UUID format");
 }
