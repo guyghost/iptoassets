@@ -28,6 +28,7 @@ export function createDocument(input: CreateDocumentInput): Result<Document> {
     uploadedAt: new Date(),
     status: "uploaded" as const,
     organizationId: input.organizationId,
+    tags: [],
   });
 }
 
@@ -46,4 +47,8 @@ export function updateDocumentStatus(
     return err(`Invalid document status transition: ${doc.status} -> ${newStatus}`);
   }
   return ok({ ...doc, status: newStatus });
+}
+
+export function updateDocumentTags(doc: Document, tags: readonly string[]): Result<Document> {
+  return ok({ ...doc, tags });
 }

@@ -51,6 +51,7 @@ export interface Document {
   readonly uploadedAt: Date;
   readonly status: DocumentStatus;
   readonly organizationId: OrganizationId;
+  readonly tags: readonly string[];
 }
 
 export interface Portfolio {

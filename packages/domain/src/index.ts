@@ -8,7 +8,7 @@ export type { CreateAssetInput, AssetFilter } from "./asset.js";
 export { createDeadline, completeDeadline } from "./deadline.js";
 export type { CreateDeadlineInput } from "./deadline.js";
 
-export { createDocument, updateDocumentStatus } from "./document.js";
+export { createDocument, updateDocumentStatus, updateDocumentTags } from "./document.js";
 export type { CreateDocumentInput } from "./document.js";
 
 export {

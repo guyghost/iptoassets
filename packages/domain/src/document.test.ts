@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { createDocument, updateDocumentStatus } from "./document.js";
-import type { AssetId, DocumentId, OrganizationId } from "@ipms/shared";
+import { createDocument, updateDocumentStatus, updateDocumentTags } from "./document.js";
+import type { AssetId, DocumentId, DocumentStatus, OrganizationId } from "@ipms/shared";
 
 const ORG_ID = "550e8400-e29b-41d4-a716-446655440000" as OrganizationId;
 const ASSET_ID = "660e8400-e29b-41d4-a716-446655440000" as AssetId;
@@ -65,5 +65,24 @@ describe("updateDocumentStatus", () => {
 
     const result = updateDocumentStatus(created.value, "approved");
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("updateDocumentTags", () => {
+  it("updates document tags", () => {
+    const doc = {
+      id: "550e8400-e29b-41d4-a716-446655440000" as DocumentId,
+      assetId: "660e8400-e29b-41d4-a716-446655440000" as AssetId,
+      name: "Test",
+      type: "claim" as const,
+      url: "https://example.com",
+      uploadedAt: new Date(),
+      status: "uploaded" as const,
+      organizationId: "770e8400-e29b-41d4-a716-446655440000" as OrganizationId,
+      tags: [] as readonly string[],
+    };
+    const result = updateDocumentTags(doc, ["patent", "claims", "draft"]);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.tags).toEqual(["patent", "claims", "draft"]);
   });
 });

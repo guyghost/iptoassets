@@ -21,6 +21,7 @@ const UPLOADED_DOC: Document = {
   uploadedAt: new Date(),
   status: "uploaded",
   organizationId: ORG_ID,
+  tags: [],
 };
 
 describe("updateDocumentStatusUseCase with email", () => {
