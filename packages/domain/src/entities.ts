@@ -161,3 +161,27 @@ export interface Invitation {
   readonly createdAt: Date;
   readonly expiresAt: Date;
 }
+
+export interface ClaimAnalysisEntry {
+  readonly number: number;
+  readonly summary: string;
+  readonly strength: "strong" | "moderate" | "weak";
+  readonly issues: readonly string[];
+}
+
+export interface ClaimAnalysis {
+  readonly overallScore: number;
+  readonly claims: readonly ClaimAnalysisEntry[];
+  readonly strengths: readonly string[];
+  readonly weaknesses: readonly string[];
+  readonly recommendations: readonly string[];
+}
+
+export interface PatentabilityAssessment {
+  readonly overallScore: number;
+  readonly novelty: { readonly score: number; readonly reasoning: string };
+  readonly nonObviousness: { readonly score: number; readonly reasoning: string };
+  readonly utility: { readonly score: number; readonly reasoning: string };
+  readonly risks: readonly string[];
+  readonly recommendations: readonly string[];
+}

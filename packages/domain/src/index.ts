@@ -1,5 +1,6 @@
 export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, BulkOperationResult, User, Organization, Membership, MemberRole } from "./entities.js";
 export type { AuditEvent, AuditAction, EntityType, Notification, NotificationType, Invitation, InvitationStatus } from "./entities.js";
+export type { ClaimAnalysis, ClaimAnalysisEntry, PatentabilityAssessment } from "./entities.js";
 export { AUDIT_ACTIONS, ENTITY_TYPES, NOTIFICATION_TYPES, INVITATION_STATUSES } from "./entities.js";
 
 export { createAsset, updateAssetStatus, validateStatusTransition, filterAssets, bulkValidateStatusTransition } from "./asset.js";
