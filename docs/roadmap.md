@@ -48,10 +48,10 @@ Multi-user, multi-tenant platform.
 
 AI-powered features for IP professionals.
 
-- [ ] Automated prior art search
+- [x] Automated prior art search
 - [x] Patent claim analysis and strength scoring
 - [x] Patentability assessment from invention disclosures
 - [x] Deadline risk prediction (likelihood of missing based on workload)
 - [x] Document classification and auto-tagging
 - [x] Natural language search across portfolio
-- [ ] Integration with patent office APIs (USPTO, EPO, WIPO)
+- [x] Integration with patent office APIs (USPTO, EPO, WIPO)
