@@ -61,6 +61,12 @@ export {
 export { exportAssetsCSVUseCase } from "./use-cases/export.js";
 
 export {
+  indexAssetEmbeddingUseCase,
+  reindexAllAssetsUseCase,
+  searchAssetsUseCase,
+} from "./use-cases/search.js";
+
+export {
   signInOrRegisterUseCase,
   createOrganizationUseCase,
   listUserOrganizationsUseCase,
