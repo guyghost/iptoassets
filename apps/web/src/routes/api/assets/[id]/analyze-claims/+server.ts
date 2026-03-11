@@ -14,7 +14,12 @@ export const POST: RequestHandler = async (event) => {
   const idResult = parseAssetId(event.params.id);
   if (!idResult.ok) return json({ error: idResult.error }, { status: 400 });
 
-  const body = await event.request.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await event.request.json();
+  } catch {
+    return json({ error: "Invalid JSON body" }, { status: 400 });
+  }
   const text = typeof body.text === "string" ? body.text.trim() : "";
   if (!text) return json({ error: "text is required" }, { status: 400 });
 
