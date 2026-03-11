@@ -131,13 +131,59 @@
 
       let succeeded = 0;
       let failed = 0;
-      for (const [, row] of families) {
+      for (const [fanId, row] of families) {
         const title = String(row["English title"] ?? "").replace(/^\([^)]+\)\s*/, "").trim();
         if (!title) { failed++; continue; }
 
         const jurisdiction = extractCountryFromTitle(String(row["English title"] ?? ""))
           ?? { code: "WO", name: "WIPO" };
         const owner = extractOwner(String(row["Current assignees"] ?? ""));
+
+        // Extract metadata from all Questel columns
+        const metadata: Record<string, unknown> = { fanId };
+        const fieldMap: Record<string, string> = {
+          "Family publication details": "publicationDetails",
+          "Publication numbers with kind code & date": "publicationNumbers",
+          "Current assignees": "assignees",
+          "Current standardized assignees - inventors removed": "standardizedAssignees",
+          "Application data including date": "applicationData",
+          "Earliest priority number": "priorityNumber",
+          "Earliest priority date": "priorityDate",
+          "Legal actions": "legalActions",
+          "Grant dates": "grantDates",
+          "Expected expiry dates": "expectedExpiryDates",
+          "Citing patents - Raw information": "citingPatents",
+          "Inventors": "inventors",
+          "IPC - International classification": "ipcClassification",
+          "CPC - Cooperative classification": "cpcClassification",
+        };
+        for (const [xlsx, key] of Object.entries(fieldMap)) {
+          const val = String(row[xlsx] ?? "").trim();
+          if (val) metadata[key] = val;
+        }
+
+        // Parse filing date from application data
+        const appDateMatch = String(row["Application data including date"] ?? "").match(/(\d{4}-\d{2}-\d{2})/);
+        const filingDate = appDateMatch ? appDateMatch[1] : null;
+
+        // Parse expiry date
+        const expiryRaw = String(row["Expected expiry dates"] ?? "").trim();
+        const expiryMatch = expiryRaw.match(/(\d{4}-\d{2}-\d{2})/);
+        const expirationDate = expiryMatch ? expiryMatch[1] : null;
+
+        // Determine status from legal actions
+        const legalActions = String(row["Legal actions"] ?? "");
+        let status = "draft";
+        if (/Legal state=DEAD|Status=LAPSED|Status=REVOKED/i.test(legalActions)) {
+          status = "expired";
+        } else if (/Status=GRANTED/i.test(legalActions)) {
+          status = "granted";
+        } else if (String(row["Grant dates"] ?? "").trim()) {
+          status = "granted";
+        } else if (/Legal state=ALIVE/i.test(legalActions)) {
+          status = "filed";
+        }
+        metadata.derivedStatus = status;
 
         const res = await fetch("/api/assets", {
           method: "POST",
@@ -148,6 +194,7 @@
             type: "patent",
             jurisdiction,
             owner,
+            metadata,
           }),
         });
         if (res.ok) succeeded++;

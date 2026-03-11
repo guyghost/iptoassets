@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex, customType } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex, customType, jsonb } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 const vector = customType<{ data: string }>({
@@ -18,6 +18,7 @@ export const assets = pgTable("assets", {
   expirationDate: timestamp("expiration_date"),
   owner: text("owner").notNull(),
   organizationId: uuid("organization_id").notNull(),
+  metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [

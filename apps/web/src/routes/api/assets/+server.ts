@@ -35,6 +35,7 @@ export const POST: RequestHandler = async (event) => {
     jurisdiction: body.jurisdiction,
     owner: body.owner,
     organizationId: auth.value.organizationId,
+    metadata: body.metadata ?? null,
   });
 
   return resultToResponse(result, 201);

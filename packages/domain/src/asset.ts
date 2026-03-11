@@ -9,6 +9,7 @@ export interface CreateAssetInput {
   readonly jurisdiction: Jurisdiction;
   readonly owner: string;
   readonly organizationId: OrganizationId;
+  readonly metadata?: Record<string, unknown> | null;
 }
 
 export function createAsset(input: CreateAssetInput): Result<IPAsset> {
@@ -33,6 +34,7 @@ export function createAsset(input: CreateAssetInput): Result<IPAsset> {
     expirationDate: null,
     owner: input.owner.trim(),
     organizationId: input.organizationId,
+    metadata: input.metadata ?? null,
     createdAt: now,
     updatedAt: now,
   });

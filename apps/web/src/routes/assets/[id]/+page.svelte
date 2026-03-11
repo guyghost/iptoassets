@@ -1,30 +1,16 @@
-<svelte:head>
-  <title>{asset.title} - IP Assets - IPMS</title>
-</svelte:head>
-
 <script lang="ts">
   import { page } from "$app/stores";
-  import { assetsMap } from "../../../features/assets/data";
   import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../features/assets/helpers";
   import { fetchAssetTimeline, type TimelineEvent } from "../../../features/timeline/data";
   import { formatTimelineEntry, formatTimelineDate } from "../../../features/timeline/helpers";
 
   let assetId = $derived($page.params.id);
-  let asset = $derived(assetsMap[assetId] ?? {
-    id: assetId,
-    title: "Unknown Asset",
-    type: "patent",
-    jurisdiction: { code: "--", name: "Unknown" },
-    status: "draft",
-    filingDate: "",
-    expirationDate: "",
-    owner: "Unknown",
-    organizationId: "",
-    createdAt: "",
-    updatedAt: "",
-  });
 
-  let transitions = $derived(statusTransitions[asset.status] ?? []);
+  let asset = $state<any>(null);
+  let loading = $state(true);
+  let error = $state<string | null>(null);
+
+  let transitions = $derived(asset ? (statusTransitions[asset.status] ?? []) : []);
 
   let timelineEvents: TimelineEvent[] = $state([]);
 
@@ -37,8 +23,54 @@
     abandoned: "bg-red-500",
   };
 
+  // Metadata display labels
+  const metadataLabels: Record<string, string> = {
+    fanId: "Questel Family ID (FAN)",
+    publicationDetails: "Publication Details",
+    publicationNumbers: "Publication Numbers",
+    assignees: "Assignees",
+    standardizedAssignees: "Standardized Assignees",
+    applicationData: "Application Data",
+    priorityNumber: "Priority Number",
+    priorityDate: "Priority Date",
+    legalActions: "Legal Actions",
+    grantDates: "Grant Dates",
+    expectedExpiryDates: "Expected Expiry Dates",
+    citingPatents: "Citing Patents",
+    inventors: "Inventors",
+    ipcClassification: "IPC Classification",
+    cpcClassification: "CPC Classification",
+  };
+
+  // Fields to show as multi-line (contain \r\n separated data)
+  const multiLineFields = new Set([
+    "publicationDetails", "publicationNumbers", "legalActions",
+    "inventors", "ipcClassification", "cpcClassification",
+    "citingPatents", "assignees",
+  ]);
+
+  // Fields shown in prominent cards (top section)
+  const prominentFields = new Set([
+    "fanId", "priorityNumber", "priorityDate", "grantDates",
+    "expectedExpiryDates", "inventors", "standardizedAssignees",
+  ]);
+
+  function parseMultiLine(val: string): string[] {
+    return val.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  }
+
   $effect(() => {
     const id = assetId;
+    loading = true;
+    error = null;
+    fetch(`/api/assets/${id}`)
+      .then(async (res) => {
+        if (!res.ok) { error = "Asset not found"; return; }
+        asset = await res.json();
+      })
+      .catch(() => { error = "Failed to load asset"; })
+      .finally(() => { loading = false; });
+
     fetchAssetTimeline(id).then((events) => {
       timelineEvents = events;
     }).catch(() => {
@@ -46,6 +78,10 @@
     });
   });
 </script>
+
+<svelte:head>
+  <title>{asset?.title ?? "Loading..."} - IP Assets - IPMS</title>
+</svelte:head>
 
 <div class="min-h-screen bg-[#f7f7f8]">
   <div class="mx-auto max-w-[1400px] px-6 py-8">
@@ -56,12 +92,18 @@
       Back to Assets
     </a>
 
+    {#if loading}
+      <div class="mt-8 text-center text-sm text-[var(--color-neutral-500)]">Loading asset...</div>
+    {:else if error}
+      <div class="mt-8 text-center text-sm text-red-600">{error}</div>
+    {:else if asset}
+
     <!-- Page Header -->
     <div class="mt-4 flex items-start justify-between">
       <div class="flex items-center gap-4">
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">{asset.title}</h1>
-        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">
-          {statusConfig[asset.status].label}
+        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status]?.bg} {statusConfig[asset.status]?.text}">
+          {statusConfig[asset.status]?.label ?? asset.status}
         </span>
       </div>
     </div>
@@ -102,13 +144,77 @@
         <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
           <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</p>
           <p class="mt-2">
-            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">
-              {statusConfig[asset.status].label}
+            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status]?.bg} {statusConfig[asset.status]?.text}">
+              {statusConfig[asset.status]?.label ?? asset.status}
             </span>
           </p>
         </div>
       </div>
     </div>
+
+    <!-- Patent Metadata (prominent fields as cards) -->
+    {#if asset.metadata}
+      {@const prominent = Object.entries(asset.metadata).filter(([k, v]) => prominentFields.has(k) && v && String(v).trim())}
+      {#if prominent.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
+              <svg class="h-4.5 w-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Patent Information</h2>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {#each prominent as [key, value]}
+              <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
+                <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">{metadataLabels[key] ?? key}</p>
+                {#if multiLineFields.has(key)}
+                  <div class="mt-2 space-y-1">
+                    {#each parseMultiLine(String(value)) as line}
+                      <p class="text-sm text-[var(--color-neutral-900)]">{line}</p>
+                    {/each}
+                  </div>
+                {:else}
+                  <p class="mt-2 text-sm font-medium text-[var(--color-neutral-900)]">{value}</p>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Publication & Classification Details -->
+      {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && k !== "derivedStatus" && v && String(v).trim())}
+      {#if detailed.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+              <svg class="h-4.5 w-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Additional Details</h2>
+          </div>
+
+          <div class="mt-5 space-y-5">
+            {#each detailed as [key, value]}
+              <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
+                <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">{metadataLabels[key] ?? key}</p>
+                {#if multiLineFields.has(key)}
+                  <div class="mt-2 space-y-1 max-h-48 overflow-y-auto">
+                    {#each parseMultiLine(String(value)) as line}
+                      <p class="text-sm text-[var(--color-neutral-700)]">{line}</p>
+                    {/each}
+                  </div>
+                {:else if key === "legalActions"}
+                  <pre class="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap text-xs text-[var(--color-neutral-700)] font-mono leading-relaxed">{value}</pre>
+                {:else}
+                  <p class="mt-2 text-sm text-[var(--color-neutral-700)]">{value}</p>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    {/if}
 
     <!-- Status Transitions -->
     {#if transitions.length > 0}
@@ -120,13 +226,13 @@
           <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Status Transitions</h2>
         </div>
         <p class="mt-2 text-sm text-[var(--color-neutral-500)]">
-          Move this asset from <span class="font-medium text-[var(--color-neutral-700)]">{statusConfig[asset.status].label}</span> to a new status.
+          Move this asset from <span class="font-medium text-[var(--color-neutral-700)]">{statusConfig[asset.status]?.label}</span> to a new status.
         </p>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           {#each transitions as target}
             <button class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium shadow-sm transition-colors {transitionButtonColors[target] ?? 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]'}">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
-              Move to {statusConfig[target].label}
+              Move to {statusConfig[target]?.label}
             </button>
           {/each}
         </div>
@@ -148,14 +254,12 @@
         <div class="mt-5 space-y-0">
           {#each timelineEvents as event, i}
             <div class="relative flex gap-4">
-              <!-- Timeline line and dot -->
               <div class="flex flex-col items-center">
                 <div class="h-3 w-3 rounded-full {timelineDotColors[event.toStatus] ?? 'bg-[var(--color-neutral-400)]'} ring-4 ring-white z-10"></div>
                 {#if i < timelineEvents.length - 1}
                   <div class="w-0.5 flex-1 bg-[var(--color-neutral-200)]"></div>
                 {/if}
               </div>
-              <!-- Event content -->
               <div class="pb-6">
                 <p class="text-sm font-medium text-[var(--color-neutral-900)]">{formatTimelineEntry(event.fromStatus, event.toStatus)}</p>
                 <p class="mt-0.5 text-xs text-[var(--color-neutral-500)]">
@@ -188,5 +292,6 @@
       </div>
     </div>
 
+    {/if}
   </div>
 </div>

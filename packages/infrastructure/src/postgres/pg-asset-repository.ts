@@ -18,6 +18,7 @@ function toEntity(row: AssetRow): IPAsset {
     expirationDate: row.expirationDate,
     owner: row.owner,
     organizationId: row.organizationId as OrganizationId,
+    metadata: (row.metadata as Record<string, unknown>) ?? null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -49,6 +50,7 @@ export function createPgAssetRepository(db: Database): AssetRepository {
         expirationDate: asset.expirationDate,
         owner: asset.owner,
         organizationId: asset.organizationId,
+        metadata: asset.metadata,
         createdAt: asset.createdAt,
         updatedAt: asset.updatedAt,
       }).onConflictDoUpdate({
@@ -62,6 +64,7 @@ export function createPgAssetRepository(db: Database): AssetRepository {
           filingDate: asset.filingDate,
           expirationDate: asset.expirationDate,
           owner: asset.owner,
+          metadata: asset.metadata,
           updatedAt: asset.updatedAt,
         },
       });

@@ -29,6 +29,7 @@ export interface IPAsset {
   readonly expirationDate: Date | null;
   readonly owner: string;
   readonly organizationId: OrganizationId;
+  readonly metadata: Record<string, unknown> | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
