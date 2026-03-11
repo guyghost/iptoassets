@@ -81,3 +81,17 @@ export interface InvitationRepository {
 export interface EmailService {
   send(to: string, subject: string, html: string): Promise<void>;
 }
+
+export interface AIService {
+  complete(systemPrompt: string, userPrompt: string): Promise<string>;
+}
+
+export interface EmbeddingService {
+  embed(texts: string[]): Promise<number[][]>;
+}
+
+export interface AssetEmbeddingRepository {
+  save(assetId: AssetId, orgId: OrganizationId, embedding: number[]): Promise<void>;
+  searchByVector(orgId: OrganizationId, embedding: number[], limit: number): Promise<readonly AssetId[]>;
+  deleteByAssetId(assetId: AssetId): Promise<void>;
+}

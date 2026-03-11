@@ -11,6 +11,9 @@ export type {
   NotificationRepository,
   InvitationRepository,
   EmailService,
+  AIService,
+  EmbeddingService,
+  AssetEmbeddingRepository,
 } from "./ports.js";
 
 export {
