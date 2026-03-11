@@ -185,3 +185,9 @@ export interface PatentabilityAssessment {
   readonly risks: readonly string[];
   readonly recommendations: readonly string[];
 }
+
+export interface DeadlineRisk {
+  readonly deadlineId: DeadlineId;
+  readonly score: number;
+  readonly factors: readonly string[];
+}

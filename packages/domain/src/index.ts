@@ -1,6 +1,6 @@
 export type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, BulkOperationResult, User, Organization, Membership, MemberRole } from "./entities.js";
 export type { AuditEvent, AuditAction, EntityType, Notification, NotificationType, Invitation, InvitationStatus } from "./entities.js";
-export type { ClaimAnalysis, ClaimAnalysisEntry, PatentabilityAssessment } from "./entities.js";
+export type { ClaimAnalysis, ClaimAnalysisEntry, PatentabilityAssessment, DeadlineRisk } from "./entities.js";
 export { AUDIT_ACTIONS, ENTITY_TYPES, NOTIFICATION_TYPES, INVITATION_STATUSES } from "./entities.js";
 
 export { createAsset, updateAssetStatus, validateStatusTransition, filterAssets, bulkValidateStatusTransition } from "./asset.js";
@@ -51,6 +51,8 @@ export type { CreateNotificationInput } from "./notification.js";
 
 export { createInvitation, acceptInvitation } from "./invitation.js";
 export type { CreateInvitationInput } from "./invitation.js";
+
+export { computeDeadlineRisks } from "./deadline-risk.js";
 
 export { renderEmailTemplate } from "./email-templates.js";
 export type { EmailTemplateType, EmailTemplateData, DeadlineEmailData, DocumentEmailData, InvitationEmailData } from "./email-templates.js";
