@@ -9,15 +9,15 @@ export const { handle, signIn, signOut } = SvelteKitAuth(async () => {
 
   return {
     providers: [
-      Google({
+      ...(env.GOOGLE_CLIENT_ID ? [Google({
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-      }),
-      MicrosoftEntraId({
+      })] : []),
+      ...(env.MICROSOFT_ISSUER ? [MicrosoftEntraId({
         clientId: env.MICROSOFT_CLIENT_ID,
         clientSecret: env.MICROSOFT_CLIENT_SECRET,
         issuer: env.MICROSOFT_ISSUER,
-      }),
+      })] : []),
     ],
     callbacks: {
       async signIn({ user, account }) {
