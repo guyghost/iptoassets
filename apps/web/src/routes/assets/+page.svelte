@@ -5,13 +5,164 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { filterAssets, type AssetFilter, type IPAsset } from "@ipms/domain";
-  import { ASSET_STATUSES } from "@ipms/shared";
+  import { ASSET_STATUSES, IP_TYPES } from "@ipms/shared";
   import { statusConfig, typeLabels, filters, formatDate } from "../../features/assets/helpers";
+  import * as XLSX from "xlsx";
 
   // --- State ---
   let assets = $state<IPAsset[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
+
+  // --- Drawer state ---
+  let drawerOpen = $state(false);
+  let drawerVisible = $state(false);
+  let creating = $state(false);
+  let createError = $state<string | null>(null);
+
+  // Form fields
+  let newTitle = $state("");
+  let newType = $state<string>("patent");
+  let newJurisdictionCode = $state("");
+  let newJurisdictionName = $state("");
+  let newOwner = $state("");
+
+  function openDrawer() {
+    drawerOpen = true;
+    // Trigger animation on next frame
+    requestAnimationFrame(() => { drawerVisible = true; });
+  }
+
+  function closeDrawer() {
+    drawerVisible = false;
+    setTimeout(() => {
+      drawerOpen = false;
+      resetForm();
+    }, 300);
+  }
+
+  function resetForm() {
+    newTitle = "";
+    newType = "patent";
+    newJurisdictionCode = "";
+    newJurisdictionName = "";
+    newOwner = "";
+    createError = null;
+  }
+
+  async function handleCreate() {
+    createError = null;
+    if (!newTitle.trim() || !newJurisdictionCode.trim() || !newJurisdictionName.trim() || !newOwner.trim()) {
+      createError = "All fields are required";
+      return;
+    }
+    creating = true;
+    try {
+      const res = await fetch("/api/assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          title: newTitle.trim(),
+          type: newType,
+          jurisdiction: { code: newJurisdictionCode.trim().toUpperCase(), name: newJurisdictionName.trim() },
+          owner: newOwner.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        createError = data.error ?? "Failed to create asset";
+        return;
+      }
+      await fetchAssets();
+      closeDrawer();
+    } catch {
+      createError = "Failed to create asset";
+    } finally {
+      creating = false;
+    }
+  }
+
+  // --- Import state ---
+  let importing = $state(false);
+  let importMessage = $state<{ type: "success" | "error"; text: string } | null>(null);
+  let fileInput: HTMLInputElement;
+
+  function extractCountryFromTitle(title: string): { code: string; name: string } | null {
+    const m = title.match(/\(([A-Z]{2})/);
+    if (!m) return null;
+    const code = m[1];
+    const names: Record<string, string> = {
+      WO: "WIPO", EP: "Europe", US: "United States", FR: "France", DE: "Germany",
+      GB: "United Kingdom", JP: "Japan", CN: "China", KR: "South Korea", CA: "Canada",
+      AU: "Australia", BR: "Brazil", IN: "India", RU: "Russia", MX: "Mexico",
+      IL: "Israel", SG: "Singapore", TW: "Taiwan", NZ: "New Zealand", ZA: "South Africa",
+    };
+    return { code, name: names[code] ?? code };
+  }
+
+  function extractOwner(assignees: string): string {
+    if (!assignees) return "Unknown";
+    // Format: "COMPANY ([CC])" — take first assignee, strip country code
+    const first = assignees.split("\n")[0].trim();
+    return first.replace(/\s*\(\[.*?\]\)\s*$/, "").trim() || "Unknown";
+  }
+
+  async function handleImport() {
+    const file = fileInput?.files?.[0];
+    if (!file) return;
+
+    importing = true;
+    importMessage = null;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: "array", cellDates: true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws);
+
+      // Group by FAN ID — one asset per family
+      const families = new Map<string, Record<string, any>>();
+      for (const row of rows) {
+        const fanId = String(row["Questel unique family ID (FAN)"] ?? "").trim();
+        if (!fanId) continue;
+        if (!families.has(fanId)) families.set(fanId, row);
+      }
+
+      let succeeded = 0;
+      let failed = 0;
+      for (const [, row] of families) {
+        const title = String(row["English title"] ?? "").replace(/^\([^)]+\)\s*/, "").trim();
+        if (!title) { failed++; continue; }
+
+        const jurisdiction = extractCountryFromTitle(String(row["English title"] ?? ""))
+          ?? { code: "WO", name: "WIPO" };
+        const owner = extractOwner(String(row["Current assignees"] ?? ""));
+
+        const res = await fetch("/api/assets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: crypto.randomUUID(),
+            title,
+            type: "patent",
+            jurisdiction,
+            owner,
+          }),
+        });
+        if (res.ok) succeeded++;
+        else failed++;
+      }
+
+      await fetchAssets();
+      importMessage = { type: "success", text: `Imported ${succeeded} assets${failed > 0 ? `, ${failed} failed` : ""}` };
+    } catch {
+      importMessage = { type: "error", text: "Failed to parse file" };
+    } finally {
+      importing = false;
+      if (fileInput) fileInput.value = "";
+    }
+  }
 
   // Filter state
   let activeTypeFilter = $state("all");
@@ -240,6 +391,15 @@
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your intellectual property portfolio</p>
       </div>
       <div class="flex items-center gap-3">
+        <input type="file" accept=".xlsx,.xls,.csv" class="hidden" bind:this={fileInput} onchange={handleImport} />
+        <button
+          onclick={() => fileInput?.click()}
+          disabled={importing}
+          class="inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors disabled:opacity-50"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          {importing ? 'Importing...' : 'Import'}
+        </button>
         <button
           onclick={exportCSV}
           class="inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
@@ -247,7 +407,10 @@
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Export CSV
         </button>
-        <button class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-700)] transition-colors">
+        <button
+          onclick={openDrawer}
+          class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-700)] transition-colors"
+        >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
           New Asset
         </button>
@@ -350,6 +513,12 @@
       {#if bulkMessage}
         <div class="mt-4 rounded-lg px-4 py-2 text-sm {bulkMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
           {bulkMessage.text}
+        </div>
+      {/if}
+
+      {#if importMessage}
+        <div class="mt-4 rounded-lg px-4 py-2 text-sm {importMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+          {importMessage.text}
         </div>
       {/if}
 
@@ -459,3 +628,105 @@
     {/if}
   </div>
 </div>
+
+<!-- Slide-over Drawer -->
+{#if drawerOpen}
+  <!-- Overlay -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 {drawerVisible ? 'opacity-100' : 'opacity-0'}"
+    onclick={closeDrawer}
+    onkeydown={(e) => { if (e.key === 'Escape') closeDrawer(); }}
+  ></div>
+
+  <!-- Panel -->
+  <div
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-out {drawerVisible ? 'translate-x-0' : 'translate-x-full'}"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-4">
+      <h2 class="text-lg font-semibold text-[var(--color-neutral-900)]">New Asset</h2>
+      <button aria-label="Close" onclick={closeDrawer} class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-neutral-400)] hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-600)]">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="flex flex-col gap-5 px-6 py-6">
+      {#if createError}
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{createError}</div>
+      {/if}
+
+      <div class="flex flex-col gap-1.5">
+        <label for="asset-title" class="text-sm font-medium text-[var(--color-neutral-700)]">Title</label>
+        <input
+          id="asset-title"
+          type="text"
+          placeholder="e.g. Quantum Computing Method"
+          bind:value={newTitle}
+          class="rounded-lg border border-[var(--border-color)] px-3 py-2.5 text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)]"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="asset-type" class="text-sm font-medium text-[var(--color-neutral-700)]">Type</label>
+        <select
+          id="asset-type"
+          bind:value={newType}
+          class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-2.5 text-sm text-[var(--color-neutral-900)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)]"
+        >
+          {#each IP_TYPES as t}
+            <option value={t}>{typeLabels[t] ?? t}</option>
+          {/each}
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="asset-jurisdiction-code" class="text-sm font-medium text-[var(--color-neutral-700)]">Jurisdiction Code</label>
+          <input
+            id="asset-jurisdiction-code"
+            type="text"
+            placeholder="e.g. US"
+            bind:value={newJurisdictionCode}
+            class="rounded-lg border border-[var(--border-color)] px-3 py-2.5 text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)]"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="asset-jurisdiction-name" class="text-sm font-medium text-[var(--color-neutral-700)]">Jurisdiction Name</label>
+          <input
+            id="asset-jurisdiction-name"
+            type="text"
+            placeholder="e.g. United States"
+            bind:value={newJurisdictionName}
+            class="rounded-lg border border-[var(--border-color)] px-3 py-2.5 text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)]"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="asset-owner" class="text-sm font-medium text-[var(--color-neutral-700)]">Owner</label>
+        <input
+          id="asset-owner"
+          type="text"
+          placeholder="e.g. Acme Corp"
+          bind:value={newOwner}
+          class="rounded-lg border border-[var(--border-color)] px-3 py-2.5 text-sm text-[var(--color-neutral-900)] placeholder-[var(--color-neutral-400)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)]"
+        />
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="absolute bottom-0 left-0 right-0 flex items-center justify-end gap-3 border-t border-[var(--border-color)] bg-white px-6 py-4">
+      <button
+        onclick={closeDrawer}
+        class="rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-50)]"
+      >Cancel</button>
+      <button
+        onclick={handleCreate}
+        disabled={creating}
+        class="rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-700)] disabled:opacity-50"
+      >{creating ? 'Creating...' : 'Create Asset'}</button>
+    </div>
+  </div>
+{/if}
