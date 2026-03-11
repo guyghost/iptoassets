@@ -62,6 +62,8 @@ export { exportAssetsCSVUseCase } from "./use-cases/export.js";
 
 export { classifyDocumentUseCase } from "./use-cases/classify.js";
 
+export { analyzeClaimsUseCase } from "./use-cases/patent-analysis.js";
+
 export {
   indexAssetEmbeddingUseCase,
   reindexAllAssetsUseCase,
