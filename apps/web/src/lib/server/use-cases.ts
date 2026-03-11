@@ -43,8 +43,10 @@ import {
   analyzeClaimsUseCase,
   assessPatentabilityUseCase,
   computeDeadlineRiskUseCase,
+  searchPriorArtUseCase,
+  listPriorArtUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -102,3 +104,6 @@ export const analyzeClaims = analyzeClaimsUseCase(assetRepo, aiService);
 export const assessPatentability = assessPatentabilityUseCase(assetRepo, aiService);
 
 export const computeDeadlineRisk = computeDeadlineRiskUseCase(deadlineRepo);
+
+export const searchPriorArt = searchPriorArtUseCase(assetRepo, patentSearchService, aiService, priorArtResultRepo);
+export const listPriorArt = listPriorArtUseCase(priorArtResultRepo);

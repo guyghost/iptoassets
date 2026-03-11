@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService, AIService, EmbeddingService, AssetEmbeddingRepository } from "@ipms/application";
+import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService, AIService, EmbeddingService, AssetEmbeddingRepository, PatentSearchService, PriorArtResultRepository } from "@ipms/application";
 
 let assetRepo: AssetRepository;
 let deadlineRepo: DeadlineRepository;
@@ -16,6 +16,8 @@ let emailService: EmailService;
 let aiService: AIService;
 let embeddingService: EmbeddingService;
 let assetEmbeddingRepo: AssetEmbeddingRepository;
+let patentSearchService: PatentSearchService;
+let priorArtResultRepo: PriorArtResultRepository;
 
 if (env.DATABASE_URL) {
   const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
@@ -58,6 +60,12 @@ if (env.DATABASE_URL) {
 
   const { createPgAssetEmbeddingRepository } = await import("@ipms/infrastructure/postgres");
   assetEmbeddingRepo = createPgAssetEmbeddingRepository(db);
+
+  const { createUSPTOPatentSearchService } = await import("@ipms/infrastructure");
+  patentSearchService = createUSPTOPatentSearchService();
+
+  const { createPgPriorArtResultRepository } = await import("@ipms/infrastructure/postgres");
+  priorArtResultRepo = createPgPriorArtResultRepository(db);
 } else {
   const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository, createInMemoryAuditEventRepository, createInMemoryNotificationRepository, createInMemoryInvitationRepository } = await import("@ipms/infrastructure");
   assetRepo = createInMemoryAssetRepository();
@@ -80,8 +88,12 @@ if (env.DATABASE_URL) {
   embeddingService = createNoOpEmbed();
   assetEmbeddingRepo = createInMemoryAssetEmbeddingRepository();
 
+  const { createNoOpPatentSearchService, createInMemoryPriorArtResultRepository: createInMemoryPriorArt } = await import("@ipms/infrastructure");
+  patentSearchService = createNoOpPatentSearchService();
+  priorArtResultRepo = createInMemoryPriorArt();
+
   const { seedData } = await import("./seed.js");
   seedData();
 }
 
-export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo };
+export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo };
