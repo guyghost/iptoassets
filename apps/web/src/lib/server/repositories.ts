@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService } from "@ipms/application";
+import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService, AIService, EmbeddingService, AssetEmbeddingRepository } from "@ipms/application";
 
 let assetRepo: AssetRepository;
 let deadlineRepo: DeadlineRepository;
@@ -13,6 +13,9 @@ let auditEventRepo: AuditEventRepository;
 let notificationRepo: NotificationRepository;
 let invitationRepo: InvitationRepository;
 let emailService: EmailService;
+let aiService: AIService;
+let embeddingService: EmbeddingService;
+let assetEmbeddingRepo: AssetEmbeddingRepository;
 
 if (env.DATABASE_URL) {
   const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
@@ -36,6 +39,25 @@ if (env.DATABASE_URL) {
     const { createNoOpEmailService } = await import("@ipms/infrastructure");
     emailService = createNoOpEmailService();
   }
+
+  if (env.ANTHROPIC_API_KEY) {
+    const { createClaudeAIService } = await import("@ipms/infrastructure");
+    aiService = createClaudeAIService(env.ANTHROPIC_API_KEY);
+  } else {
+    const { createNoOpAIService } = await import("@ipms/infrastructure");
+    aiService = createNoOpAIService();
+  }
+
+  if (env.VOYAGE_API_KEY) {
+    const { createVoyageEmbeddingService } = await import("@ipms/infrastructure");
+    embeddingService = createVoyageEmbeddingService(env.VOYAGE_API_KEY);
+  } else {
+    const { createNoOpEmbeddingService } = await import("@ipms/infrastructure");
+    embeddingService = createNoOpEmbeddingService();
+  }
+
+  const { createPgAssetEmbeddingRepository } = await import("@ipms/infrastructure/postgres");
+  assetEmbeddingRepo = createPgAssetEmbeddingRepository(db);
 } else {
   const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository, createInMemoryAuditEventRepository, createInMemoryNotificationRepository, createInMemoryInvitationRepository } = await import("@ipms/infrastructure");
   assetRepo = createInMemoryAssetRepository();
@@ -53,8 +75,13 @@ if (env.DATABASE_URL) {
   const { createNoOpEmailService: createNoOp } = await import("@ipms/infrastructure");
   emailService = createNoOp();
 
+  const { createNoOpAIService: createNoOpAI, createNoOpEmbeddingService: createNoOpEmbed, createInMemoryAssetEmbeddingRepository } = await import("@ipms/infrastructure");
+  aiService = createNoOpAI();
+  embeddingService = createNoOpEmbed();
+  assetEmbeddingRepo = createInMemoryAssetEmbeddingRepository();
+
   const { seedData } = await import("./seed.js");
   seedData();
 }
 
-export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService };
+export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo };

@@ -36,8 +36,12 @@ import {
   listInvitationsUseCase,
   deleteInvitationUseCase,
   acceptPendingInvitationsUseCase,
+  indexAssetEmbeddingUseCase,
+  reindexAllAssetsUseCase,
+  searchAssetsUseCase,
+  classifyDocumentUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -86,3 +90,8 @@ export const createInvitation = createInvitationUseCase(invitationRepo, emailSer
 export const listInvitations = listInvitationsUseCase(invitationRepo);
 export const deleteInvitation = deleteInvitationUseCase(invitationRepo);
 export const acceptPendingInvitations = acceptPendingInvitationsUseCase(invitationRepo, memberRepo);
+
+export const indexAssetEmbedding = indexAssetEmbeddingUseCase(assetRepo, assetEmbeddingRepo, embeddingService);
+export const reindexAllAssets = reindexAllAssetsUseCase(assetRepo, assetEmbeddingRepo, embeddingService);
+export const searchAssets = searchAssetsUseCase(assetRepo, assetEmbeddingRepo, embeddingService);
+export const classifyDocument = classifyDocumentUseCase(documentRepo, assetRepo, aiService);
