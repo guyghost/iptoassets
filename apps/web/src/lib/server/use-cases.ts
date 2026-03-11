@@ -40,6 +40,8 @@ import {
   reindexAllAssetsUseCase,
   searchAssetsUseCase,
   classifyDocumentUseCase,
+  analyzeClaimsUseCase,
+  assessPatentabilityUseCase,
 } from "@ipms/application";
 import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo } from "./repositories.js";
 
@@ -95,3 +97,5 @@ export const indexAssetEmbedding = indexAssetEmbeddingUseCase(assetRepo, assetEm
 export const reindexAllAssets = reindexAllAssetsUseCase(assetRepo, assetEmbeddingRepo, embeddingService);
 export const searchAssets = searchAssetsUseCase(assetRepo, assetEmbeddingRepo, embeddingService);
 export const classifyDocument = classifyDocumentUseCase(documentRepo, assetRepo, aiService);
+export const analyzeClaims = analyzeClaimsUseCase(assetRepo, aiService);
+export const assessPatentability = assessPatentabilityUseCase(assetRepo, aiService);
