@@ -174,10 +174,10 @@
                         </div>
                       </button>
                       {#if msExpanded && ms.events.length > 0}
+                        {@const msSplit = splitEvents(ms.events)}
+                        {@const msShowAll = showAllEvents.has(msKey)}
+                        {@const msDisplayEvents = msShowAll ? ms.events : msSplit.visible}
                         <div class="border-t border-[var(--border-color)] px-4 py-3">
-                          {@const msSplit = splitEvents(ms.events)}
-                          {@const msShowAll = showAllEvents.has(msKey)}
-                          {@const msDisplayEvents = msShowAll ? ms.events : msSplit.visible}
                           <div class="space-y-0">
                             {#each msDisplayEvents as event, i}
                               <div class="relative flex gap-3">
@@ -216,11 +216,11 @@
 
             <!-- Events timeline -->
             {#if member.events.length > 0}
+              {@const split = splitEvents(member.events)}
+              {@const memberShowAll = showAllEvents.has(member.id)}
+              {@const displayEvents = memberShowAll ? member.events : split.visible}
               <div>
                 <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] mb-3">Event Timeline</p>
-                {@const split = splitEvents(member.events)}
-                {@const memberShowAll = showAllEvents.has(member.id)}
-                {@const displayEvents = memberShowAll ? member.events : split.visible}
                 <div class="space-y-0">
                   {#each displayEvents as event, i}
                     <div class="relative flex gap-3">
