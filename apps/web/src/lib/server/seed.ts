@@ -76,30 +76,50 @@ const statusTransitionPaths: Record<string, { statuses: AssetStatus[]; dates: Da
 export async function seedData() {
   const orgId = SEED_ORG_ID;
 
-  // --- Dev User + Organization ---
-  const userResult = createUser({
-    id: SEED_USER_ID,
-    email: "dev@ipms.local",
-    name: "Dev User",
-    avatarUrl: null,
-    authProviderId: "dev-login:dev@ipms.local",
-  });
-  if (userResult.ok) await userRepo.save(userResult.value);
+  // --- Dev User + Organization (idempotent) ---
+  let userId = SEED_USER_ID;
 
-  const orgResult = createOrganization({
-    id: orgId,
-    name: "Dev Organization",
-    ownerId: SEED_USER_ID,
-  });
-  if (orgResult.ok) await orgRepo.save(orgResult.value);
+  // Check if user already exists (may have been created by signInOrRegister with a different ID)
+  const existingUser = await userRepo.findByEmail("dev@ipms.local");
+  if (existingUser) {
+    userId = existingUser.id;
+  } else {
+    const userResult = createUser({
+      id: SEED_USER_ID,
+      email: "dev@ipms.local",
+      name: "Dev User",
+      avatarUrl: null,
+      authProviderId: "dev-login:dev@ipms.local",
+    });
+    if (userResult.ok) await userRepo.save(userResult.value);
+  }
 
-  const memberResult = createMembership({
-    id: uuid() as MembershipId,
-    userId: SEED_USER_ID,
-    organizationId: orgId,
-    role: "admin",
-  });
-  if (memberResult.ok) await memberRepo.save(memberResult.value);
+  // Create org if it doesn't exist
+  const existingOrg = await orgRepo.findById(orgId);
+  if (!existingOrg) {
+    const orgResult = createOrganization({
+      id: orgId,
+      name: "Dev Organization",
+      ownerId: userId,
+    });
+    if (orgResult.ok) await orgRepo.save(orgResult.value);
+  }
+
+  // Create membership if it doesn't exist
+  const existingMember = await memberRepo.findByUserAndOrg(userId, orgId);
+  if (!existingMember) {
+    const memberResult = createMembership({
+      id: uuid() as MembershipId,
+      userId,
+      organizationId: orgId,
+      role: "admin",
+    });
+    if (memberResult.ok) await memberRepo.save(memberResult.value);
+  }
+
+  // Skip asset seeding if org already has assets
+  const existingAssets = await assetRepo.findAll(orgId);
+  if (existingAssets.length > 0) return;
 
   // --- Assets ---
   const assetInputs = [

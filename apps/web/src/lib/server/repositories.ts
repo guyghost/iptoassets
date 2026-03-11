@@ -66,6 +66,13 @@ if (env.DATABASE_URL) {
 
   const { createPgPriorArtResultRepository } = await import("@ipms/infrastructure/postgres");
   priorArtResultRepo = createPgPriorArtResultRepository(db);
+
+  // Seed dev data if not already present
+  const { dev } = await import("$app/environment");
+  if (dev) {
+    const { seedData } = await import("./seed.js");
+    seedData().catch((e: unknown) => console.warn("[seed]", e));
+  }
 } else {
   const { createInMemoryAssetRepository, createInMemoryDeadlineRepository, createInMemoryDocumentRepository, createInMemoryPortfolioRepository, createInMemoryStatusChangeEventRepository, createInMemoryUserRepository, createInMemoryOrganizationRepository, createInMemoryMembershipRepository, createInMemoryAuditEventRepository, createInMemoryNotificationRepository, createInMemoryInvitationRepository } = await import("@ipms/infrastructure");
   assetRepo = createInMemoryAssetRepository();
