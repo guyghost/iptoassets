@@ -16,6 +16,7 @@ import type {
   DocumentType,
   DocumentStatus,
   Jurisdiction,
+  PriorArtResultId,
 } from "@ipms/shared";
 
 export interface IPAsset {
@@ -190,4 +191,17 @@ export interface DeadlineRisk {
   readonly deadlineId: DeadlineId;
   readonly score: number;
   readonly factors: readonly string[];
+}
+
+export interface PriorArtResult {
+  readonly id: PriorArtResultId;
+  readonly assetId: AssetId;
+  readonly organizationId: OrganizationId;
+  readonly patentNumber: string;
+  readonly title: string;
+  readonly abstractText: string;
+  readonly relevanceScore: number;
+  readonly relevanceReasoning: string;
+  readonly source: "uspto";
+  readonly searchedAt: Date;
 }
