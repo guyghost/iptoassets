@@ -14,6 +14,9 @@ export type {
   AIService,
   EmbeddingService,
   AssetEmbeddingRepository,
+  PatentSearchService,
+  PatentSearchResult,
+  PriorArtResultRepository,
 } from "./ports.js";
 
 export {

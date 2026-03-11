@@ -1,5 +1,5 @@
 import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId, UserId, MembershipId, AuditEventId, NotificationId, InvitationId } from "@ipms/shared";
-import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership, AuditEvent, Notification, Invitation } from "@ipms/domain";
+import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership, AuditEvent, Notification, Invitation, PriorArtResult } from "@ipms/domain";
 
 export interface AssetRepository {
   findById(id: AssetId, orgId: OrganizationId): Promise<IPAsset | null>;
@@ -94,4 +94,20 @@ export interface AssetEmbeddingRepository {
   save(assetId: AssetId, orgId: OrganizationId, embedding: number[]): Promise<void>;
   searchByVector(orgId: OrganizationId, embedding: number[], limit: number): Promise<readonly AssetId[]>;
   deleteByAssetId(assetId: AssetId): Promise<void>;
+}
+
+export interface PatentSearchResult {
+  readonly patentNumber: string;
+  readonly title: string;
+  readonly abstractText: string;
+}
+
+export interface PatentSearchService {
+  search(query: string, limit: number): Promise<readonly PatentSearchResult[]>;
+}
+
+export interface PriorArtResultRepository {
+  save(result: PriorArtResult): Promise<void>;
+  findByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<readonly PriorArtResult[]>;
+  deleteByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<void>;
 }
