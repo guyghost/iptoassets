@@ -41,15 +41,26 @@ const authHandler: Handle = async ({ event, resolve }) => {
 };
 
 const protectRoutes: Handle = async ({ event, resolve }) => {
-  if (
+  const isPublicRoute =
     event.url.pathname.startsWith("/api/auth") ||
-    event.url.pathname.startsWith("/login") ||
-    event.url.pathname === "/" ||
-    event.url.pathname.startsWith("/api/cron")
-  ) {
+    event.url.pathname.startsWith("/api/cron") ||
+    event.url.pathname === "/";
+
+  if (isPublicRoute) {
     return resolve(event);
   }
 
+  // Redirect authenticated users away from login
+  if (event.url.pathname.startsWith("/login") && event.locals.betterAuthUser) {
+    throw redirect(303, "/dashboard");
+  }
+
+  // Allow login page for unauthenticated users
+  if (event.url.pathname.startsWith("/login")) {
+    return resolve(event);
+  }
+
+  // All other routes require authentication
   if (!event.locals.betterAuthUser) {
     throw redirect(303, "/login");
   }
