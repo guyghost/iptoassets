@@ -1,6 +1,10 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
   import { NavActions } from "@ipms/ui";
+  import ProfileDropdown from "../../features/profile/ProfileDropdown.svelte";
+  import NotificationPanel from "../../features/notifications/NotificationPanel.svelte";
+
   let { children } = $props();
 
   const data = $derived($page.data);
@@ -13,6 +17,9 @@
       .toUpperCase()
       .slice(0, 2) || "?"
   );
+
+  let profileOpen = $state(false);
+  let notificationsOpen = $state(false);
 
   const navItems = [
     { href: "/dashboard", label: "Home", icon: "home" },
@@ -62,9 +69,36 @@
       </div>
 
       <!-- Right: Actions -->
-      <NavActions userInitials={userInitials} notificationCount={3} />
+      <div class="relative">
+        <NavActions
+          userInitials={userInitials}
+          notificationCount={3}
+          onsettingsclick={() => goto('/settings')}
+          onnotificationsclick={() => {
+            notificationsOpen = !notificationsOpen;
+            profileOpen = false;
+          }}
+          onprofileclick={() => {
+            profileOpen = !profileOpen;
+            notificationsOpen = false;
+          }}
+        />
+        <ProfileDropdown
+          userName={data.user?.name ?? ""}
+          userEmail={data.user?.email ?? ""}
+          {userInitials}
+          open={profileOpen}
+          onclose={() => (profileOpen = false)}
+        />
+      </div>
     </div>
   </nav>
+
+  <!-- Notification slide-over -->
+  <NotificationPanel
+    open={notificationsOpen}
+    onclose={() => (notificationsOpen = false)}
+  />
 
   <!-- Content -->
   <main>
