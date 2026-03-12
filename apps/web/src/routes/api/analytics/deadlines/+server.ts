@@ -1,6 +1,7 @@
 import type { RequestHandler } from "./$types";
 import { computeDeadlineMetrics } from "$lib/server/use-cases";
 import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
+import { parseFilterParams } from "$lib/server/parse-filter-params";
 
 export const GET: RequestHandler = async (event) => {
   const auth = await requireAuth(event);
@@ -9,6 +10,7 @@ export const GET: RequestHandler = async (event) => {
   const forbidden = requirePermission(auth.value, "deadline:read");
   if (forbidden) return forbidden;
 
-  const result = await computeDeadlineMetrics(auth.value.organizationId, new Date());
+  const filter = parseFilterParams(event.url);
+  const result = await computeDeadlineMetrics(auth.value.organizationId, new Date(), filter);
   return resultToResponse(result);
 };

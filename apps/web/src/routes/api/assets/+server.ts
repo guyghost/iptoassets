@@ -1,7 +1,8 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { listAssets, createAsset } from "$lib/server/use-cases";
+import { listAssets, listAssetsFiltered, createAsset } from "$lib/server/use-cases";
 import { resultToResponse, requireAuth, unauthorizedResponse, requirePermission } from "$lib/server/api-utils";
+import { parseFilterParams } from "$lib/server/parse-filter-params";
 import { parseAssetId } from "@ipms/shared";
 import type { AssetStatus } from "@ipms/shared";
 import { assetRepo } from "$lib/server/repositories";
@@ -13,7 +14,10 @@ export const GET: RequestHandler = async (event) => {
   const forbidden = requirePermission(auth.value, "asset:read");
   if (forbidden) return forbidden;
 
-  const result = await listAssets(auth.value.organizationId);
+  const filter = parseFilterParams(event.url);
+  const result = filter
+    ? await listAssetsFiltered(auth.value.organizationId, filter)
+    : await listAssets(auth.value.organizationId);
   return resultToResponse(result);
 };
 
