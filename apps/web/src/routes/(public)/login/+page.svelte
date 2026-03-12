@@ -6,12 +6,33 @@
   const hasMicrosoft = $derived(($page.data as any)?.hasMicrosoft ?? false);
   const hasOAuthProviders = $derived(hasGoogle || hasMicrosoft);
 
-  function signInWithGoogle() {
-    authClient.signIn.social({ provider: "google", callbackURL: "/assets" });
+  let loading = $state(false);
+  let error = $state("");
+
+  async function signInWithGoogle() {
+    loading = true;
+    error = "";
+    const result = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+    if (result.error) {
+      error = result.error.message ?? "Failed to sign in with Google";
+      loading = false;
+    }
   }
 
-  function signInWithMicrosoft() {
-    authClient.signIn.social({ provider: "microsoft", callbackURL: "/assets" });
+  async function signInWithMicrosoft() {
+    loading = true;
+    error = "";
+    const result = await authClient.signIn.social({
+      provider: "microsoft",
+      callbackURL: "/dashboard",
+    });
+    if (result.error) {
+      error = result.error.message ?? "Failed to sign in with Microsoft";
+      loading = false;
+    }
   }
 </script>
 
@@ -22,15 +43,22 @@
       <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Intellectual Property Management System</p>
     </div>
 
+    {#if error}
+      <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {error}
+      </div>
+    {/if}
+
     <div class="space-y-3">
       {#if hasOAuthProviders}
         {#if hasGoogle}
           <button
             onclick={signInWithGoogle}
             type="button"
-            class="w-full rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+            disabled={loading}
+            class="w-full rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign in with Google
+            {loading ? "Redirecting..." : "Sign in with Google"}
           </button>
         {/if}
 
@@ -38,9 +66,10 @@
           <button
             onclick={signInWithMicrosoft}
             type="button"
-            class="w-full rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+            disabled={loading}
+            class="w-full rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign in with Microsoft
+            {loading ? "Redirecting..." : "Sign in with Microsoft"}
           </button>
         {/if}
       {:else}
