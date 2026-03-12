@@ -102,7 +102,7 @@
             <input
               id="org-name"
               type="text"
-              value="Melvin Corp"
+              value={data.organizationName}
               disabled
               class="mt-1.5 w-full max-w-md rounded-lg border border-[var(--border-color)] bg-[var(--color-neutral-50)] px-3 py-2 text-sm text-[var(--color-neutral-500)]"
             />
@@ -112,7 +112,7 @@
             <input
               id="role"
               type="text"
-              value="Admin"
+              value={data.role}
               disabled
               class="mt-1.5 w-full max-w-md rounded-lg border border-[var(--border-color)] bg-[var(--color-neutral-50)] px-3 py-2 text-sm text-[var(--color-neutral-500)]"
             />

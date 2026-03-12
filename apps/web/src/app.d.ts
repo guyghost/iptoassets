@@ -8,6 +8,7 @@ declare global {
       betterAuthUser: any;
       userId?: UserId;
       activeOrganizationId?: OrganizationId;
+      activeOrganizationName?: string;
       role?: MemberRole;
     }
   }

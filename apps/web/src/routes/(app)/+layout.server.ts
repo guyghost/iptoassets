@@ -16,5 +16,6 @@ export const load: LayoutServerLoad = async (event) => {
     },
     role: event.locals.role ?? "viewer",
     organizationId: event.locals.activeOrganizationId,
+    organizationName: event.locals.activeOrganizationName ?? "",
   };
 };

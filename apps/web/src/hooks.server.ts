@@ -38,6 +38,7 @@ const authHandler: Handle = async ({ event, resolve }) => {
       const orgsResult = await listUserOrganizations(domainUser.id);
       if (orgsResult.ok && orgsResult.value.length > 0) {
         event.locals.activeOrganizationId = orgsResult.value[0].id;
+        event.locals.activeOrganizationName = orgsResult.value[0].name;
 
         const membership = await memberRepo.findByUserAndOrg(
           domainUser.id,

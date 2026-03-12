@@ -40,7 +40,7 @@
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-600)] text-sm font-bold text-white">IP</span>
         </a>
         <div class="flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-[var(--color-neutral-50)] cursor-pointer">
-          <span class="text-sm font-semibold text-[var(--color-neutral-800)]">Melvin Corp</span>
+          <span class="text-sm font-semibold text-[var(--color-neutral-800)]">{data.organizationName}</span>
           <svg class="h-3.5 w-3.5 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
         </div>
       </div>
