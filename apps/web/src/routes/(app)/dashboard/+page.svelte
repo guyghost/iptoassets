@@ -11,6 +11,8 @@
   let activeType = $state("all");
   let activeStatus = $state("all");
   let activeJurisdiction = $state("all");
+  let searchQuery = $state("");
+  let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   const typeFilters = [
     { id: "all", label: "All" },
@@ -87,6 +89,7 @@
     if (activeType !== "all") params.set("type", activeType);
     if (activeStatus !== "all") params.set("status", activeStatus);
     if (activeJurisdiction !== "all") params.set("jurisdiction", activeJurisdiction);
+    if (searchQuery.trim()) params.set("search", searchQuery.trim());
     const qs = params.toString();
     return qs ? `?${qs}` : "";
   }
@@ -274,10 +277,27 @@
     <div class="mt-5 max-w-2xl">
       <div class="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 shadow-sm">
         <svg class="h-5 w-5 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-        <input type="text" placeholder="Search for assets, portfolios, deadlines or documents..." class="w-full bg-transparent text-sm text-[var(--color-neutral-800)] outline-none placeholder:text-[var(--color-neutral-400)]" />
-        <button aria-label="Clear search" class="text-[var(--color-neutral-300)] hover:text-[var(--color-neutral-500)]">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <input
+          type="text"
+          placeholder="Search for assets, portfolios, deadlines or documents..."
+          class="w-full bg-transparent text-sm text-[var(--color-neutral-800)] outline-none placeholder:text-[var(--color-neutral-400)]"
+          bind:value={searchQuery}
+          oninput={() => {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+              if (initialized) fetchDashboardData();
+            }, 300);
+          }}
+        />
+        {#if searchQuery}
+          <button
+            aria-label="Clear search"
+            class="text-[var(--color-neutral-300)] hover:text-[var(--color-neutral-500)]"
+            onclick={() => { searchQuery = ""; if (initialized) fetchDashboardData(); }}
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        {/if}
       </div>
     </div>
   </div>

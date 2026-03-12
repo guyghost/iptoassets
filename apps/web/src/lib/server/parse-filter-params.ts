@@ -6,8 +6,9 @@ export function parseFilterParams(url: URL): AssetFilter | undefined {
   const type = url.searchParams.get("type");
   const status = url.searchParams.get("status");
   const jurisdiction = url.searchParams.get("jurisdiction");
+  const search = url.searchParams.get("search");
 
-  if (!type && !status && !jurisdiction) return undefined;
+  if (!type && !status && !jurisdiction && !search) return undefined;
 
   const filter: AssetFilter = {};
   if (type && (IP_TYPES as readonly string[]).includes(type)) {
@@ -18,6 +19,9 @@ export function parseFilterParams(url: URL): AssetFilter | undefined {
   }
   if (jurisdiction) {
     (filter as { jurisdiction?: string }).jurisdiction = jurisdiction;
+  }
+  if (search) {
+    (filter as { search?: string }).search = search;
   }
   return filter;
 }
