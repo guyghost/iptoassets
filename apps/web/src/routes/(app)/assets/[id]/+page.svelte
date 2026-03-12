@@ -242,13 +242,8 @@
     {:else if asset}
 
     <!-- Page Header -->
-    <div class="mt-4 flex items-start justify-between">
-      <div class="flex items-center gap-4">
-        <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</h1>
-        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status]?.bg} {statusConfig[asset.status]?.text}">
-          {statusConfig[asset.status]?.label ?? asset.status}
-        </span>
-      </div>
+    <div class="mt-4">
+      <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</h1>
     </div>
 
     <!-- Info Grid -->
