@@ -101,7 +101,7 @@
   />
 
   <!-- Content -->
-  <main>
+  <main class="animate-page-enter">
     {@render children()}
   </main>
 </div>
