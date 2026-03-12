@@ -89,6 +89,13 @@
   let importMessage = $state<{ type: "success" | "error"; text: string } | null>(null);
   let fileInput: HTMLInputElement;
 
+  // Clean title: extract text before first patent reference (for legacy data)
+  function cleanTitle(raw: string): string {
+    const idx = raw.search(/\([A-Z]{2}[\w\/-]+\)/);
+    if (idx > 0) return raw.slice(0, idx).trim();
+    return raw;
+  }
+
   function extractCountryFromTitle(title: string): { code: string; name: string } | null {
     const m = title.match(/\(([A-Z]{2})/);
     if (!m) return null;
@@ -133,7 +140,11 @@
       let succeeded = 0;
       let failed = 0;
       for (const [fanId, row] of families) {
-        const title = String(row["English title"] ?? "").replace(/^\([^)]+\)\s*/, "").trim();
+        // Extract clean title: text before the first (PATENT_REF)
+        const rawTitleFull = String(row["English title"] ?? "").trim();
+        const firstRefIdx = rawTitleFull.search(/\([A-Z]{2}/);
+        const titleBeforeRef = firstRefIdx > 0 ? rawTitleFull.slice(0, firstRefIdx).trim() : rawTitleFull.replace(/^\([^)]+\)\s*/, "").trim();
+        const title = titleBeforeRef || rawTitleFull.replace(/\s*\([A-Z][\w\/-]+\)\s*/g, " ").trim();
         if (!title) { failed++; continue; }
 
         const jurisdiction = extractCountryFromTitle(String(row["English title"] ?? ""))
@@ -680,7 +691,7 @@
                       <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="rounded border-[var(--border-color)]" />
                     </td>
                     <td class="py-3.5">
-                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{asset.title}</a>
+                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
                     <td class="py-3.5 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
                     <td class="py-3.5">

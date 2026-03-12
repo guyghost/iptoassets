@@ -63,6 +63,13 @@
     "ipcClassification", "cpcClassification", "citingPatents",
   ]);
 
+  // Clean title: extract text before first patent reference (for legacy data)
+  function cleanTitle(raw: string): string {
+    const idx = raw.search(/\([A-Z]{2}[\w\/-]+\)/);
+    if (idx > 0) return raw.slice(0, idx).trim();
+    return raw;
+  }
+
   function parseMultiLine(val: string): string[] {
     return val.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   }
@@ -216,7 +223,7 @@
 </script>
 
 <svelte:head>
-  <title>{asset?.title ?? "Loading..."} - IP Assets - IPMS</title>
+  <title>{asset ? cleanTitle(asset.title) : "Loading..."} - IP Assets - IPMS</title>
 </svelte:head>
 
 <div class="min-h-screen bg-[#f7f7f8]">
@@ -237,7 +244,7 @@
     <!-- Page Header -->
     <div class="mt-4 flex items-start justify-between">
       <div class="flex items-center gap-4">
-        <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">{asset.title}</h1>
+        <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</h1>
         <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {statusConfig[asset.status]?.bg} {statusConfig[asset.status]?.text}">
           {statusConfig[asset.status]?.label ?? asset.status}
         </span>
