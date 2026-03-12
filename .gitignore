@@ -12,3 +12,4 @@ dist/
 .superset/
 .vercel/
 skills-lock.json
+.vercel
