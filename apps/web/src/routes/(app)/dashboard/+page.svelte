@@ -285,7 +285,7 @@
 
 <!-- Dashboard Content -->
 <div class="mx-auto max-w-[1400px] px-6 pb-12">
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_380px]">
 
     <!-- Left Column -->
     <div class="flex flex-col gap-6">
@@ -397,8 +397,56 @@
     <!-- Right Column -->
     <div class="flex flex-col gap-6">
 
+      <!-- Portfolio Health -->
+      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold text-white">Portfolio health</h2>
+          {#if loading}
+            <div class="skeleton-dark h-7 w-12"></div>
+          {:else}
+            <span class="text-2xl font-bold {healthColor}">{healthScore}%</span>
+          {/if}
+        </div>
+        {#if !loading}
+          <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{healthLabelText.toLowerCase()}</p>
+        {/if}
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+          {#if loading}
+            <div class="skeleton-dark h-full w-full rounded-full"></div>
+          {:else}
+            <div class="animate-gauge-fill h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {healthScore}%"></div>
+          {/if}
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+          <div class="text-center">
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{portfolioMetrics?.byStatus.granted ?? 0}</p>
+            {/if}
+            <p class="text-xs text-white/50">Granted</p>
+          </div>
+          <div class="text-center">
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{pendingCount}</p>
+            {/if}
+            <p class="text-xs text-white/50">Pending</p>
+          </div>
+          <div class="text-center">
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{portfolioMetrics?.expiringWithin90Days ?? 0}</p>
+            {/if}
+            <p class="text-xs text-amber-400">Expiring</p>
+          </div>
+        </div>
+      </div>
+
       <!-- For You Today -->
-      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
@@ -454,54 +502,6 @@
               </div>
             {/each}
           {/if}
-        </div>
-      </div>
-
-      <!-- Portfolio Overview -->
-      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold text-white">Portfolio health</h2>
-          {#if loading}
-            <div class="skeleton-dark h-7 w-12"></div>
-          {:else}
-            <span class="text-2xl font-bold {healthColor}">{healthScore}%</span>
-          {/if}
-        </div>
-        {#if !loading}
-          <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{healthLabelText.toLowerCase()}</p>
-        {/if}
-        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-          {#if loading}
-            <div class="skeleton-dark h-full w-full rounded-full"></div>
-          {:else}
-            <div class="animate-gauge-fill h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {healthScore}%"></div>
-          {/if}
-        </div>
-        <div class="mt-4 grid grid-cols-3 gap-3">
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{portfolioMetrics?.byStatus.granted ?? 0}</p>
-            {/if}
-            <p class="text-xs text-white/50">Granted</p>
-          </div>
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{pendingCount}</p>
-            {/if}
-            <p class="text-xs text-white/50">Pending</p>
-          </div>
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{portfolioMetrics?.expiringWithin90Days ?? 0}</p>
-            {/if}
-            <p class="text-xs text-amber-400">Expiring</p>
-          </div>
         </div>
       </div>
     </div>
