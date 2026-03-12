@@ -230,56 +230,43 @@
       <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Overview of your intellectual property portfolio</p>
     </div>
 
-    <!-- Filter Chips -->
-    <div class="mt-5 flex flex-col gap-2">
-      <!-- Type -->
-      <div class="flex items-center gap-2">
-        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Type</span>
-        <div class="flex flex-wrap items-center gap-1.5">
-          {#each typeFilters as filter}
-            <button
-              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeType === filter.id
-                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
-                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
-              onclick={() => (activeType = filter.id)}
-            >
-              {filter.label}
-            </button>
-          {/each}
-        </div>
+    <!-- Filters -->
+    <div class="mt-5 flex flex-wrap items-center gap-3">
+      <!-- Type Chips -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        {#each typeFilters as filter}
+          <button
+            class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeType === filter.id
+              ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
+              : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
+            onclick={() => (activeType = filter.id)}
+          >
+            {filter.label}
+          </button>
+        {/each}
       </div>
-      <!-- Status -->
-      <div class="flex items-center gap-2">
-        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Status</span>
-        <div class="flex flex-wrap items-center gap-1.5">
-          {#each statusFilters as filter}
-            <button
-              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeStatus === filter.id
-                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
-                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
-              onclick={() => (activeStatus = filter.id)}
-            >
-              {filter.label}
-            </button>
-          {/each}
-        </div>
-      </div>
-      <!-- Jurisdiction -->
-      <div class="flex items-center gap-2">
-        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Region</span>
-        <div class="flex flex-wrap items-center gap-1.5">
-          {#each jurisdictionFilters as filter}
-            <button
-              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeJurisdiction === filter.id
-                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
-                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
-              onclick={() => (activeJurisdiction = filter.id)}
-            >
-              {filter.label}
-            </button>
-          {/each}
-        </div>
-      </div>
+
+      <div class="h-4 w-px bg-[var(--border-color)]"></div>
+
+      <!-- Status Dropdown -->
+      <select
+        class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
+        bind:value={activeStatus}
+      >
+        {#each statusFilters as filter}
+          <option value={filter.id}>{filter.id === "all" ? "All statuses" : filter.label}</option>
+        {/each}
+      </select>
+
+      <!-- Jurisdiction Dropdown -->
+      <select
+        class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
+        bind:value={activeJurisdiction}
+      >
+        {#each jurisdictionFilters as filter}
+          <option value={filter.id}>{filter.id === "all" ? "All regions" : filter.label}</option>
+        {/each}
+      </select>
     </div>
 
     <!-- Search Bar -->
