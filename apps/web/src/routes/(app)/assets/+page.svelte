@@ -670,35 +670,35 @@
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
-                  <th class="w-10 pb-3">
+                  <th class="w-12 pb-3 pl-1 text-center align-middle">
                     <input type="checkbox" checked={allSelected} onchange={toggleSelectAll} class="rounded border-[var(--border-color)]" />
                   </th>
-                  <th class="w-[30%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
-                  <th class="w-[12%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
-                  <th class="w-[8%] cursor-pointer select-none pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("jurisdiction")}>Jurisdiction{sortIndicator("jurisdiction")}</th>
-                  <th class="w-[12%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("status")}>Status{sortIndicator("status")}</th>
-                  <th class="w-[20%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("owner")}>Owner{sortIndicator("owner")}</th>
-                  <th class="w-[13%] cursor-pointer select-none pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("date")}>Date{sortIndicator("date")}</th>
+                  <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
+                  <th class="w-20 pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
+                  <th class="w-12 pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("jurisdiction")}><span title="Jurisdiction">Jur.</span>{sortIndicator("jurisdiction")}</th>
+                  <th class="w-24 pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("status")}>Status{sortIndicator("status")}</th>
+                  <th class="w-36 pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("owner")}>Owner{sortIndicator("owner")}</th>
+                  <th class="w-28 pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("date")}>Date{sortIndicator("date")}</th>
                 </tr>
               </thead>
               <tbody>
                 {#each sortedAssets as asset}
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
-                    <td class="w-10 py-3.5">
-                      <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="rounded border-[var(--border-color)]" />
+                    <td class="w-12 py-3.5 pl-1 text-center align-top">
+                      <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="mt-0.5 rounded border-[var(--border-color)]" />
                     </td>
-                    <td class="py-3.5 pr-4">
+                    <td class="py-3.5 pr-6">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
-                    <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
-                    <td class="py-3.5 text-center">
+                    <td class="w-20 py-3.5 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
+                    <td class="w-12 py-3.5 text-center">
                       <span class="text-base leading-none" title={asset.jurisdiction.code}>{countryFlag(asset.jurisdiction.code)}</span>
                     </td>
-                    <td class="py-3.5 pr-4">
+                    <td class="w-24 py-3.5">
                       <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">{statusConfig[asset.status].label}</span>
                     </td>
-                    <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{asset.owner}</td>
-                    <td class="py-3.5 text-right text-sm text-[var(--color-neutral-400)]">{formatDate(asset.filingDate || asset.createdAt)}</td>
+                    <td class="w-36 py-3.5 text-sm text-[var(--color-neutral-500)]">{asset.owner}</td>
+                    <td class="w-28 py-3.5 text-right text-sm text-[var(--color-neutral-400)]">{formatDate(asset.filingDate || asset.createdAt)}</td>
                   </tr>
                 {/each}
               </tbody>
