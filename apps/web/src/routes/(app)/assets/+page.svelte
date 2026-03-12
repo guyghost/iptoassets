@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { filterAssets, type AssetFilter, type IPAsset } from "@ipms/domain";
   import { ASSET_STATUSES, IP_TYPES } from "@ipms/shared";
-  import { statusConfig, typeLabels, filters, formatDate } from "../../../features/assets/helpers";
+  import { statusConfig, typeLabels, filters, formatDate, cleanTitle } from "../../../features/assets/helpers";
   import * as XLSX from "xlsx";
   import { parseLegalActions } from "../../../features/assets/parse-legal-actions";
 
@@ -88,13 +88,6 @@
   let importing = $state(false);
   let importMessage = $state<{ type: "success" | "error"; text: string } | null>(null);
   let fileInput: HTMLInputElement;
-
-  // Clean title: extract text before first patent reference (for legacy data)
-  function cleanTitle(raw: string): string {
-    const idx = raw.search(/\([A-Z]{2}[\w\/-]+\)/);
-    if (idx > 0) return raw.slice(0, idx).trim();
-    return raw;
-  }
 
   function extractCountryFromTitle(title: string): { code: string; name: string } | null {
     const m = title.match(/\(([A-Z]{2})/);

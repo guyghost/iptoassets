@@ -40,6 +40,12 @@ export const transitionButtonColors: Record<string, string> = {
   abandoned: "bg-red-100 hover:bg-red-200 text-red-700",
 };
 
+export function cleanTitle(raw: string): string {
+  const idx = raw.search(/\([A-Z]{2}[\w\/-]+\)/);
+  if (idx > 0) return raw.slice(0, idx).trim();
+  return raw;
+}
+
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "--";
   const d = new Date(dateStr);

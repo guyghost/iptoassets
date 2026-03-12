@@ -5,7 +5,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { computeHealthScore, healthLabel } from "../../../features/analytics/helpers";
-  import { statusConfig, typeLabels, formatDate } from "../../../features/assets/helpers";
+  import { statusConfig, typeLabels, formatDate, cleanTitle } from "../../../features/assets/helpers";
 
   let activeFilter = $state("all");
 
@@ -167,13 +167,14 @@
 <!-- Hero Section -->
 <div class="bg-gradient-to-b from-[#f0ecff] to-[#f7f7f8] pb-6">
   <div class="mx-auto max-w-[1400px] px-6 pt-8">
-    <!-- Greeting -->
-    <h1 class="text-center text-2xl font-bold text-[var(--color-neutral-900)]">
-      Good afternoon, Alex
-    </h1>
+    <!-- Page Header -->
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Dashboard</h1>
+      <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Overview of your intellectual property portfolio</p>
+    </div>
 
     <!-- Filter Pills -->
-    <div class="mt-5 flex items-center justify-center gap-2">
+    <div class="mt-5 flex items-center gap-2">
       {#each filters as filter}
         <button
           class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors {activeFilter === filter.id
@@ -187,7 +188,7 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="mx-auto mt-5 max-w-2xl">
+    <div class="mt-5 max-w-2xl">
       <div class="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 shadow-sm">
         <svg class="h-5 w-5 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
         <input type="text" placeholder="Search for assets, portfolios, deadlines or documents..." class="w-full bg-transparent text-sm text-[var(--color-neutral-800)] outline-none placeholder:text-[var(--color-neutral-400)]" />
@@ -262,7 +263,7 @@
                 {#each recentAssets as asset}
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
                     <td class="py-3.5">
-                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{asset.title}</a>
+                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
                     <td class="py-3.5 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
                     <td class="py-3.5">
