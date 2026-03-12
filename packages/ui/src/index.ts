@@ -3,11 +3,14 @@ export { default as Input } from "./atoms/Input.svelte";
 export { default as Badge } from "./atoms/Badge.svelte";
 export { default as Card } from "./atoms/Card.svelte";
 export { default as Icon } from "./atoms/Icon.svelte";
+export { default as IconButton } from "./atoms/IconButton.svelte";
 export { default as Select } from "./atoms/Select.svelte";
+export { default as UserAvatar } from "./atoms/UserAvatar.svelte";
 
 export { default as StatusBadge } from "./molecules/StatusBadge.svelte";
 export { default as FormField } from "./molecules/FormField.svelte";
 export { default as AssetCard } from "./molecules/AssetCard.svelte";
+export { default as NavActions } from "./molecules/NavActions.svelte";
 export { default as SearchBar } from "./molecules/SearchBar.svelte";
 export { default as StatCard } from "./molecules/StatCard.svelte";
 
