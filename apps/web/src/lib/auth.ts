@@ -11,7 +11,7 @@ async function getDb() {
   if (!_db) {
     if (env.DATABASE_URL) {
       const { createDatabase } = await import("@ipms/infrastructure/postgres");
-      _db = createDatabase(env.DATABASE_URL);
+      _db = await createDatabase(env.DATABASE_URL);
     }
   }
   return _db;

@@ -21,7 +21,7 @@ let priorArtResultRepo: PriorArtResultRepository;
 
 if (env.DATABASE_URL) {
   const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
-  const db = createDatabase(env.DATABASE_URL);
+  const db = await createDatabase(env.DATABASE_URL);
   assetRepo = createPgAssetRepository(db);
   deadlineRepo = createPgDeadlineRepository(db);
   documentRepo = createPgDocumentRepository(db);
