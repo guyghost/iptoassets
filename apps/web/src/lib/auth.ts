@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { getRequestEvent } from "$app/server";
@@ -36,29 +37,27 @@ export const auth = betterAuth({
     }),
   },
   hooks: {
-    after: [
-      {
-        matcher: (ctx) => ctx.path === "/sign-in/social",
-        handler: async (ctx) => {
-          const user = (ctx as any).context?.session?.user;
-          if (!user?.email || !user?.name) return;
+    after: createAuthMiddleware(async (ctx) => {
+      if (!ctx.path.startsWith("/sign-in")) return;
 
-          const { signInOrRegister, acceptPendingInvitations } =
-            await import("$lib/server/use-cases");
+      const newSession = (ctx as any).context?.newSession;
+      const user = newSession?.user;
+      if (!user?.email || !user?.name) return;
 
-          const result = await signInOrRegister({
-            authProviderId: `better-auth:${user.id}`,
-            email: user.email,
-            name: user.name,
-            avatarUrl: user.image ?? null,
-          });
+      const { signInOrRegister, acceptPendingInvitations } =
+        await import("$lib/server/use-cases");
 
-          if (result.ok) {
-            await acceptPendingInvitations(user.email, result.value.id);
-          }
-        },
-      },
-    ],
+      const result = await signInOrRegister({
+        authProviderId: `better-auth:${user.id}`,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.image ?? null,
+      });
+
+      if (result.ok) {
+        await acceptPendingInvitations(user.email, result.value.id);
+      }
+    }),
   },
   plugins: [sveltekitCookies(getRequestEvent)],
 });
