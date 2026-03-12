@@ -20,14 +20,9 @@ export interface AuthContext {
 }
 
 export async function requireAuth(event: RequestEvent): Promise<Result<AuthContext>> {
-  const session = await event.locals.auth();
-  if (!session?.user) {
-    return err("Not authenticated");
-  }
-
-  const userId = (session as any).userId as UserId | undefined;
-  const organizationId = (session as any).activeOrganizationId as OrganizationId | undefined;
-  const role = (session as any).role as MemberRole | undefined;
+  const userId = event.locals.userId;
+  const organizationId = event.locals.activeOrganizationId;
+  const role = event.locals.role;
 
   if (!userId) return err("Not authenticated");
   if (!organizationId) return err("No organization selected");
