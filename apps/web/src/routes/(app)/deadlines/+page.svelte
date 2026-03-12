@@ -3,8 +3,8 @@
 </svelte:head>
 
 <script lang="ts">
-  import { mockDeadlines } from "../../features/deadlines/data";
-  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate } from "../../features/deadlines/helpers";
+  import { mockDeadlines } from "../../../features/deadlines/data";
+  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate } from "../../../features/deadlines/helpers";
 
   let activeFilter = $state("all");
   let deadlines = $state(mockDeadlines.map(d => ({ ...d })));

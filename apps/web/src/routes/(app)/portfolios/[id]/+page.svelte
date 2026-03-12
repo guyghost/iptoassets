@@ -4,8 +4,8 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import { mockPortfolios, mockAssets } from "../../../features/portfolios/data";
-  import { statusConfig, typeColorConfig } from "../../../features/portfolios/helpers";
+  import { mockPortfolios, mockAssets } from "../../../../features/portfolios/data";
+  import { statusConfig, typeColorConfig } from "../../../../features/portfolios/helpers";
 
   const portfolioId = $derived($page.params.id);
 

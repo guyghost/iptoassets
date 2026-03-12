@@ -3,8 +3,8 @@
 </svelte:head>
 
 <script lang="ts">
-  import { documents, assetNames } from "../../features/documents/data";
-  import { statusFilters, typeConfig, statusConfig } from "../../features/documents/helpers";
+  import { documents, assetNames } from "../../../features/documents/data";
+  import { statusFilters, typeConfig, statusConfig } from "../../../features/documents/helpers";
 
   let activeFilter = $state("all");
 

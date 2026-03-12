@@ -3,8 +3,8 @@
 </svelte:head>
 
 <script lang="ts">
-  import { portfolios } from "../../features/portfolios/data";
-  import { truncate } from "../../features/portfolios/helpers";
+  import { portfolios } from "../../../features/portfolios/data";
+  import { truncate } from "../../../features/portfolios/helpers";
 
   let searchQuery = $state("");
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../features/assets/helpers";
-  import { fetchAssetTimeline, type TimelineEvent } from "../../../features/timeline/data";
-  import { formatTimelineEntry, formatTimelineDate } from "../../../features/timeline/helpers";
-  import LegalStatus from "../../../features/assets/LegalStatus.svelte";
+  import { statusConfig, typeLabels, statusTransitions, transitionButtonColors, formatDate } from "../../../../features/assets/helpers";
+  import { fetchAssetTimeline, type TimelineEvent } from "../../../../features/timeline/data";
+  import { formatTimelineEntry, formatTimelineDate } from "../../../../features/timeline/helpers";
+  import LegalStatus from "../../../../features/assets/LegalStatus.svelte";
 
   let assetId = $derived($page.params.id);
 

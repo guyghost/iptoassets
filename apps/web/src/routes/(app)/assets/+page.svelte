@@ -6,9 +6,9 @@
   import { onMount } from "svelte";
   import { filterAssets, type AssetFilter, type IPAsset } from "@ipms/domain";
   import { ASSET_STATUSES, IP_TYPES } from "@ipms/shared";
-  import { statusConfig, typeLabels, filters, formatDate } from "../../features/assets/helpers";
+  import { statusConfig, typeLabels, filters, formatDate } from "../../../features/assets/helpers";
   import * as XLSX from "xlsx";
-  import { parseLegalActions } from "../../features/assets/parse-legal-actions";
+  import { parseLegalActions } from "../../../features/assets/parse-legal-actions";
 
   // --- State ---
   let assets = $state<IPAsset[]>([]);
