@@ -7,13 +7,26 @@
   import { computeHealthScore, healthLabel } from "../../../features/analytics/helpers";
   import { statusConfig, typeLabels, formatDate, cleanTitle, countryFlag } from "../../../features/assets/helpers";
 
-  let activeFilter = $state("all");
+  let activeType = $state("all");
+  let activeStatus = $state("all");
+  let activeJurisdiction = $state("all");
 
-  const filters = [
+  const typeFilters = [
     { id: "all", label: "All" },
-    { id: "patents", label: "Patents" },
-    { id: "trademarks", label: "Trademarks" },
-    { id: "copyrights", label: "Copyrights" },
+    { id: "patent", label: "Patents" },
+    { id: "trademark", label: "Trademarks" },
+    { id: "copyright", label: "Copyrights" },
+    { id: "design-right", label: "Design Rights" },
+  ];
+
+  const statusFilters = [
+    { id: "all", label: "All" },
+    { id: "draft", label: "Draft" },
+    { id: "filed", label: "Filed" },
+    { id: "published", label: "Published" },
+    { id: "granted", label: "Granted" },
+    { id: "expired", label: "Expired" },
+    { id: "abandoned", label: "Abandoned" },
   ];
 
   interface PortfolioMetrics {
@@ -50,6 +63,52 @@
   let deadlineMetrics = $state<DeadlineMetrics | null>(null);
   let assets = $state<Asset[]>([]);
   let loading = $state(true);
+  let allAssets = $state<Asset[]>([]);
+
+  const jurisdictionFilters = $derived((() => {
+    const seen = new Map<string, string>();
+    for (const a of allAssets) {
+      if (!seen.has(a.jurisdiction.code)) {
+        seen.set(a.jurisdiction.code, a.jurisdiction.name);
+      }
+    }
+    return [
+      { id: "all", label: "All" },
+      ...[...seen.entries()].map(([code]) => ({
+        id: code,
+        label: `${countryFlag(code)} ${code}`,
+      })),
+    ];
+  })());
+
+  function buildFilterParams(): string {
+    const params = new URLSearchParams();
+    if (activeType !== "all") params.set("type", activeType);
+    if (activeStatus !== "all") params.set("status", activeStatus);
+    if (activeJurisdiction !== "all") params.set("jurisdiction", activeJurisdiction);
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
+  }
+
+  async function fetchDashboardData() {
+    loading = true;
+    try {
+      const qs = buildFilterParams();
+      const [portfolioRes, deadlinesRes, assetsRes] = await Promise.all([
+        fetch(`/api/analytics/portfolio${qs}`),
+        fetch(`/api/analytics/deadlines${qs}`),
+        fetch(`/api/assets${qs}`),
+      ]);
+
+      if (portfolioRes.ok) portfolioMetrics = await portfolioRes.json();
+      if (deadlinesRes.ok) deadlineMetrics = await deadlinesRes.json();
+      if (assetsRes.ok) assets = await assetsRes.json();
+    } catch {
+      // Gracefully handle fetch errors
+    } finally {
+      loading = false;
+    }
+  }
 
   const recentAssets = $derived(
     [...assets]
@@ -139,28 +198,26 @@
     custom: "bg-gray-100 text-gray-600",
   };
 
+  let initialized = $state(false);
+
   onMount(async () => {
     try {
-      const [portfolioRes, deadlinesRes, assetsRes] = await Promise.all([
-        fetch("/api/analytics/portfolio"),
-        fetch("/api/analytics/deadlines"),
-        fetch("/api/assets"),
-      ]);
-
-      if (portfolioRes.ok) {
-        portfolioMetrics = await portfolioRes.json();
-      }
-      if (deadlinesRes.ok) {
-        deadlineMetrics = await deadlinesRes.json();
-      }
-      if (assetsRes.ok) {
-        assets = await assetsRes.json();
-      }
+      const res = await fetch("/api/assets");
+      if (res.ok) allAssets = await res.json();
     } catch {
-      // Gracefully handle fetch errors - dashboard will show loading placeholders
-    } finally {
-      loading = false;
+      // Gracefully handle
     }
+    await fetchDashboardData();
+    initialized = true;
+  });
+
+  $effect(() => {
+    // Track these reactive values to trigger re-fetch
+    activeType;
+    activeStatus;
+    activeJurisdiction;
+    if (!initialized) return;
+    fetchDashboardData();
   });
 </script>
 
@@ -173,18 +230,56 @@
       <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Overview of your intellectual property portfolio</p>
     </div>
 
-    <!-- Filter Pills -->
-    <div class="mt-5 flex items-center gap-2">
-      {#each filters as filter}
-        <button
-          class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors {activeFilter === filter.id
-            ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
-            : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
-          onclick={() => (activeFilter = filter.id)}
-        >
-          {filter.label}
-        </button>
-      {/each}
+    <!-- Filter Chips -->
+    <div class="mt-5 flex flex-col gap-2">
+      <!-- Type -->
+      <div class="flex items-center gap-2">
+        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Type</span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          {#each typeFilters as filter}
+            <button
+              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeType === filter.id
+                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
+                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
+              onclick={() => (activeType = filter.id)}
+            >
+              {filter.label}
+            </button>
+          {/each}
+        </div>
+      </div>
+      <!-- Status -->
+      <div class="flex items-center gap-2">
+        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Status</span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          {#each statusFilters as filter}
+            <button
+              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeStatus === filter.id
+                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
+                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
+              onclick={() => (activeStatus = filter.id)}
+            >
+              {filter.label}
+            </button>
+          {/each}
+        </div>
+      </div>
+      <!-- Jurisdiction -->
+      <div class="flex items-center gap-2">
+        <span class="w-20 shrink-0 text-xs font-medium text-[var(--color-neutral-400)]">Region</span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          {#each jurisdictionFilters as filter}
+            <button
+              class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeJurisdiction === filter.id
+                ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
+                : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
+              onclick={() => (activeJurisdiction = filter.id)}
+            >
+              {filter.label}
+            </button>
+          {/each}
+        </div>
+      </div>
     </div>
 
     <!-- Search Bar -->
