@@ -285,52 +285,101 @@
 
 <!-- Dashboard Content -->
 <div class="mx-auto max-w-[1400px] px-6 pb-12">
-  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_380px]">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
 
-    <!-- Left Column -->
-    <div class="flex flex-col gap-6">
-
-      <!-- Asset Tracker -->
-      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
-        <div class="flex items-center gap-2.5">
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
-            <svg class="h-4.5 w-4.5 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
-          </div>
-          <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Asset tracker</h2>
+    <!-- Asset Tracker -->
+    <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
+          <svg class="h-4.5 w-4.5 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
         </div>
-
-        <div class="mt-5 grid grid-cols-3 gap-4">
-          {#if loading}
-            {#each [0, 1, 2] as _}
-              <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
-                <div class="skeleton h-4 w-20"></div>
-                <div class="skeleton mt-2 h-8 w-16"></div>
-                <div class="skeleton mt-2 h-3 w-14"></div>
-              </div>
-            {/each}
-          {:else}
-            {#each stats as stat, i}
-              <div
-                use:inView={{ delay: i * 80 }}
-                class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
-              >
-                <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
-                <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">
-                  {#if stat.value !== "\u2014"}
-                    <span use:countUp={parseInt(stat.value)}></span>
-                  {:else}
-                    {stat.value}
-                  {/if}
-                </p>
-                <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{stat.sub}</p>
-              </div>
-            {/each}
-          {/if}
-        </div>
+        <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Asset tracker</h2>
       </div>
 
-      <!-- Recent Assets -->
-      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div class="mt-5 grid grid-cols-3 gap-4">
+        {#if loading}
+          {#each [0, 1, 2] as _}
+            <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
+              <div class="skeleton h-4 w-20"></div>
+              <div class="skeleton mt-2 h-8 w-16"></div>
+              <div class="skeleton mt-2 h-3 w-14"></div>
+            </div>
+          {/each}
+        {:else}
+          {#each stats as stat, i}
+            <div
+              use:inView={{ delay: i * 80 }}
+              class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
+            >
+              <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
+              <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">
+                {#if stat.value !== "\u2014"}
+                  <span use:countUp={parseInt(stat.value)}></span>
+                {:else}
+                  {stat.value}
+                {/if}
+              </p>
+              <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{stat.sub}</p>
+            </div>
+          {/each}
+        {/if}
+      </div>
+    </div>
+
+    <!-- Portfolio Health -->
+    <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
+      <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold text-white">Portfolio health</h2>
+          {#if loading}
+            <div class="skeleton-dark h-7 w-12"></div>
+          {:else}
+            <span class="text-2xl font-bold {healthColor}">{healthScore}%</span>
+          {/if}
+        </div>
+        {#if !loading}
+          <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{healthLabelText.toLowerCase()}</p>
+        {/if}
+        <div class="mt-auto pt-4">
+          <div class="h-2 overflow-hidden rounded-full bg-white/10">
+            {#if loading}
+              <div class="skeleton-dark h-full w-full rounded-full"></div>
+            {:else}
+              <div class="animate-gauge-fill h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {healthScore}%"></div>
+            {/if}
+          </div>
+          <div class="mt-4 grid grid-cols-3 gap-3">
+            <div class="text-center">
+              {#if loading}
+                <div class="skeleton-dark mx-auto h-5 w-8"></div>
+              {:else}
+                <p class="text-lg font-bold text-white">{portfolioMetrics?.byStatus.granted ?? 0}</p>
+              {/if}
+              <p class="text-xs text-white/50">Granted</p>
+            </div>
+            <div class="text-center">
+              {#if loading}
+                <div class="skeleton-dark mx-auto h-5 w-8"></div>
+              {:else}
+                <p class="text-lg font-bold text-white">{pendingCount}</p>
+              {/if}
+              <p class="text-xs text-white/50">Pending</p>
+            </div>
+            <div class="text-center">
+              {#if loading}
+                <div class="skeleton-dark mx-auto h-5 w-8"></div>
+              {:else}
+                <p class="text-lg font-bold text-white">{portfolioMetrics?.expiringWithin90Days ?? 0}</p>
+              {/if}
+              <p class="text-xs text-amber-400">Expiring</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Assets -->
+    <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
@@ -392,61 +441,9 @@
           </table>
         </div>
       </div>
-    </div>
 
-    <!-- Right Column -->
-    <div class="flex flex-col gap-6">
-
-      <!-- Portfolio Health -->
-      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold text-white">Portfolio health</h2>
-          {#if loading}
-            <div class="skeleton-dark h-7 w-12"></div>
-          {:else}
-            <span class="text-2xl font-bold {healthColor}">{healthScore}%</span>
-          {/if}
-        </div>
-        {#if !loading}
-          <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{healthLabelText.toLowerCase()}</p>
-        {/if}
-        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-          {#if loading}
-            <div class="skeleton-dark h-full w-full rounded-full"></div>
-          {:else}
-            <div class="animate-gauge-fill h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {healthScore}%"></div>
-          {/if}
-        </div>
-        <div class="mt-4 grid grid-cols-3 gap-3">
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{portfolioMetrics?.byStatus.granted ?? 0}</p>
-            {/if}
-            <p class="text-xs text-white/50">Granted</p>
-          </div>
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{pendingCount}</p>
-            {/if}
-            <p class="text-xs text-white/50">Pending</p>
-          </div>
-          <div class="text-center">
-            {#if loading}
-              <div class="skeleton-dark mx-auto h-5 w-8"></div>
-            {:else}
-              <p class="text-lg font-bold text-white">{portfolioMetrics?.expiringWithin90Days ?? 0}</p>
-            {/if}
-            <p class="text-xs text-amber-400">Expiring</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- For You Today -->
-      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <!-- For You Today -->
+    <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
@@ -504,6 +501,5 @@
           {/if}
         </div>
       </div>
-    </div>
   </div>
 </div>
