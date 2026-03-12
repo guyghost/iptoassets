@@ -17,8 +17,18 @@ async function getDb() {
   return _db;
 }
 
+const { authUser, authSession, authAccount, authVerification } = await import("@ipms/infrastructure/postgres/schema");
+
 export const auth = betterAuth({
-  database: drizzleAdapter(await getDb(), { provider: "pg" }),
+  database: drizzleAdapter(await getDb(), {
+    provider: "pg",
+    schema: {
+      user: authUser,
+      session: authSession,
+      account: authAccount,
+      verification: authVerification,
+    },
+  }),
   baseURL: env.BETTER_AUTH_URL ?? "http://localhost:5173",
   secret: env.BETTER_AUTH_SECRET,
   socialProviders: {

@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./postgres": "./src/postgres/index.ts",
+    "./postgres/schema": "./src/postgres/schema.ts",
     "./voyage": "./src/voyage-embedding-service.ts"
   },
   "dependencies": {
