@@ -8,7 +8,7 @@ export const load: PageServerLoad = async (event) => {
 
   const orgsResult = await listUserOrganizations(userId);
   if (orgsResult.ok && orgsResult.value.length > 0) {
-    throw redirect(303, "/app");
+    throw redirect(303, "/dashboard");
   }
 };
 
@@ -25,6 +25,6 @@ export const actions: Actions = {
       return { error: result.error };
     }
 
-    throw redirect(303, "/app");
+    throw redirect(303, "/dashboard");
   },
 };
