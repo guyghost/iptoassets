@@ -29,7 +29,7 @@ export const auth = betterAuth({
       verification: authVerification,
     },
   }),
-  baseURL: env.BETTER_AUTH_URL ?? "http://localhost:5173",
+  baseURL: (env.BETTER_AUTH_URL ?? "http://localhost:5173").trim(),
   secret: env.BETTER_AUTH_SECRET,
   socialProviders: {
     ...(env.GOOGLE_CLIENT_ID && {
