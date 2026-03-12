@@ -81,4 +81,26 @@ describe("computePortfolioMetrics", () => {
     const metrics = computePortfolioMetrics(assets, now);
     expect(metrics.expiringWithin90Days).toBe(1);
   });
+
+  it("computes correct metrics on a pre-filtered subset of assets", () => {
+    const now = new Date("2026-03-09");
+    const allAssets = [
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000001" as AssetId, type: "patent", status: "granted", jurisdiction: { code: "US", name: "United States" } }),
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000002" as AssetId, type: "trademark", status: "filed", jurisdiction: { code: "EU", name: "European Union" } }),
+      makeAsset({ id: "a0000000-0000-0000-0000-000000000003" as AssetId, type: "patent", status: "draft", jurisdiction: { code: "US", name: "United States" } }),
+    ];
+    // Simulate filtering to only patents
+    const filtered = allAssets.filter((a) => a.type === "patent");
+    const metrics = computePortfolioMetrics(filtered, now);
+
+    expect(metrics.totalAssets).toBe(2);
+    expect(metrics.byType.patent).toBe(2);
+    expect(metrics.byType.trademark).toBe(0);
+    expect(metrics.byStatus.granted).toBe(1);
+    expect(metrics.byStatus.draft).toBe(1);
+    expect(metrics.byStatus.filed).toBe(0);
+    expect(metrics.byJurisdiction).toEqual([
+      { code: "US", name: "United States", count: 2 },
+    ]);
+  });
 });

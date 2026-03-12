@@ -71,7 +71,7 @@ export const deleteDocument = deleteDocumentUseCase(documentRepo);
 
 export const listAssetsFiltered = listAssetsFilteredUseCase(assetRepo);
 export const computePortfolioMetrics = computePortfolioMetricsUseCase(assetRepo);
-export const computeDeadlineMetrics = computeDeadlineMetricsUseCase(deadlineRepo);
+export const computeDeadlineMetrics = computeDeadlineMetricsUseCase(deadlineRepo, assetRepo);
 export const getAssetTimeline = getAssetTimelineUseCase(statusChangeEventRepo);
 
 export const bulkUpdateAssetStatus = bulkUpdateAssetStatusUseCase(assetRepo, statusChangeEventRepo);
