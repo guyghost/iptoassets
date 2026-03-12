@@ -18,7 +18,20 @@ const authHandler: Handle = async ({ event, resolve }) => {
     const { userRepo, memberRepo } = await import("$lib/server/repositories");
     const { listUserOrganizations } = await import("$lib/server/use-cases");
 
-    const domainUser = await userRepo.findByEmail(session.user.email);
+    let domainUser = await userRepo.findByEmail(session.user.email);
+    if (!domainUser) {
+      // User exists in Better Auth but not in domain tables — provision now
+      const { signInOrRegister } = await import("$lib/server/use-cases");
+      const result = await signInOrRegister({
+        authProviderId: `better-auth:${session.user.id}`,
+        email: session.user.email,
+        name: session.user.name,
+        avatarUrl: session.user.image ?? null,
+      });
+      if (result.ok) {
+        domainUser = result.value;
+      }
+    }
     if (domainUser) {
       event.locals.userId = domainUser.id;
 
@@ -63,6 +76,11 @@ const protectRoutes: Handle = async ({ event, resolve }) => {
   // All other routes require authentication
   if (!event.locals.betterAuthUser) {
     throw redirect(303, "/login");
+  }
+
+  // Redirect authenticated users without an organization to onboarding
+  if (!event.locals.activeOrganizationId && !event.url.pathname.startsWith("/onboarding")) {
+    throw redirect(303, "/onboarding");
   }
 
   return resolve(event);

@@ -48,7 +48,7 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      if (!ctx.path.startsWith("/sign-in")) return;
+      if (!ctx.path.startsWith("/sign-in") && !ctx.path.startsWith("/callback")) return;
 
       const newSession = (ctx as any).context?.newSession;
       const user = newSession?.user;
