@@ -234,10 +234,14 @@
           }
         }
 
-        // Parse legal actions into structured data
+        // Parse legal actions into structured data, then drop raw text to reduce payload size
         if (metadata.legalActions) {
           metadata.parsedLegalActions = parseLegalActions(String(metadata.legalActions));
+          delete metadata.legalActions;
         }
+
+        // Drop large raw text fields already parsed into structured data
+        delete metadata.publicationDetails;
 
         // Parse filing date from earliest priority date
         const priorityDateRaw = String(row["Earliest priority date"] ?? "").trim();
