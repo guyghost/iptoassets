@@ -40,6 +40,25 @@ export const transitionButtonColors: Record<string, string> = {
   abandoned: "bg-red-100 hover:bg-red-200 text-red-700",
 };
 
+const orgFlags: Record<string, string> = {
+  WO: "🌐",
+  EP: "🇪🇺",
+  EU: "🇪🇺",
+  OA: "🌍",
+  AP: "🌍",
+  EA: "🌍",
+  GC: "🌍",
+};
+
+export function countryFlag(code: string): string {
+  if (!code || code.length !== 2) return "";
+  const upper = code.toUpperCase();
+  if (orgFlags[upper]) return orgFlags[upper];
+  return String.fromCodePoint(
+    ...([...upper].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65))
+  );
+}
+
 export function cleanTitle(raw: string): string {
   const idx = raw.search(/\([A-Z]{2}[\w\/-]+\)/);
   if (idx > 0) return raw.slice(0, idx).trim();

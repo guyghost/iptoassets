@@ -5,7 +5,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { computeHealthScore, healthLabel } from "../../../features/analytics/helpers";
-  import { statusConfig, typeLabels, formatDate, cleanTitle } from "../../../features/assets/helpers";
+  import { statusConfig, typeLabels, formatDate, cleanTitle, countryFlag } from "../../../features/assets/helpers";
 
   let activeFilter = $state("all");
 
@@ -243,11 +243,11 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
-                <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
-                <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
-                <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
-                <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
-                <th class="pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Date</th>
+                <th class="w-[40%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
+                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
+                <th class="w-[10%] pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
+                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
+                <th class="w-[20%] pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -262,14 +262,14 @@
               {:else}
                 {#each recentAssets as asset}
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
-                    <td class="py-3.5">
+                    <td class="py-3.5 pr-4">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
-                    <td class="py-3.5 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
-                    <td class="py-3.5">
-                      <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-medium text-[var(--color-neutral-600)]">{asset.jurisdiction.code}</span>
+                    <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
+                    <td class="py-3.5 text-center">
+                      <span class="text-base leading-none" title={asset.jurisdiction.code}>{countryFlag(asset.jurisdiction.code)}</span>
                     </td>
-                    <td class="py-3.5">
+                    <td class="py-3.5 pr-4">
                       {#if statusConfig[asset.status]}
                         <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">{statusConfig[asset.status].label}</span>
                       {:else}

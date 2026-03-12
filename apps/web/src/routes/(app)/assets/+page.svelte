@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { filterAssets, type AssetFilter, type IPAsset } from "@ipms/domain";
   import { ASSET_STATUSES, IP_TYPES } from "@ipms/shared";
-  import { statusConfig, typeLabels, filters, formatDate, cleanTitle } from "../../../features/assets/helpers";
+  import { statusConfig, typeLabels, filters, formatDate, cleanTitle, countryFlag } from "../../../features/assets/helpers";
   import * as XLSX from "xlsx";
   import { parseLegalActions } from "../../../features/assets/parse-legal-actions";
 
@@ -670,34 +670,34 @@
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
-                  <th class="pb-3 w-10">
+                  <th class="w-10 pb-3">
                     <input type="checkbox" checked={allSelected} onchange={toggleSelectAll} class="rounded border-[var(--border-color)]" />
                   </th>
-                  <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
-                  <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
-                  <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("jurisdiction")}>Jurisdiction{sortIndicator("jurisdiction")}</th>
-                  <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("status")}>Status{sortIndicator("status")}</th>
-                  <th class="cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("owner")}>Owner{sortIndicator("owner")}</th>
-                  <th class="cursor-pointer select-none pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("date")}>Date{sortIndicator("date")}</th>
+                  <th class="w-[30%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
+                  <th class="w-[12%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
+                  <th class="w-[8%] cursor-pointer select-none pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("jurisdiction")}>Jurisdiction{sortIndicator("jurisdiction")}</th>
+                  <th class="w-[12%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("status")}>Status{sortIndicator("status")}</th>
+                  <th class="w-[20%] cursor-pointer select-none pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("owner")}>Owner{sortIndicator("owner")}</th>
+                  <th class="w-[13%] cursor-pointer select-none pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" onclick={() => toggleSort("date")}>Date{sortIndicator("date")}</th>
                 </tr>
               </thead>
               <tbody>
                 {#each sortedAssets as asset}
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
-                    <td class="py-3.5 w-10">
+                    <td class="w-10 py-3.5">
                       <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="rounded border-[var(--border-color)]" />
                     </td>
-                    <td class="py-3.5">
+                    <td class="py-3.5 pr-4">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
-                    <td class="py-3.5 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
-                    <td class="py-3.5">
-                      <span class="inline-flex items-center rounded bg-[var(--color-neutral-100)] px-1.5 py-0.5 text-xs font-medium text-[var(--color-neutral-600)]">{asset.jurisdiction.code}</span>
+                    <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
+                    <td class="py-3.5 text-center">
+                      <span class="text-base leading-none" title={asset.jurisdiction.code}>{countryFlag(asset.jurisdiction.code)}</span>
                     </td>
-                    <td class="py-3.5">
+                    <td class="py-3.5 pr-4">
                       <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">{statusConfig[asset.status].label}</span>
                     </td>
-                    <td class="py-3.5 text-sm text-[var(--color-neutral-500)]">{asset.owner}</td>
+                    <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{asset.owner}</td>
                     <td class="py-3.5 text-right text-sm text-[var(--color-neutral-400)]">{formatDate(asset.filingDate || asset.createdAt)}</td>
                   </tr>
                 {/each}
