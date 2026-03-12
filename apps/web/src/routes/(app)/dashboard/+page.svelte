@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import { computeHealthScore, healthLabel } from "../../../features/analytics/helpers";
   import { statusConfig, typeLabels, formatDate, cleanTitle, countryFlag } from "../../../features/assets/helpers";
+  import { countUp, flashlight, inView } from "$lib/animations";
 
   let activeType = $state("all");
   let activeStatus = $state("all");
@@ -290,7 +291,7 @@
     <div class="flex flex-col gap-6">
 
       <!-- Asset Tracker -->
-      <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center gap-2.5">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
             <svg class="h-4.5 w-4.5 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
@@ -308,10 +309,19 @@
               </div>
             {/each}
           {:else}
-            {#each stats as stat}
-              <div class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}">
+            {#each stats as stat, i}
+              <div
+                use:inView={{ delay: i * 80 }}
+                class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
+              >
                 <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
-                <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">{stat.value}</p>
+                <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">
+                  {#if stat.value !== "\u2014"}
+                    <span use:countUp={parseInt(stat.value)}></span>
+                  {:else}
+                    {stat.value}
+                  {/if}
+                </p>
                 <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{stat.sub}</p>
               </div>
             {/each}
@@ -320,7 +330,7 @@
       </div>
 
       <!-- Recent Assets -->
-      <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
@@ -359,7 +369,7 @@
                 </tr>
               {:else}
                 {#each recentAssets as asset}
-                  <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
+                  <tr use:flashlight class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
                     <td class="py-3.5 pr-4">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
@@ -388,7 +398,7 @@
     <div class="flex flex-col gap-6">
 
       <!-- For You Today -->
-      <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
@@ -448,7 +458,7 @@
       </div>
 
       <!-- Portfolio Overview -->
-      <div class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
+      <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <h2 class="text-base font-semibold text-white">Portfolio health</h2>
           {#if loading}
