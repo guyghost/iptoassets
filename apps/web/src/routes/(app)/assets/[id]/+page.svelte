@@ -202,6 +202,31 @@
     D: "Cited in application",
   };
 
+  // Expiration summary derived from publications
+  let expirationSummary = $derived.by(() => {
+    const pubs = asset?.metadata?.publications as any[] | undefined;
+    if (!pubs || pubs.length === 0) return { hasData: false, hasActive: false, expiredCount: 0, activeCount: 0, total: 0 } as const;
+
+    const now = new Date();
+    let expiredCount = 0;
+    let activeCount = 0;
+    let checkedCount = 0;
+
+    for (const pub of pubs) {
+      const expiry = pub.expiry ?? getPublicationExpiry(pub.number);
+      if (!expiry) continue;
+      checkedCount++;
+      if (new Date(expiry) < now) {
+        expiredCount++;
+      } else {
+        activeCount++;
+      }
+    }
+
+    if (checkedCount === 0) return { hasData: false, hasActive: false, expiredCount: 0, activeCount: 0, total: pubs.length } as const;
+    return { hasData: true, hasActive: activeCount > 0, expiredCount, activeCount, total: pubs.length } as const;
+  });
+
   $effect(() => {
     const id = assetId;
     loading = true;
@@ -276,8 +301,27 @@
           <p class="mt-2 text-sm font-medium text-[var(--color-neutral-900)]">{formatDate(asset.filingDate)}</p>
         </div>
         <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
-          <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Expiration Date</p>
-          <p class="mt-2 text-sm font-medium text-[var(--color-neutral-900)]">{formatDate(asset.expirationDate)}</p>
+          <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Expiration</p>
+          <div class="mt-2 flex items-center gap-2">
+            {#if expirationSummary.hasData}
+              {#if expirationSummary.hasActive}
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700">Active</span>
+                {#if expirationSummary.expiredCount > 0}
+                  <a href="#publications" class="inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:text-amber-700" title="{expirationSummary.expiredCount} of {expirationSummary.total} publications expired">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    {expirationSummary.expiredCount}/{expirationSummary.total}
+                  </a>
+                {/if}
+              {:else}
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700">Expired</span>
+                <a href="#publications" class="text-xs font-medium text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)]" title="See all publications">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                </a>
+              {/if}
+            {:else}
+              <span class="text-sm font-medium text-[var(--color-neutral-900)]">{formatDate(asset.expirationDate)}</span>
+            {/if}
+          </div>
         </div>
         <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
           <p class="text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</p>
@@ -359,7 +403,7 @@
 
       <!-- Publications table -->
       {#if Array.isArray(asset.metadata.publications) && asset.metadata.publications.length > 0}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div id="publications" class="mt-6 scroll-mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
               <svg class="h-4.5 w-4.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
