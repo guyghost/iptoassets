@@ -102,6 +102,21 @@ export function bulkValidateStatusTransition(
   return { valid, errors };
 }
 
+/**
+ * Fuzzy match: every character of the query must appear in order in the target,
+ * but not necessarily contiguously. Case-insensitive.
+ * e.g. "ptnt" matches "Patent Application for Widget"
+ */
+function fuzzyMatch(query: string, target: string): boolean {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  let qi = 0;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) qi++;
+  }
+  return qi === q.length;
+}
+
 export function filterAssets(assets: readonly IPAsset[], filter: AssetFilter): IPAsset[] {
   return assets.filter((asset) => {
     if (filter.status && filter.status.length > 0 && !filter.status.includes(asset.status)) {
@@ -116,7 +131,7 @@ export function filterAssets(assets: readonly IPAsset[], filter: AssetFilter): I
     if (filter.owner && asset.owner !== filter.owner) {
       return false;
     }
-    if (filter.search && !asset.title.toLowerCase().includes(filter.search.toLowerCase())) {
+    if (filter.search && !fuzzyMatch(filter.search, asset.title)) {
       return false;
     }
     if (filter.dateFrom || filter.dateTo) {
