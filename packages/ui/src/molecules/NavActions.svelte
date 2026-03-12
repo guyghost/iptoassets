@@ -5,9 +5,18 @@
   interface Props {
     userInitials?: string;
     notificationCount?: number;
+    onsettingsclick?: () => void;
+    onnotificationsclick?: () => void;
+    onprofileclick?: () => void;
   }
 
-  let { userInitials = "AG", notificationCount = 0 }: Props = $props();
+  let {
+    userInitials = "AG",
+    notificationCount = 0,
+    onsettingsclick,
+    onnotificationsclick,
+    onprofileclick,
+  }: Props = $props();
 </script>
 
 <div class="flex items-center gap-2" data-testid="nav-actions">
@@ -15,6 +24,7 @@
     icon="settings"
     aria-label="Settings"
     data-testid="nav-settings"
+    onclick={onsettingsclick}
   />
 
   <div class="relative">
@@ -22,6 +32,7 @@
       icon="bell"
       aria-label="Notifications"
       data-testid="nav-notifications"
+      onclick={onnotificationsclick}
     />
     {#if notificationCount > 0}
       <span
@@ -34,6 +45,6 @@
   </div>
 
   <div class="ml-1">
-    <UserAvatar initials={userInitials} />
+    <UserAvatar initials={userInitials} onclick={onprofileclick} />
   </div>
 </div>

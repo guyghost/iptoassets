@@ -5,9 +5,10 @@
     initials: string;
     size?: Size;
     class?: string;
+    onclick?: () => void;
   }
 
-  let { initials, size = "md", class: className = "" }: Props = $props();
+  let { initials, size = "md", class: className = "", onclick }: Props = $props();
 
   const sizeClasses: Record<Size, string> = {
     sm: "h-7 w-7 text-xs",
@@ -20,6 +21,7 @@
   class="flex items-center justify-center rounded-full bg-[var(--color-primary-100)] font-semibold text-[var(--color-primary-700)] cursor-pointer transition-colors hover:bg-[var(--color-primary-200)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] {sizeClasses[size]} {className}"
   aria-label="User menu"
   data-testid="user-avatar"
+  {onclick}
 >
   {initials}
 </button>
