@@ -299,13 +299,23 @@
         </div>
 
         <div class="mt-5 grid grid-cols-3 gap-4">
-          {#each stats as stat}
-            <div class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}">
-              <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
-              <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">{stat.value}</p>
-              <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{stat.sub}</p>
-            </div>
-          {/each}
+          {#if loading}
+            {#each [0, 1, 2] as _}
+              <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
+                <div class="skeleton h-4 w-20"></div>
+                <div class="skeleton mt-2 h-8 w-16"></div>
+                <div class="skeleton mt-2 h-3 w-14"></div>
+              </div>
+            {/each}
+          {:else}
+            {#each stats as stat}
+              <div class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}">
+                <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
+                <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">{stat.value}</p>
+                <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{stat.sub}</p>
+              </div>
+            {/each}
+          {/if}
         </div>
       </div>
 
@@ -334,9 +344,15 @@
             </thead>
             <tbody>
               {#if loading}
-                <tr>
-                  <td colspan="5" class="py-8 text-center text-sm text-[var(--color-neutral-400)]">{"\u2014"}</td>
-                </tr>
+                {#each [0, 1, 2, 3, 4] as _}
+                  <tr class="border-b border-[var(--border-color)] last:border-0">
+                    <td class="py-3.5 pr-4"><div class="skeleton h-4 w-40"></div></td>
+                    <td class="py-3.5 pr-4"><div class="skeleton h-4 w-16"></div></td>
+                    <td class="py-3.5 text-center"><div class="skeleton mx-auto h-5 w-5 !rounded-full"></div></td>
+                    <td class="py-3.5 pr-4"><div class="skeleton h-5 w-16 !rounded-full"></div></td>
+                    <td class="py-3.5 text-right"><div class="skeleton ml-auto h-4 w-20"></div></td>
+                  </tr>
+                {/each}
               {:else if recentAssets.length === 0}
                 <tr>
                   <td colspan="5" class="py-8 text-center text-sm text-[var(--color-neutral-400)]">No assets yet</td>
@@ -389,7 +405,15 @@
 
         <div class="mt-4 flex flex-col">
           {#if loading}
-            <div class="py-4 text-center text-sm text-[var(--color-neutral-400)]">{"\u2014"}</div>
+            {#each [0, 1, 2] as _}
+              <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0">
+                <div class="flex items-center gap-3">
+                  <div class="skeleton h-9 w-9 !rounded-xl"></div>
+                  <div class="skeleton h-4 w-32"></div>
+                </div>
+                <div class="skeleton h-6 w-14 !rounded-full"></div>
+              </div>
+            {/each}
           {:else if deadlines.length === 0}
             <div class="py-4 text-center text-sm text-[var(--color-neutral-400)]">No overdue deadlines</div>
           {:else}
@@ -427,23 +451,45 @@
       <div class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <h2 class="text-base font-semibold text-white">Portfolio health</h2>
-          <span class="text-2xl font-bold {healthColor}">{loading ? "\u2014" : `${healthScore}%`}</span>
+          {#if loading}
+            <div class="skeleton-dark h-7 w-12"></div>
+          {:else}
+            <span class="text-2xl font-bold {healthColor}">{healthScore}%</span>
+          {/if}
         </div>
-        <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{loading ? "" : healthLabelText.toLowerCase()}</p>
+        {#if !loading}
+          <p class="mt-0.5 text-right text-xs uppercase tracking-wider {healthColorMuted}">{healthLabelText.toLowerCase()}</p>
+        {/if}
         <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-          <div class="h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {loading ? 0 : healthScore}%"></div>
+          {#if loading}
+            <div class="skeleton-dark h-full w-full rounded-full"></div>
+          {:else}
+            <div class="animate-gauge-fill h-full rounded-full bg-gradient-to-r {healthBarFrom} {healthBarTo}" style="width: {healthScore}%"></div>
+          {/if}
         </div>
         <div class="mt-4 grid grid-cols-3 gap-3">
           <div class="text-center">
-            <p class="text-lg font-bold text-white">{portfolioMetrics ? portfolioMetrics.byStatus.granted ?? 0 : "\u2014"}</p>
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{portfolioMetrics?.byStatus.granted ?? 0}</p>
+            {/if}
             <p class="text-xs text-white/50">Granted</p>
           </div>
           <div class="text-center">
-            <p class="text-lg font-bold text-white">{portfolioMetrics ? pendingCount : "\u2014"}</p>
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{pendingCount}</p>
+            {/if}
             <p class="text-xs text-white/50">Pending</p>
           </div>
           <div class="text-center">
-            <p class="text-lg font-bold text-white">{portfolioMetrics ? portfolioMetrics.expiringWithin90Days : "\u2014"}</p>
+            {#if loading}
+              <div class="skeleton-dark mx-auto h-5 w-8"></div>
+            {:else}
+              <p class="text-lg font-bold text-white">{portfolioMetrics?.expiringWithin90Days ?? 0}</p>
+            {/if}
             <p class="text-xs text-amber-400">Expiring</p>
           </div>
         </div>
