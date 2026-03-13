@@ -706,52 +706,53 @@
           </div>
         {/if}
       </div>
-      {#if selectedIds.size > 0}
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
-          <span class="text-sm font-medium text-[var(--color-neutral-700)]">{selectedIds.size} selected</span>
-
-          <div class="h-6 w-px bg-[var(--border-color)]"></div>
-
-          <!-- Change Status -->
-          <div class="flex items-center gap-2">
-            <select bind:value={bulkStatusTarget} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
-              <option value="">Change status...</option>
-              {#each ASSET_STATUSES as status}
-                <option value={status}>{status}</option>
-              {/each}
-            </select>
-            <button
-              onclick={bulkChangeStatus}
-              disabled={!bulkStatusTarget || bulkLoading}
-              class="rounded-lg bg-[var(--color-primary-600)] px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-[var(--color-primary-700)]"
-            >Apply</button>
-          </div>
-
-          <div class="h-6 w-px bg-[var(--border-color)]"></div>
-
-          <!-- Add to Portfolio -->
-          <div class="flex items-center gap-2">
-            <select bind:value={bulkPortfolioTarget} onfocus={loadPortfolios} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
-              <option value="">Add to portfolio...</option>
-              {#each portfolios as portfolio}
-                <option value={portfolio.id}>{portfolio.name}</option>
-              {/each}
-            </select>
-            <button
-              onclick={bulkAddToPortfolio}
-              disabled={!bulkPortfolioTarget || bulkLoading}
-              class="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-indigo-700"
-            >Add</button>
-          </div>
-
-          <div class="h-6 w-px bg-[var(--border-color)]"></div>
-
-          <button onclick={() => { selectedIds = new Set(); }} class="text-sm text-[var(--color-neutral-500)] hover:text-[var(--color-neutral-700)]">Clear</button>
-        </div>
-      {/if}
     {/if}
   </div>
 </div>
+
+{#if selectedIds.size > 0}
+  <div class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
+    <span class="text-sm font-medium text-[var(--color-neutral-700)]">{selectedIds.size} selected</span>
+
+    <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+    <!-- Change Status -->
+    <div class="flex items-center gap-2">
+      <select bind:value={bulkStatusTarget} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
+        <option value="">Change status...</option>
+        {#each ASSET_STATUSES as status}
+          <option value={status}>{status}</option>
+        {/each}
+      </select>
+      <button
+        onclick={bulkChangeStatus}
+        disabled={!bulkStatusTarget || bulkLoading}
+        class="rounded-lg bg-[var(--color-primary-600)] px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-[var(--color-primary-700)]"
+      >Apply</button>
+    </div>
+
+    <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+    <!-- Add to Portfolio -->
+    <div class="flex items-center gap-2">
+      <select bind:value={bulkPortfolioTarget} onfocus={loadPortfolios} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
+        <option value="">Add to portfolio...</option>
+        {#each portfolios as portfolio}
+          <option value={portfolio.id}>{portfolio.name}</option>
+        {/each}
+      </select>
+      <button
+        onclick={bulkAddToPortfolio}
+        disabled={!bulkPortfolioTarget || bulkLoading}
+        class="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-indigo-700"
+      >Add</button>
+    </div>
+
+    <div class="h-6 w-px bg-[var(--border-color)]"></div>
+
+    <button onclick={() => { selectedIds = new Set(); }} class="text-sm text-[var(--color-neutral-500)] hover:text-[var(--color-neutral-700)]">Clear</button>
+  </div>
+{/if}
 
 <!-- Slide-over Drawer -->
 {#if drawerOpen}
