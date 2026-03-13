@@ -182,7 +182,7 @@
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <span>{deadline.assetName}</span>
+                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -223,7 +223,7 @@
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <span>{deadline.assetName}</span>
+                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -264,7 +264,7 @@
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <span>{deadline.assetName}</span>
+                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -303,7 +303,7 @@
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <span>{deadline.assetName}</span>
+                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -358,7 +358,7 @@
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <span>{deadline.assetName}</span>
+                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>

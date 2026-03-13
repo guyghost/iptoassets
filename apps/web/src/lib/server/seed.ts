@@ -117,6 +117,9 @@ export async function seedData() {
     if (memberResult.ok) await memberRepo.save(memberResult.value);
   }
 
+  // Seed deadlines for any org that has assets but no deadlines
+  await seedDeadlinesForAllOrgs();
+
   // Skip asset seeding if org already has assets
   const existingAssets = await assetRepo.findAll(orgId);
   if (existingAssets.length > 0) return;
@@ -272,6 +275,93 @@ export async function seedData() {
     if (result.ok) {
       const portfolio = { ...result.value, assetIds: input.assetIds };
       await portfolioRepo.save(portfolio);
+    }
+  }
+}
+
+/**
+ * For any organization that has assets but no deadlines, generate
+ * realistic deadlines based on the actual assets in that org.
+ */
+async function seedDeadlinesForAllOrgs() {
+  const orgs = await orgRepo.findAll();
+  const now = new Date();
+
+  for (const org of orgs) {
+    const existingDeadlines = await deadlineRepo.findAll(org.id);
+    if (existingDeadlines.length > 0) continue;
+
+    const assets = await assetRepo.findAll(org.id);
+    if (assets.length === 0) continue;
+
+    const deadlineTypes: Array<"renewal" | "response" | "filing" | "review" | "custom"> =
+      ["renewal", "response", "filing", "review", "custom"];
+
+    const titleTemplates: Record<string, (assetTitle: string) => string> = {
+      renewal: (t) => `Renewal fee payment - ${t}`,
+      response: (t) => `Office action response - ${t}`,
+      filing: (t) => `Filing deadline - ${t}`,
+      review: (t) => `Portfolio review - ${t}`,
+      custom: (t) => `Administrative review - ${t}`,
+    };
+
+    // Pick a subset of assets for deadlines (up to 14)
+    const selected = assets.slice(0, Math.min(assets.length, 14));
+    const deadlines: Array<{
+      assetId: AssetId;
+      type: "renewal" | "response" | "filing" | "review" | "custom";
+      title: string;
+      dueDate: Date;
+      completed: boolean;
+    }> = [];
+
+    for (let i = 0; i < selected.length; i++) {
+      const asset = selected[i];
+      const type = deadlineTypes[i % deadlineTypes.length];
+      const shortTitle = asset.title.split("\n")[0].slice(0, 80);
+      const template = titleTemplates[type];
+
+      // Spread deadlines: some overdue, some this week, some upcoming, some completed
+      let dueDate: Date;
+      let completed = false;
+
+      if (i < 3) {
+        // Overdue (3-10 days ago)
+        dueDate = new Date(now.getTime() - (3 + i * 3) * 86_400_000);
+      } else if (i < 6) {
+        // Due this week (1-5 days from now)
+        dueDate = new Date(now.getTime() + (1 + (i - 3) * 2) * 86_400_000);
+      } else if (i < 10) {
+        // Upcoming (2-6 weeks from now)
+        dueDate = new Date(now.getTime() + (14 + (i - 6) * 10) * 86_400_000);
+      } else {
+        // Completed (past dates)
+        dueDate = new Date(now.getTime() - (15 + (i - 10) * 7) * 86_400_000);
+        completed = true;
+      }
+
+      deadlines.push({
+        assetId: asset.id,
+        type,
+        title: template(shortTitle),
+        dueDate,
+        completed,
+      });
+    }
+
+    for (const input of deadlines) {
+      const result = createDeadline({
+        id: uuid() as DeadlineId,
+        assetId: input.assetId,
+        type: input.type,
+        title: input.title,
+        dueDate: input.dueDate,
+        organizationId: org.id,
+      });
+
+      if (!result.ok) continue;
+      const deadline = input.completed ? { ...result.value, completed: true } : result.value;
+      await deadlineRepo.save(deadline);
     }
   }
 }
