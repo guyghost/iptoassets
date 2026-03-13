@@ -73,7 +73,21 @@ const statusTransitionPaths: Record<string, { statuses: AssetStatus[]; dates: Da
   },
 };
 
+async function seedRenewalFees() {
+  const { renewalFeeRepo } = await import("./repositories.js");
+  const existingFees = await renewalFeeRepo.findAll();
+  if (existingFees.length > 0) return;
+
+  const { generateRenewalFees } = await import("./renewal-fee-seed.js");
+  const fees = generateRenewalFees();
+  await renewalFeeRepo.saveMany(fees);
+  console.log(`[seed] Created ${fees.length} renewal fee entries`);
+}
+
 export async function seedData() {
+  // Seed renewal fees (org-independent, idempotent)
+  await seedRenewalFees();
+
   const orgId = SEED_ORG_ID;
 
   // --- Dev User + Organization (idempotent) ---
