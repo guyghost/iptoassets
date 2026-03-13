@@ -9,10 +9,12 @@ function isNeonUrl(url: string) {
 
 export async function createDatabase(connectionString: string): Promise<Database> {
   if (isNeonUrl(connectionString)) {
-    const { neon } = await import("@neondatabase/serverless");
-    const { drizzle } = await import("drizzle-orm/neon-http");
-    const sql = neon(connectionString);
-    return drizzle(sql, { schema });
+    const { Pool, neonConfig } = await import("@neondatabase/serverless");
+    const ws = await import("ws");
+    neonConfig.webSocketConstructor = ws.default;
+    const { drizzle } = await import("drizzle-orm/neon-serverless");
+    const pool = new Pool({ connectionString });
+    return drizzle(pool, { schema });
   }
   const pg = await import("pg");
   const { drizzle } = await import("drizzle-orm/node-postgres");
