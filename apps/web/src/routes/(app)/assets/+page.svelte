@@ -766,8 +766,8 @@
               </thead>
               <tbody>
                 {#each sortedAssets as asset}
-                  <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
-                    <td class="w-12 py-3.5 pl-1 text-center align-top">
+                  <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)] align-top">
+                    <td class="w-12 py-3.5 pl-1 text-center">
                       <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="mt-0.5 rounded border-[var(--border-color)]" />
                     </td>
                     <td class="w-40 py-3.5 pr-4">
