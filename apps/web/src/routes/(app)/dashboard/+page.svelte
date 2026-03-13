@@ -227,7 +227,7 @@
 
 <!-- Hero Section -->
 <div class="bg-gradient-to-b from-[#f0ecff] to-[#f7f7f8] pb-6">
-  <div class="mx-auto max-w-[1400px] px-6 pt-8">
+  <div class="mx-auto max-w-[1400px] px-4 md:px-6 pt-8">
     <!-- Page Header -->
     <div>
       <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Dashboard</h1>
@@ -237,7 +237,7 @@
     <!-- Filters -->
     <div class="mt-5 flex flex-wrap items-center gap-3">
       <!-- Type Chips -->
-      <div class="flex flex-wrap items-center gap-1.5">
+      <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
         {#each typeFilters as filter}
           <button
             class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeType === filter.id
@@ -304,11 +304,11 @@
 </div>
 
 <!-- Dashboard Content -->
-<div class="mx-auto max-w-[1400px] px-6 pb-12">
+<div class="mx-auto max-w-[1400px] px-4 md:px-6 pb-12">
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
 
     <!-- Asset Tracker -->
-    <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <div use:inView={{ delay: 0 }} use:flashlight class="order-2 lg:order-1 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
       <div class="flex items-center gap-2.5">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
           <svg class="h-4.5 w-4.5 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
@@ -316,10 +316,10 @@
         <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Asset tracker</h2>
       </div>
 
-      <div class="mt-5 grid grid-cols-3 gap-4">
+      <div class="mt-5 grid grid-cols-3 gap-2 md:gap-4">
         {#if loading}
           {#each [0, 1, 2] as _}
-            <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
+            <div class="rounded-xl border border-[var(--border-color)] px-3 py-3 md:px-5 md:py-4">
               <div class="skeleton h-4 w-20"></div>
               <div class="skeleton mt-2 h-8 w-16"></div>
               <div class="skeleton mt-2 h-3 w-14"></div>
@@ -329,10 +329,10 @@
           {#each stats as stat, i}
             <div
               use:inView={{ delay: i * 80 }}
-              class="rounded-xl border px-5 py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
+              class="rounded-xl border px-3 py-3 md:px-5 md:py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
             >
               <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
-              <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">
+              <p class="mt-1 text-2xl md:text-3xl font-bold text-[var(--color-neutral-900)]">
                 {#if stat.value !== "\u2014"}
                   <span use:countUp={parseInt(stat.value)}></span>
                 {:else}
@@ -347,7 +347,7 @@
     </div>
 
     <!-- Portfolio Health -->
-    <div use:inView={{ delay: 0 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
+    <div use:inView={{ delay: 0 }} use:flashlight class="order-1 lg:order-2 rounded-2xl border border-[var(--border-color)] bg-[#2d1b69] p-6 shadow-sm">
       <div class="flex h-full flex-col">
         <div class="flex items-center justify-between">
           <h2 class="text-base font-semibold text-white">Portfolio health</h2>
@@ -399,7 +399,7 @@
     </div>
 
     <!-- Recent Assets -->
-    <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <div use:inView={{ delay: 100 }} use:flashlight class="order-4 lg:order-3 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
@@ -411,6 +411,42 @@
         </div>
 
         <div class="mt-4">
+          <!-- Mobile: compact list -->
+          <div class="flex flex-col md:hidden">
+            {#if loading}
+              {#each [0, 1, 2, 3, 4] as _}
+                <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0">
+                  <div>
+                    <div class="skeleton h-4 w-40"></div>
+                    <div class="skeleton mt-1.5 h-3 w-28"></div>
+                  </div>
+                  <div class="skeleton h-4 w-4"></div>
+                </div>
+              {/each}
+            {:else if recentAssets.length === 0}
+              <div class="py-8 text-center text-sm text-[var(--color-neutral-400)]">No assets yet</div>
+            {:else}
+              {#each recentAssets as asset}
+                <a href="/assets/{asset.id}" class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0 min-h-[var(--touch-target-min)] active:bg-[var(--color-neutral-50)] transition-colors">
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</p>
+                    <div class="mt-0.5 flex items-center gap-2 text-xs text-[var(--color-neutral-400)]">
+                      <span>{countryFlag(asset.jurisdiction.code)}</span>
+                      <span>{typeLabels[asset.type] ?? asset.type}</span>
+                      <span class="text-[var(--color-neutral-200)]">·</span>
+                      {#if statusConfig[asset.status]}
+                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">{statusConfig[asset.status].label}</span>
+                      {/if}
+                      <span class="ml-auto">{formatDate(asset.updatedAt)}</span>
+                    </div>
+                  </div>
+                  <svg class="ml-2 h-4 w-4 flex-shrink-0 text-[var(--color-neutral-300)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </a>
+              {/each}
+            {/if}
+          </div>
+          <!-- Desktop: table -->
+          <div class="hidden md:block">
           <table class="w-full">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
@@ -459,11 +495,12 @@
               {/if}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
     <!-- For You Today -->
-    <div use:inView={{ delay: 100 }} use:flashlight class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <div use:inView={{ delay: 100 }} use:flashlight class="order-3 lg:order-4 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
@@ -481,7 +518,7 @@
         <div class="mt-4 flex flex-col">
           {#if loading}
             {#each [0, 1, 2] as _}
-              <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0">
+              <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0 min-h-[var(--touch-target-min)]">
                 <div class="flex items-center gap-3">
                   <div class="skeleton h-9 w-9 !rounded-xl"></div>
                   <div class="skeleton h-4 w-32"></div>
@@ -493,7 +530,7 @@
             <div class="py-4 text-center text-sm text-[var(--color-neutral-400)]">No overdue deadlines</div>
           {:else}
             {#each deadlines as deadline}
-              <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0">
+              <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0 min-h-[var(--touch-target-min)]">
                 <div class="flex items-center gap-3">
                   <div class="relative">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl {typeColors[deadline.type] ?? 'bg-gray-100 text-gray-600'}">
@@ -513,7 +550,7 @@
                   </div>
                   <span class="text-sm font-medium text-[var(--color-neutral-800)]">{deadline.title}</span>
                 </div>
-                <button class="rounded-full border border-[var(--border-color)] px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-50)] hover:text-[var(--color-neutral-800)]">
+                <button class="rounded-full border border-[var(--border-color)] px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-50)] hover:text-[var(--color-neutral-800)]">
                   Review
                 </button>
               </div>
