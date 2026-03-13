@@ -3,11 +3,29 @@
 </svelte:head>
 
 <script lang="ts">
-  import { mockDeadlines } from "../../../features/deadlines/data";
-  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate } from "../../../features/deadlines/helpers";
+  import { onMount } from "svelte";
+  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate, type DeadlineItem } from "../../../features/deadlines/helpers";
 
   let activeFilter = $state("all");
-  let deadlines = $state(mockDeadlines.map(d => ({ ...d })));
+  let deadlines = $state<DeadlineItem[]>([]);
+  let loading = $state(true);
+
+  onMount(async () => {
+    try {
+      const res = await fetch("/api/deadlines");
+      if (res.ok) {
+        const data = await res.json();
+        deadlines = data.map((d: any) => ({
+          ...d,
+          dueDate: typeof d.dueDate === "string" ? d.dueDate : new Date(d.dueDate).toISOString().split("T")[0],
+        }));
+      }
+    } catch {
+      // Gracefully handle
+    } finally {
+      loading = false;
+    }
+  });
 
   let overdueItems = $derived(deadlines.filter(d => isOverdue(d)));
   let weekItems = $derived(deadlines.filter(d => isDueThisWeek(d)));
@@ -42,8 +60,18 @@
     activeFilter === "all" ? completedItems : []
   );
 
-  function toggleComplete(id: string) {
+  async function toggleComplete(id: string) {
     deadlines = deadlines.map(d => d.id === id ? { ...d, completed: !d.completed } : d);
+    try {
+      await fetch(`/api/deadlines`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+    } catch {
+      // Revert on failure
+      deadlines = deadlines.map(d => d.id === id ? { ...d, completed: !d.completed } : d);
+    }
   }
 </script>
 
@@ -104,7 +132,7 @@
         <p class="text-sm font-medium text-[var(--color-neutral-600)]">Due this month</p>
       </div>
       <p class="mt-3 text-3xl font-bold text-[var(--color-neutral-900)]">{monthItems.length}</p>
-      <p class="mt-1 text-xs text-[var(--color-neutral-400)]">in March 2026</p>
+      <p class="mt-1 text-xs text-[var(--color-neutral-400)]">this month</p>
     </div>
 
     <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">

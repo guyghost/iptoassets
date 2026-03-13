@@ -1,7 +1,7 @@
 import type { AssetId, DeadlineId, OrganizationId, Result } from "@ipms/shared";
 import { ok, err } from "@ipms/shared";
 import { type Deadline, type CreateDeadlineInput, createDeadline, completeDeadline } from "@ipms/domain";
-import type { DeadlineRepository } from "../ports.js";
+import type { AssetRepository, DeadlineRepository } from "../ports.js";
 
 export function createDeadlineUseCase(repo: DeadlineRepository) {
   return async (
@@ -21,6 +21,27 @@ export function listDeadlinesByAssetUseCase(repo: DeadlineRepository) {
   ): Promise<Result<readonly Deadline[]>> => {
     const deadlines = await repo.findByAssetId(assetId, orgId);
     return ok(deadlines);
+  };
+}
+
+export interface DeadlineWithAsset extends Deadline {
+  readonly assetName: string;
+}
+
+export function listAllDeadlinesUseCase(repo: DeadlineRepository, assetRepo: AssetRepository) {
+  return async (
+    orgId: OrganizationId,
+  ): Promise<Result<readonly DeadlineWithAsset[]>> => {
+    const [deadlines, assets] = await Promise.all([
+      repo.findAll(orgId),
+      assetRepo.findAll(orgId),
+    ]);
+    const assetNames = new Map(assets.map((a) => [a.id, a.title]));
+    const enriched = deadlines.map((d) => ({
+      ...d,
+      assetName: assetNames.get(d.assetId) ?? "Unknown asset",
+    }));
+    return ok(enriched);
   };
 }
 

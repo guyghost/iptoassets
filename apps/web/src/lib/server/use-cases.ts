@@ -6,6 +6,7 @@ import {
   deleteAssetUseCase,
   createDeadlineUseCase,
   listDeadlinesByAssetUseCase,
+  listAllDeadlinesUseCase,
   completeDeadlineUseCase,
   createPortfolioUseCase,
   getPortfolioUseCase,
@@ -56,6 +57,7 @@ export const deleteAsset = deleteAssetUseCase(assetRepo);
 
 export const createDeadline = createDeadlineUseCase(deadlineRepo);
 export const listDeadlinesByAsset = listDeadlinesByAssetUseCase(deadlineRepo);
+export const listAllDeadlines = listAllDeadlinesUseCase(deadlineRepo, assetRepo);
 export const completeDeadline = completeDeadlineUseCase(deadlineRepo);
 
 export const createPortfolio = createPortfolioUseCase(portfolioRepo);

@@ -31,8 +31,10 @@ export {
 export {
   createDeadlineUseCase,
   listDeadlinesByAssetUseCase,
+  listAllDeadlinesUseCase,
   completeDeadlineUseCase,
 } from "./use-cases/deadline.js";
+export type { DeadlineWithAsset } from "./use-cases/deadline.js";
 
 export {
   createDocumentUseCase,

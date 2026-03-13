@@ -3,10 +3,34 @@
 </svelte:head>
 
 <script lang="ts">
-  import { portfolios } from "../../../features/portfolios/data";
+  import { onMount } from "svelte";
   import { truncate } from "../../../features/portfolios/helpers";
 
+  interface Portfolio {
+    id: string;
+    name: string;
+    description: string;
+    assetIds: string[];
+    owner: string;
+    organizationId: string;
+  }
+
+  let portfolios = $state<Portfolio[]>([]);
+  let loading = $state(true);
   let searchQuery = $state("");
+
+  onMount(async () => {
+    try {
+      const res = await fetch("/api/portfolios");
+      if (res.ok) {
+        portfolios = await res.json();
+      }
+    } catch {
+      // Gracefully handle
+    } finally {
+      loading = false;
+    }
+  });
 
   const filtered = $derived(
     portfolios.filter(
@@ -45,7 +69,22 @@
     </div>
 
     <!-- Portfolio Grid -->
-    {#if filtered.length > 0}
+    {#if loading}
+      <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {#each [0, 1, 2] as _}
+          <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+            <div class="skeleton h-10 w-10 !rounded-lg"></div>
+            <div class="skeleton mt-4 h-5 w-40"></div>
+            <div class="skeleton mt-2 h-4 w-full"></div>
+            <div class="skeleton mt-1 h-4 w-3/4"></div>
+            <div class="mt-5 flex items-center justify-between border-t border-[var(--border-color)] pt-4">
+              <div class="skeleton h-4 w-20"></div>
+              <div class="skeleton h-4 w-24"></div>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {:else if filtered.length > 0}
       <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {#each filtered as portfolio}
           <a
