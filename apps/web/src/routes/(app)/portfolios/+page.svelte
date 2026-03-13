@@ -94,16 +94,16 @@
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">
-  <div class="mx-auto max-w-[1400px] px-6 py-8">
+  <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
     <!-- Page Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Portfolios</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Organize and manage your intellectual property collections</p>
       </div>
       <button
         onclick={openModal}
-        class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]"
+        class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-[var(--shadow-card)] transition-colors hover:bg-[var(--color-primary-700)]"
       >
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
         New Portfolio
@@ -112,7 +112,7 @@
 
     <!-- Search -->
     <div class="mt-6 max-w-md">
-      <div class="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 shadow-sm">
+      <div class="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 shadow-[var(--shadow-card)]">
         <svg class="h-5 w-5 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
         <input
           type="text"
@@ -127,7 +127,7 @@
     {#if loading}
       <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {#each [0, 1, 2] as _}
-          <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
             <div class="skeleton h-10 w-10 !rounded-lg"></div>
             <div class="skeleton mt-4 h-5 w-40"></div>
             <div class="skeleton mt-2 h-4 w-full"></div>
@@ -144,7 +144,8 @@
         {#each filtered as portfolio}
           <a
             href="/portfolios/{portfolio.id}"
-            class="group rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm transition-all hover:border-[var(--color-primary-200)] hover:shadow-md"
+            class="group rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)] transition-all hover:border-[var(--color-primary-200)] hover:shadow-md active:scale-[0.97] transition-transform"
+            style="transition-timing-function: var(--ease-spring);"
           >
             <div class="flex items-start justify-between">
               <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
@@ -175,7 +176,7 @@
       </div>
     {:else}
       <!-- Empty State -->
-      <div class="mt-12 flex flex-col items-center justify-center rounded-2xl border border-[var(--border-color)] bg-white py-16 shadow-sm">
+      <div class="mt-12 flex flex-col items-center justify-center rounded-2xl border border-[var(--border-color)] bg-white py-16 shadow-[var(--shadow-card)]">
         <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-neutral-100)]">
           <svg class="h-7 w-7 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
         </div>
@@ -190,7 +191,7 @@
         {#if !searchQuery}
           <button
             onclick={openModal}
-            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]"
+            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-[var(--shadow-card)] transition-colors hover:bg-[var(--color-primary-700)]"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Create Portfolio
@@ -265,7 +266,7 @@
           <button
             type="submit"
             disabled={creating}
-            class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)] disabled:opacity-50"
+            class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-[var(--shadow-card)] transition-colors hover:bg-[var(--color-primary-700)] disabled:opacity-50"
           >
             {#if creating}
               Creating...

@@ -252,7 +252,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-[#f7f7f8]">
-  <div class="mx-auto max-w-[1400px] px-6 py-8">
+  <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
 
     <!-- Back Link -->
     <a href="/assets" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-neutral-500)] hover:text-[var(--color-primary-600)] transition-colors">
@@ -272,7 +272,7 @@
     </div>
 
     <!-- Info Grid -->
-    <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
       <div class="flex items-center gap-2.5">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary-50)]">
           <svg class="h-4.5 w-4.5 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
@@ -338,7 +338,7 @@
     {#if asset.metadata}
       {@const prominent = Object.entries(asset.metadata).filter(([k, v]) => prominentFields.has(k) && v && String(v).trim())}
       {#if prominent.length > 0}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
               <svg class="h-4.5 w-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
@@ -367,7 +367,7 @@
 
       <!-- Applications table -->
       {#if applications.length > 0}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
               <svg class="h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
@@ -403,7 +403,7 @@
 
       <!-- Publications table -->
       {#if Array.isArray(asset.metadata.publications) && asset.metadata.publications.length > 0}
-        <div id="publications" class="mt-6 scroll-mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div id="publications" class="mt-6 scroll-mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
               <svg class="h-4.5 w-4.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
@@ -475,7 +475,7 @@
 
       <!-- Classifications -->
       {#if ipcCodes.length > 0 || cpcCodes.length > 0}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
               <svg class="h-4.5 w-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
@@ -512,7 +512,7 @@
         {@const examinerCits = citations.citations.filter(c => c.who === "Examiner")}
         {@const applicantCits = citations.citations.filter(c => c.who === "Applicant")}
         {@const selfCits = citations.citations.filter(c => c.self)}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
               <svg class="h-4.5 w-4.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.37a4.5 4.5 0 00-6.364-6.364L4.5 8.257"/></svg>
@@ -588,7 +588,7 @@
       <!-- Additional Details -->
       {@const detailed = Object.entries(asset.metadata).filter(([k, v]) => !prominentFields.has(k) && !dedicatedFields.has(k) && v && String(v).trim())}
       {#if detailed.length > 0}
-        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
               <svg class="h-4.5 w-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
@@ -625,7 +625,7 @@
 
     <!-- Status Transitions -->
     {#if transitions.length > 0}
-      <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+      <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
         <div class="flex items-center gap-2.5">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
             <svg class="h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
@@ -637,7 +637,7 @@
         </p>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           {#each transitions as target}
-            <button class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium shadow-sm transition-colors {transitionButtonColors[target] ?? 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]'}">
+            <button class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium shadow-[var(--shadow-card)] transition-colors {transitionButtonColors[target] ?? 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)]'}">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
               Move to {statusConfig[target]?.label}
             </button>
@@ -647,7 +647,7 @@
     {/if}
 
     <!-- Status Timeline -->
-    <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+    <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
       <div class="flex items-center gap-2.5">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
           <svg class="h-4.5 w-4.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -681,7 +681,7 @@
     </div>
 
     <!-- Danger Zone -->
-    <div class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
+    <div class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-[var(--shadow-card)]">
       <div class="flex items-center gap-2.5">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
           <svg class="h-4.5 w-4.5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
@@ -692,7 +692,7 @@
         Permanently delete this asset. This action cannot be undone.
       </p>
       <div class="mt-4">
-        <button class="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-700 shadow-sm transition-colors hover:bg-red-50">
+        <button class="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-700 shadow-[var(--shadow-card)] transition-colors hover:bg-red-50">
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
           Delete Asset
         </button>

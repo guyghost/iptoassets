@@ -16,16 +16,16 @@
   ];
 </script>
 
-<div class="mx-auto max-w-[1400px] px-6 py-8">
+<div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
   <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Settings</h1>
   <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your account and preferences</p>
 
-  <div class="mt-8 grid grid-cols-[220px_1fr] gap-8">
+  <div class="mt-8 flex flex-col gap-6 md:grid md:grid-cols-[220px_1fr] md:gap-8">
     <!-- Sidebar -->
     <nav class="flex flex-col gap-1">
       {#each sections as section}
         <button
-          class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors {activeSection === section.id
+          class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors min-h-[var(--touch-target-min)] {activeSection === section.id
             ? 'bg-[var(--color-primary-50)] text-[var(--color-primary-700)]'
             : 'text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-50)] hover:text-[var(--color-neutral-800)]'}"
           onclick={() => (activeSection = section.id)}
@@ -43,7 +43,7 @@
     </nav>
 
     <!-- Content -->
-    <div class="rounded-2xl border border-[var(--border-color)] bg-white p-8 shadow-sm">
+    <div class="rounded-2xl border border-[var(--border-color)] bg-white p-8 shadow-[var(--shadow-card)]">
       {#if activeSection === "general"}
         <h2 class="text-lg font-semibold text-[var(--color-neutral-900)]">General</h2>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your account settings</p>
@@ -87,7 +87,7 @@
                 <p class="text-xs text-[var(--color-neutral-500)]">{pref.description}</p>
               </div>
               <div class="h-6 w-10 rounded-full bg-[var(--color-primary-500)] p-0.5 cursor-pointer">
-                <div class="h-5 w-5 translate-x-4 rounded-full bg-white shadow-sm transition-transform"></div>
+                <div class="h-5 w-5 translate-x-4 rounded-full bg-white shadow-[var(--shadow-card)] transition-transform"></div>
               </div>
             </div>
           {/each}
