@@ -52,45 +52,41 @@ export function createPgPortfolioRepository(db: Database): PortfolioRepository {
     },
 
     async save(portfolio) {
-      await db.transaction(async (tx) => {
-        await tx.insert(portfolios).values({
-          id: portfolio.id,
+      await db.insert(portfolios).values({
+        id: portfolio.id,
+        name: portfolio.name,
+        description: portfolio.description,
+        owner: portfolio.owner,
+        organizationId: portfolio.organizationId,
+      }).onConflictDoUpdate({
+        target: portfolios.id,
+        set: {
           name: portfolio.name,
           description: portfolio.description,
           owner: portfolio.owner,
-          organizationId: portfolio.organizationId,
-        }).onConflictDoUpdate({
-          target: portfolios.id,
-          set: {
-            name: portfolio.name,
-            description: portfolio.description,
-            owner: portfolio.owner,
-          },
-        });
-
-        await tx.delete(portfolioAssets)
-          .where(eq(portfolioAssets.portfolioId, portfolio.id));
-
-        if (portfolio.assetIds.length > 0) {
-          await tx.insert(portfolioAssets).values(
-            portfolio.assetIds.map((assetId) => ({
-              portfolioId: portfolio.id,
-              assetId,
-            })),
-          );
-        }
+        },
       });
+
+      await db.delete(portfolioAssets)
+        .where(eq(portfolioAssets.portfolioId, portfolio.id));
+
+      if (portfolio.assetIds.length > 0) {
+        await db.insert(portfolioAssets).values(
+          portfolio.assetIds.map((assetId) => ({
+            portfolioId: portfolio.id,
+            assetId,
+          })),
+        );
+      }
     },
 
     async delete(id, orgId) {
-      return await db.transaction(async (tx) => {
-        await tx.delete(portfolioAssets)
-          .where(eq(portfolioAssets.portfolioId, id));
+      await db.delete(portfolioAssets)
+        .where(eq(portfolioAssets.portfolioId, id));
 
-        const result = await tx.delete(portfolios)
-          .where(and(eq(portfolios.id, id), eq(portfolios.organizationId, orgId)));
-        return (result.rowCount ?? 0) > 0;
-      });
+      const result = await db.delete(portfolios)
+        .where(and(eq(portfolios.id, id), eq(portfolios.organizationId, orgId)));
+      return (result.rowCount ?? 0) > 0;
     },
   };
 }
