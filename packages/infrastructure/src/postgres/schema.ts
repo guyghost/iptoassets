@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex, customType, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, primaryKey, index, uniqueIndex, customType, jsonb, integer, numeric } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 const vector = customType<{ data: string }>({
@@ -227,4 +227,39 @@ export const priorArtResults = pgTable("prior_art_results", {
   searchedAt: timestamp("searched_at").notNull().defaultNow(),
 }, (table) => [
   index("prior_art_results_asset_id_idx").on(table.assetId, table.organizationId),
+]);
+
+export const renewalFees = pgTable("renewal_fees", {
+  id: uuid("id").primaryKey(),
+  jurisdictionCode: text("jurisdiction_code").notNull(),
+  year: integer("year").notNull(),
+  officialFee: numeric("official_fee", { precision: 12, scale: 2 }).notNull(),
+  typicalAgentFee: numeric("typical_agent_fee", { precision: 12, scale: 2 }),
+  currency: text("currency").notNull(),
+  officialFeeLocal: numeric("official_fee_local", { precision: 12, scale: 2 }).notNull(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("renewal_fees_jurisdiction_year_idx").on(table.jurisdictionCode, table.year),
+]);
+
+export const renewalDecisions = pgTable("renewal_decisions", {
+  id: uuid("id").primaryKey(),
+  deadlineId: uuid("deadline_id").notNull().references(() => deadlines.id),
+  assetId: uuid("asset_id").notNull().references(() => assets.id),
+  organizationId: uuid("organization_id").notNull(),
+  estimatedCost: numeric("estimated_cost", { precision: 12, scale: 2 }).notNull(),
+  costOverride: numeric("cost_override", { precision: 12, scale: 2 }),
+  score: numeric("score", { precision: 5, scale: 2 }).notNull(),
+  scoreBreakdown: jsonb("score_breakdown").notNull(),
+  decision: text("decision").notNull().default("pending"),
+  decidedBy: text("decided_by"),
+  decidedAt: timestamp("decided_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("renewal_decisions_organization_id_idx").on(table.organizationId),
+  index("renewal_decisions_deadline_id_idx").on(table.deadlineId),
+  index("renewal_decisions_asset_id_idx").on(table.assetId),
+  uniqueIndex("renewal_decisions_deadline_id_unique").on(table.deadlineId),
 ]);
