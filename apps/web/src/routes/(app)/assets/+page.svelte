@@ -290,18 +290,41 @@
 
   // Filter state
   let activeTypeFilter = $state("all");
+  let activeStatus = $state("all");
+  let activeJurisdiction = $state("all");
   let searchQuery = $state("");
-  let selectedJurisdiction = $state("");
   let selectedOwner = $state("");
+
+  const statusFilters = [
+    { id: "all", label: "All" },
+    { id: "draft", label: "Draft" },
+    { id: "filed", label: "Filed" },
+    { id: "published", label: "Published" },
+    { id: "granted", label: "Granted" },
+    { id: "expired", label: "Expired" },
+    { id: "abandoned", label: "Abandoned" },
+  ];
 
   // Sort state
   let sortColumn = $state<string>("title");
   let sortDirection = $state<"asc" | "desc">("asc");
 
   // --- Derived ---
-  let jurisdictions = $derived(
-    [...new Set(assets.map((a) => a.jurisdiction.code))].sort()
-  );
+  let jurisdictionFilters = $derived((() => {
+    const seen = new Map<string, string>();
+    for (const a of assets) {
+      if (!seen.has(a.jurisdiction.code)) {
+        seen.set(a.jurisdiction.code, a.jurisdiction.name);
+      }
+    }
+    return [
+      { id: "all", label: "All regions" },
+      ...[...seen.entries()].map(([code]) => ({
+        id: code,
+        label: `${countryFlag(code)} ${code}`,
+      })),
+    ];
+  })());
 
   let owners = $derived(
     [...new Set(assets.map((a) => a.owner))].sort()
@@ -309,8 +332,9 @@
 
   let assetFilter = $derived<AssetFilter>({
     type: activeTypeFilter === "all" ? undefined : [activeTypeFilter as any],
+    status: activeStatus === "all" ? undefined : [activeStatus as any],
     search: searchQuery || undefined,
-    jurisdiction: selectedJurisdiction || undefined,
+    jurisdiction: activeJurisdiction === "all" ? undefined : activeJurisdiction,
     owner: selectedOwner || undefined,
   });
 
@@ -487,7 +511,8 @@
   function exportCSV() {
     const params = new URLSearchParams();
     if (activeTypeFilter !== "all") params.append("type", activeTypeFilter);
-    if (selectedJurisdiction) params.append("jurisdiction", selectedJurisdiction);
+    if (activeStatus !== "all") params.append("status", activeStatus);
+    if (activeJurisdiction !== "all") params.append("jurisdiction", activeJurisdiction);
     if (selectedOwner) params.append("owner", selectedOwner);
     const queryString = params.toString();
     const url = `/api/export/assets.csv${queryString ? `?${queryString}` : ""}`;
@@ -573,21 +598,33 @@
     </div>
 
     <!-- Dropdown Filters -->
-    <div class="mt-4 grid grid-cols-2 gap-2 lg:flex lg:items-center lg:gap-4">
+    <div class="mt-4 flex flex-wrap items-center gap-2 lg:gap-3">
+      <!-- Status Dropdown -->
       <select
-        class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-700)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)] transition-colors"
-        bind:value={selectedJurisdiction}
+        class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
+        bind:value={activeStatus}
       >
-        <option value="">All Jurisdictions</option>
-        {#each jurisdictions as code}
-          <option value={code}>{code}</option>
+        {#each statusFilters as filter}
+          <option value={filter.id}>{filter.id === "all" ? "All statuses" : filter.label}</option>
         {/each}
       </select>
+
+      <!-- Jurisdiction Dropdown -->
       <select
-        class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-700)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)] transition-colors"
+        class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
+        bind:value={activeJurisdiction}
+      >
+        {#each jurisdictionFilters as filter}
+          <option value={filter.id}>{filter.label}</option>
+        {/each}
+      </select>
+
+      <!-- Owner Dropdown -->
+      <select
+        class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
         bind:value={selectedOwner}
       >
-        <option value="">All Owners</option>
+        <option value="">All owners</option>
         {#each owners as owner}
           <option value={owner}>{owner}</option>
         {/each}
