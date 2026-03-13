@@ -13,3 +13,5 @@ export { createPgNotificationRepository } from "./pg-notification-repository.js"
 export { createPgInvitationRepository } from "./pg-invitation-repository.js";
 export { createPgAssetEmbeddingRepository } from "./pg-asset-embedding-repository.js";
 export { createPgPriorArtResultRepository } from "./pg-prior-art-result-repository.js";
+export { createPgRenewalFeeRepository } from "./pg-renewal-fee-repository.js";
+export { createPgRenewalDecisionRepository } from "./pg-renewal-decision-repository.js";
