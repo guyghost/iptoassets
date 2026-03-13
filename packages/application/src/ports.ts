@@ -1,5 +1,5 @@
-import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId, UserId, MembershipId, AuditEventId, NotificationId, InvitationId } from "@ipms/shared";
-import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership, AuditEvent, Notification, Invitation, PriorArtResult } from "@ipms/domain";
+import type { AssetId, DeadlineId, DocumentId, PortfolioId, OrganizationId, StatusChangeEventId, UserId, MembershipId, AuditEventId, NotificationId, InvitationId, RenewalFeeId, RenewalDecisionId } from "@ipms/shared";
+import type { IPAsset, Deadline, Document, Portfolio, StatusChangeEvent, User, Organization, Membership, AuditEvent, Notification, Invitation, PriorArtResult, RenewalFee, RenewalDecision } from "@ipms/domain";
 
 export interface AssetRepository {
   findById(id: AssetId, orgId: OrganizationId): Promise<IPAsset | null>;
@@ -110,4 +110,21 @@ export interface PriorArtResultRepository {
   save(result: PriorArtResult): Promise<void>;
   findByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<readonly PriorArtResult[]>;
   deleteByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<void>;
+}
+
+export interface RenewalFeeRepository {
+  findByJurisdiction(jurisdictionCode: string): Promise<readonly RenewalFee[]>;
+  findByJurisdictionAndYear(jurisdictionCode: string, year: number): Promise<RenewalFee | null>;
+  findAll(): Promise<readonly RenewalFee[]>;
+  save(fee: RenewalFee): Promise<void>;
+  saveMany(fees: readonly RenewalFee[]): Promise<void>;
+}
+
+export interface RenewalDecisionRepository {
+  findById(id: RenewalDecisionId, orgId: OrganizationId): Promise<RenewalDecision | null>;
+  findByDeadlineId(deadlineId: DeadlineId, orgId: OrganizationId): Promise<RenewalDecision | null>;
+  findAll(orgId: OrganizationId): Promise<readonly RenewalDecision[]>;
+  findByAssetId(assetId: AssetId, orgId: OrganizationId): Promise<readonly RenewalDecision[]>;
+  save(decision: RenewalDecision): Promise<void>;
+  saveMany(decisions: readonly RenewalDecision[]): Promise<void>;
 }

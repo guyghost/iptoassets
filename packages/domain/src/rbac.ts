@@ -11,6 +11,8 @@ export const PERMISSION_ACTIONS = [
   "portfolio:read", "portfolio:create", "portfolio:modify", "portfolio:delete",
   "bulk:operate", "export:csv", "audit:read",
   "member:invite", "member:change-role", "member:remove", "org:manage",
+  "renewal-fee:read", "renewal-fee:write",
+  "renewal-decision:read", "renewal-decision:write",
 ] as const;
 
 export type PermissionAction = (typeof PERMISSION_ACTIONS)[number];
@@ -23,6 +25,10 @@ const MIN_ROLE_FOR_ACTION: Record<PermissionAction, MemberRole> = {
   "portfolio:create": "manager", "portfolio:modify": "manager", "portfolio:delete": "manager",
   "bulk:operate": "manager", "export:csv": "manager", "audit:read": "manager",
   "member:invite": "admin", "member:change-role": "admin", "member:remove": "admin", "org:manage": "admin",
+  "renewal-fee:read": "viewer",
+  "renewal-fee:write": "admin",
+  "renewal-decision:read": "viewer",
+  "renewal-decision:write": "attorney",
 };
 
 export function hasPermission(role: MemberRole, action: PermissionAction): boolean {

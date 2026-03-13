@@ -17,6 +17,8 @@ export type {
   PatentSearchService,
   PatentSearchResult,
   PriorArtResultRepository,
+  RenewalFeeRepository,
+  RenewalDecisionRepository,
 } from "./ports.js";
 
 export {
