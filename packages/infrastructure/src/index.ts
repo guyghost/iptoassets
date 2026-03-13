@@ -19,3 +19,5 @@ export { createInMemoryAssetEmbeddingRepository } from "./in-memory-asset-embedd
 export { createNoOpPatentSearchService } from "./noop-patent-search-service.js";
 export { createUSPTOPatentSearchService } from "./uspto-patent-search-service.js";
 export { createInMemoryPriorArtResultRepository } from "./in-memory-prior-art-result-repository.js";
+export { createInMemoryRenewalFeeRepository } from "./in-memory-renewal-fee-repository.js";
+export { createInMemoryRenewalDecisionRepository } from "./in-memory-renewal-decision-repository.js";
