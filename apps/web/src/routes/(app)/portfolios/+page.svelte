@@ -4,6 +4,7 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
+  import { page } from "$app/stores";
   import { truncate } from "../../../features/portfolios/helpers";
 
   interface Portfolio {
@@ -18,6 +19,13 @@
   let portfolios = $state<Portfolio[]>([]);
   let loading = $state(true);
   let searchQuery = $state("");
+
+  // Modal state
+  let showModal = $state(false);
+  let newName = $state("");
+  let newDescription = $state("");
+  let creating = $state(false);
+  let error = $state("");
 
   onMount(async () => {
     try {
@@ -39,6 +47,50 @@
         p.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
+
+  function openModal() {
+    newName = "";
+    newDescription = "";
+    error = "";
+    showModal = true;
+  }
+
+  function closeModal() {
+    showModal = false;
+  }
+
+  async function handleCreate() {
+    if (!newName.trim()) {
+      error = "Portfolio name is required";
+      return;
+    }
+    creating = true;
+    error = "";
+    try {
+      const res = await fetch("/api/portfolios", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          name: newName.trim(),
+          description: newDescription.trim(),
+          owner: $page.data.user.name,
+        }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        portfolios = [...portfolios, created];
+        closeModal();
+      } else {
+        const data = await res.json().catch(() => null);
+        error = data?.error ?? "Failed to create portfolio";
+      }
+    } catch {
+      error = "Network error. Please try again.";
+    } finally {
+      creating = false;
+    }
+  }
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">
@@ -49,7 +101,10 @@
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Portfolios</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Organize and manage your intellectual property collections</p>
       </div>
-      <button class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]">
+      <button
+        onclick={openModal}
+        class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]"
+      >
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
         New Portfolio
       </button>
@@ -133,7 +188,10 @@
           {/if}
         </p>
         {#if !searchQuery}
-          <button class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]">
+          <button
+            onclick={openModal}
+            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)]"
+          >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Create Portfolio
           </button>
@@ -142,3 +200,81 @@
     {/if}
   </div>
 </div>
+
+<!-- Create Portfolio Modal -->
+{#if showModal}
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <button
+      class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+      onclick={closeModal}
+      aria-label="Close modal"
+    ></button>
+
+    <!-- Modal -->
+    <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border-color)] bg-white p-8 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-[var(--color-neutral-900)]">New Portfolio</h2>
+        <button
+          onclick={closeModal}
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-neutral-400)] transition-colors hover:bg-[var(--color-neutral-100)] hover:text-[var(--color-neutral-600)]"
+          aria-label="Close"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form
+        onsubmit={(e) => { e.preventDefault(); handleCreate(); }}
+        class="mt-6 flex flex-col gap-5"
+      >
+        <div>
+          <label for="portfolio-name" class="block text-sm font-medium text-[var(--color-neutral-700)]">Name</label>
+          <input
+            id="portfolio-name"
+            type="text"
+            bind:value={newName}
+            placeholder="e.g. Core Patents"
+            class="mt-1.5 w-full rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm text-[var(--color-neutral-800)] outline-none transition-colors placeholder:text-[var(--color-neutral-400)] focus:border-[var(--color-primary-400)] focus:ring-2 focus:ring-[var(--color-primary-100)]"
+          />
+        </div>
+
+        <div>
+          <label for="portfolio-description" class="block text-sm font-medium text-[var(--color-neutral-700)]">Description</label>
+          <textarea
+            id="portfolio-description"
+            bind:value={newDescription}
+            placeholder="Describe what this portfolio contains..."
+            rows="3"
+            class="mt-1.5 w-full resize-none rounded-xl border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm text-[var(--color-neutral-800)] outline-none transition-colors placeholder:text-[var(--color-neutral-400)] focus:border-[var(--color-primary-400)] focus:ring-2 focus:ring-[var(--color-primary-100)]"
+          ></textarea>
+        </div>
+
+        {#if error}
+          <p class="text-sm text-red-600">{error}</p>
+        {/if}
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onclick={closeModal}
+            class="rounded-xl border border-[var(--border-color)] px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-600)] transition-colors hover:bg-[var(--color-neutral-50)]"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={creating}
+            class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-700)] disabled:opacity-50"
+          >
+            {#if creating}
+              Creating...
+            {:else}
+              Create Portfolio
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{/if}
