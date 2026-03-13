@@ -506,10 +506,10 @@
 </script>
 
 <div class="min-h-screen bg-[#f7f7f8]">
-  <div class="mx-auto max-w-[1400px] px-6 py-8">
+  <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
 
     <!-- Page Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">IP Assets</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your intellectual property portfolio</p>
@@ -526,10 +526,17 @@
         </button>
         <button
           onclick={exportCSV}
-          class="inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+          class="hidden md:inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Export CSV
+        </button>
+        <button
+          onclick={exportCSV}
+          class="inline-flex md:hidden items-center justify-center rounded-lg border border-[var(--border-color)] bg-white p-2.5 text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+          aria-label="Export CSV"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </button>
         <button
           onclick={openDrawer}
@@ -552,7 +559,7 @@
     </div>
 
     <!-- Filter Pills -->
-    <div class="mt-4 flex items-center gap-2">
+    <div class="mt-4 flex items-center gap-2 overflow-x-auto scrollbar-hide">
       {#each filters as filter}
         <button
           class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors {activeTypeFilter === filter.id
@@ -566,7 +573,7 @@
     </div>
 
     <!-- Dropdown Filters -->
-    <div class="mt-4 flex items-center gap-4">
+    <div class="mt-4 grid grid-cols-2 gap-2 md:flex md:items-center md:gap-4">
       <select
         class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-700)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)] transition-colors"
         bind:value={selectedJurisdiction}
@@ -610,7 +617,7 @@
           <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Overview</h2>
         </div>
 
-        <div class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div class="mt-5 grid grid-cols-2 gap-2 md:gap-4 sm:grid-cols-5">
           <div class="rounded-xl border border-[var(--border-color)] px-5 py-4">
             <p class="text-sm text-[var(--color-neutral-500)]">Total</p>
             <p class="mt-1 text-3xl font-bold text-[var(--color-neutral-900)]">{totalCount}</p>
@@ -666,7 +673,30 @@
             <p class="mt-1 text-sm text-[var(--color-neutral-500)]">No assets match the current filters. Try adjusting your search or filters.</p>
           </div>
         {:else}
-          <div class="mt-4 overflow-x-auto">
+          <!-- Mobile: card view -->
+          <div class="mt-4 flex flex-col gap-3 md:hidden">
+            {#each sortedAssets as asset, i}
+              <a
+                href="/assets/{asset.id}"
+                class="block rounded-xl border border-[var(--border-color)] bg-white p-4 shadow-[var(--shadow-card)] active:shadow-[var(--shadow-card-hover)] active:scale-[0.97] transition-all animate-card-enter-mobile"
+                style="animation-delay: {i * 80}ms; transition-timing-function: var(--ease-spring);"
+              >
+                <p class="truncate text-sm font-medium text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</p>
+                <div class="mt-1.5 flex items-center gap-2 text-xs text-[var(--color-neutral-500)]">
+                  <span>{countryFlag(asset.jurisdiction.code)}</span>
+                  <span>{typeLabels[asset.type] ?? asset.type}</span>
+                  <span class="text-[var(--color-neutral-200)]">·</span>
+                  <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium {statusConfig[asset.status].bg} {statusConfig[asset.status].text}">{statusConfig[asset.status].label}</span>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-xs text-[var(--color-neutral-400)]">
+                  <span>{asset.owner}</span>
+                  <span>{formatDate(asset.filingDate || asset.createdAt)}</span>
+                </div>
+              </a>
+            {/each}
+          </div>
+
+          <div class="mt-4 hidden overflow-x-auto md:block">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
@@ -711,7 +741,7 @@
 </div>
 
 {#if selectedIds.size > 0}
-  <div class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
+  <div class="fixed bottom-20 md:bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 md:gap-4 max-w-[calc(100vw-2rem)] rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
     <span class="text-sm font-medium text-[var(--color-neutral-700)]">{selectedIds.size} selected</span>
 
     <div class="h-6 w-px bg-[var(--border-color)]"></div>
@@ -731,10 +761,10 @@
       >Apply</button>
     </div>
 
-    <div class="h-6 w-px bg-[var(--border-color)]"></div>
+    <div class="hidden md:block h-6 w-px bg-[var(--border-color)]"></div>
 
     <!-- Add to Portfolio -->
-    <div class="flex items-center gap-2">
+    <div class="hidden md:flex items-center gap-2">
       <select bind:value={bulkPortfolioTarget} onfocus={loadPortfolios} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
         <option value="">Add to portfolio...</option>
         {#each portfolios as portfolio}
@@ -766,7 +796,8 @@
 
   <!-- Panel -->
   <div
-    class="fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-out {drawerVisible ? 'translate-x-0' : 'translate-x-full'}"
+    class="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:right-0 z-50 w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 rounded-t-2xl md:rounded-none {drawerVisible ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}"
+    style="transition-timing-function: var(--ease-spring);"
   >
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-4">
