@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, formatDate, type DeadlineItem } from "../../../features/deadlines/helpers";
+  import { filters, typeColors, getDaysUntil, getRelativeDate, isOverdue, isDueThisWeek, isDueThisMonth, isDueThisYear, formatDate, type DeadlineItem } from "../../../features/deadlines/helpers";
 
   let activeFilter = $state("all");
   let deadlines = $state<DeadlineItem[]>([]);
@@ -30,7 +30,7 @@
   let overdueItems = $derived(deadlines.filter(d => isOverdue(d)));
   let weekItems = $derived(deadlines.filter(d => isDueThisWeek(d)));
   let monthItems = $derived(deadlines.filter(d => isDueThisMonth(d)));
-  let completedItems = $derived(deadlines.filter(d => d.completed));
+  let yearItems = $derived(deadlines.filter(d => isDueThisYear(d)));
 
   let upcomingItems = $derived(
     deadlines.filter(d => !d.completed && getDaysUntil(d.dueDate) > 6)
@@ -41,7 +41,7 @@
       case "overdue": return overdueItems;
       case "week": return weekItems;
       case "month": return monthItems;
-      case "completed": return completedItems;
+      case "year": return yearItems;
       default: return deadlines;
     }
   });
@@ -56,23 +56,6 @@
   let groupedUpcoming = $derived(
     activeFilter === "all" ? upcomingItems.sort((a, b) => getDaysUntil(a.dueDate) - getDaysUntil(b.dueDate)) : []
   );
-  let groupedCompleted = $derived(
-    activeFilter === "all" ? completedItems : []
-  );
-
-  async function toggleComplete(id: string) {
-    deadlines = deadlines.map(d => d.id === id ? { ...d, completed: !d.completed } : d);
-    try {
-      await fetch(`/api/deadlines`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-    } catch {
-      // Revert on failure
-      deadlines = deadlines.map(d => d.id === id ? { ...d, completed: !d.completed } : d);
-    }
-  }
 </script>
 
 <!-- Page Header -->
@@ -137,13 +120,13 @@
 
     <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
       <div class="flex items-center gap-2.5">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-          <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
+          <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-3.75h.008v.008H12v-.008z"/></svg>
         </div>
-        <p class="text-sm font-medium text-emerald-600">Completed</p>
+        <p class="text-sm font-medium text-indigo-600">This year</p>
       </div>
-      <p class="mt-3 text-3xl font-bold text-[var(--color-neutral-900)]">{completedItems.length}</p>
-      <p class="mt-1 text-xs text-[var(--color-neutral-400)]">deadlines met</p>
+      <p class="mt-3 text-3xl font-bold text-[var(--color-neutral-900)]">{yearItems.length}</p>
+      <p class="mt-1 text-xs text-[var(--color-neutral-400)]">all deadlines in {new Date().getFullYear()}</p>
     </div>
   </div>
 
@@ -166,19 +149,10 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedOverdue as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-red-400 pl-4 {deadline.completed ? 'opacity-50' : ''}">
-                <button
-                  aria-label="Toggle complete"
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
-                  onclick={() => toggleComplete(deadline.id)}
-                >
-                  {#if deadline.completed}
-                    <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
-                  {/if}
-                </button>
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-red-400 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-[var(--color-neutral-900)] {deadline.completed ? 'line-through text-[var(--color-neutral-400)]' : ''}">{deadline.title}</span>
+                    <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
@@ -207,19 +181,10 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedWeek as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-amber-400 pl-4 {deadline.completed ? 'opacity-50' : ''}">
-                <button
-                  aria-label="Toggle complete"
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
-                  onclick={() => toggleComplete(deadline.id)}
-                >
-                  {#if deadline.completed}
-                    <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
-                  {/if}
-                </button>
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-amber-400 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-[var(--color-neutral-900)] {deadline.completed ? 'line-through text-[var(--color-neutral-400)]' : ''}">{deadline.title}</span>
+                    <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
@@ -248,19 +213,10 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedUpcoming as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {deadline.completed ? 'opacity-50' : ''}">
-                <button
-                  aria-label="Toggle complete"
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
-                  onclick={() => toggleComplete(deadline.id)}
-                >
-                  {#if deadline.completed}
-                    <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
-                  {/if}
-                </button>
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-[var(--color-neutral-900)] {deadline.completed ? 'line-through text-[var(--color-neutral-400)]' : ''}">{deadline.title}</span>
+                    <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
@@ -270,45 +226,6 @@
                   </div>
                 </div>
                 <span class="flex-shrink-0 text-sm font-medium text-[var(--color-neutral-500)]">{getRelativeDate(deadline.dueDate)}</span>
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-
-      <!-- Completed Section -->
-      {#if groupedCompleted.length > 0}
-        <div class="rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
-          <div class="flex items-center gap-2.5">
-            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-              <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Completed</h2>
-            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">{groupedCompleted.length}</span>
-          </div>
-
-          <div class="mt-4 flex flex-col">
-            {#each groupedCompleted as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 opacity-50">
-                <button
-                  aria-label="Toggle complete"
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 border-emerald-500 bg-emerald-500 transition-colors"
-                  onclick={() => toggleComplete(deadline.id)}
-                >
-                  <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
-                </button>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium line-through text-[var(--color-neutral-400)]">{deadline.title}</span>
-                    <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
-                  </div>
-                  <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
-                    <span>-</span>
-                    <span>{formatDate(deadline.dueDate)}</span>
-                  </div>
-                </div>
-                <span class="flex-shrink-0 text-sm font-medium text-[var(--color-neutral-400)]">{getRelativeDate(deadline.dueDate)}</span>
               </div>
             {/each}
           </div>
@@ -331,7 +248,7 @@
         {#if filteredDeadlines.length === 0}
           <div class="mt-8 flex flex-col items-center justify-center py-8 text-center">
             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-neutral-100)]">
-              <svg class="h-6 w-6 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg class="h-6 w-6 text-[var(--color-neutral-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
             </div>
             <p class="mt-3 text-sm font-medium text-[var(--color-neutral-600)]">No deadlines found</p>
             <p class="mt-1 text-xs text-[var(--color-neutral-400)]">Nothing matches this filter right now</p>
@@ -340,21 +257,12 @@
           <div class="mt-4 flex flex-col">
             {#each filteredDeadlines as deadline}
               {@const days = getDaysUntil(deadline.dueDate)}
-              {@const borderColor = deadline.completed ? '' : days < 0 ? 'border-l-2 border-l-red-400' : days <= 6 ? 'border-l-2 border-l-amber-400' : ''}
-              {@const dateColor = deadline.completed ? 'text-[var(--color-neutral-400)]' : days < 0 ? 'text-red-600' : days <= 6 ? 'text-amber-600' : 'text-[var(--color-neutral-500)]'}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {borderColor} {deadline.completed ? 'opacity-50' : ''}">
-                <button
-                  aria-label="Toggle complete"
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors {deadline.completed ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--color-neutral-300)] hover:border-[var(--color-neutral-400)]'}"
-                  onclick={() => toggleComplete(deadline.id)}
-                >
-                  {#if deadline.completed}
-                    <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
-                  {/if}
-                </button>
+              {@const borderColor = days < 0 ? 'border-l-2 border-l-red-400' : days <= 6 ? 'border-l-2 border-l-amber-400' : ''}
+              {@const dateColor = days < 0 ? 'text-red-600' : days <= 6 ? 'text-amber-600' : 'text-[var(--color-neutral-500)]'}
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {borderColor}">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium {deadline.completed ? 'line-through text-[var(--color-neutral-400)]' : 'text-[var(--color-neutral-900)]'}">{deadline.title}</span>
+                    <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">

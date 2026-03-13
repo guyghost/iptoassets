@@ -3,7 +3,7 @@ export const filters = [
   { id: "overdue", label: "Overdue" },
   { id: "week", label: "This Week" },
   { id: "month", label: "This Month" },
-  { id: "completed", label: "Completed" },
+  { id: "year", label: "This Year" },
 ];
 
 export const typeColors: Record<string, { bg: string; text: string; label: string }> = {
@@ -60,6 +60,12 @@ export function isDueThisMonth(d: DeadlineItem): boolean {
   const due = new Date(d.dueDate);
   const today = now();
   return !d.completed && due.getMonth() === today.getMonth() && due.getFullYear() === today.getFullYear();
+}
+
+export function isDueThisYear(d: DeadlineItem): boolean {
+  const due = new Date(d.dueDate);
+  const today = now();
+  return due.getFullYear() === today.getFullYear();
 }
 
 export function formatDate(dateStr: string): string {
