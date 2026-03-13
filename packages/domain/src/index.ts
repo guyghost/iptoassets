@@ -57,3 +57,6 @@ export { computeDeadlineRisks } from "./deadline-risk.js";
 
 export { renderEmailTemplate } from "./email-templates.js";
 export type { EmailTemplateType, EmailTemplateData, DeadlineEmailData, DocumentEmailData, InvitationEmailData } from "./email-templates.js";
+
+export { computeRenewalScore } from "./renewal-score.js";
+export type { RenewalScoreInput } from "./renewal-score.js";
