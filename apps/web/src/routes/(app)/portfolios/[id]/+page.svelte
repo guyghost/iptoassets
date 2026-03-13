@@ -35,6 +35,9 @@
   let loading = $state(true);
   let showDeleteConfirm = $state(false);
   let deleting = $state(false);
+  let financials = $state<any>(null);
+  let projections = $state<any[]>([]);
+  let financialsLoading = $state(true);
 
   const portfolioId = $derived($page.params.id);
 
@@ -70,7 +73,24 @@
     } finally {
       loading = false;
     }
+
+    try {
+      const [finRes, projRes] = await Promise.all([
+        fetch(`/api/portfolios/${portfolioId}/financials`),
+        fetch(`/api/portfolios/${portfolioId}/projections?years=5`),
+      ]);
+      if (finRes.ok) financials = await finRes.json();
+      if (projRes.ok) projections = await projRes.json();
+    } catch {
+      // Gracefully handle
+    } finally {
+      financialsLoading = false;
+    }
   });
+
+  function formatCost(amount: number): string {
+    return new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  }
 
   async function handleDelete() {
     deleting = true;
@@ -243,6 +263,87 @@
           </div>
         {/if}
       </div>
+
+      <!-- Portfolio Financials -->
+      {#if financials}
+      <div class="mt-8">
+        <h2 class="text-lg font-semibold text-[var(--color-neutral-900)]">Portfolio Financials</h2>
+
+        <!-- Stats cards row -->
+        <div class="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <!-- Total Annual Cost -->
+          <div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-emerald-600">Annual Cost</p>
+            <p class="mt-2 text-2xl font-bold text-[var(--color-neutral-900)]">{formatCost(financials.totalAnnualCost)} EUR</p>
+            <p class="mt-1 text-xs text-[var(--color-neutral-400)]">renewed this year</p>
+          </div>
+
+          <!-- Pending Cost -->
+          <div class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-amber-600">Pending</p>
+            <p class="mt-2 text-2xl font-bold text-[var(--color-neutral-900)]">{formatCost(financials.totalPendingCost)} EUR</p>
+            <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{financials.pendingCount} decisions pending</p>
+          </div>
+
+          <!-- Decisions Made -->
+          <div class="rounded-2xl border border-[var(--border-color)] bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-[var(--color-neutral-600)]">Decisions</p>
+            <p class="mt-2 text-2xl font-bold text-[var(--color-neutral-900)]">{financials.renewedCount + financials.abandonedCount}</p>
+            <p class="mt-1 text-xs text-[var(--color-neutral-400)]">{financials.renewedCount} renewed, {financials.abandonedCount} abandoned</p>
+          </div>
+
+          <!-- Savings -->
+          <div class="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-indigo-600">Savings</p>
+            <p class="mt-2 text-2xl font-bold text-[var(--color-neutral-900)]">{formatCost(financials.savedByAbandoning)} EUR</p>
+            <p class="mt-1 text-xs text-[var(--color-neutral-400)]">by abandoning low-value patents</p>
+          </div>
+        </div>
+
+        <!-- Jurisdiction Breakdown -->
+        {#if Object.keys(financials.costByJurisdiction).length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <h3 class="text-base font-semibold text-[var(--color-neutral-900)]">Cost by Jurisdiction</h3>
+          <div class="mt-4 flex flex-col gap-3">
+            {#each Object.entries(financials.costByJurisdiction).sort((a, b) => (b[1] as number) - (a[1] as number)) as [jurisdiction, cost]}
+              {@const total = financials.totalAnnualCost + financials.totalPendingCost}
+              {@const percentage = total > 0 ? ((cost as number) / total * 100) : 0}
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-sm font-medium text-[var(--color-neutral-700)]">{jurisdiction}</span>
+                <div class="flex-1 h-6 bg-[var(--color-neutral-100)] rounded-full overflow-hidden">
+                  <div class="h-full bg-[var(--color-primary-500)] rounded-full transition-all" style="width: {percentage}%"></div>
+                </div>
+                <span class="w-24 text-right text-sm font-medium text-[var(--color-neutral-700)]">{formatCost(cost as number)} EUR</span>
+                <span class="w-12 text-right text-xs text-[var(--color-neutral-400)]">{percentage.toFixed(0)}%</span>
+              </div>
+            {/each}
+          </div>
+        </div>
+        {/if}
+
+        <!-- Cost Projections -->
+        {#if projections.length > 0}
+        <div class="mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-sm">
+          <h3 class="text-base font-semibold text-[var(--color-neutral-900)]">5-Year Cost Projection</h3>
+          <div class="mt-4">
+            <div class="flex flex-col gap-2">
+              {#each projections as proj}
+                {@const maxCost = Math.max(...projections.map(p => p.totalCost), 1)}
+                {@const barWidth = (proj.totalCost / maxCost) * 100}
+                <div class="flex items-center gap-3">
+                  <span class="w-12 text-sm font-medium text-[var(--color-neutral-700)]">{proj.year}</span>
+                  <div class="flex-1 h-8 bg-[var(--color-neutral-100)] rounded-lg overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-[var(--color-primary-400)] to-[var(--color-primary-600)] rounded-lg transition-all" style="width: {barWidth}%"></div>
+                  </div>
+                  <span class="w-28 text-right text-sm font-bold text-[var(--color-neutral-900)]">{formatCost(proj.totalCost)} EUR</span>
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+        {/if}
+      </div>
+      {/if}
 
       <!-- Danger Zone -->
       <div class="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
