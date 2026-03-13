@@ -402,6 +402,18 @@
     return sortDirection === "asc" ? " \u2191" : " \u2193";
   }
 
+  // Pick priority publication number: WO > US > EP > first available
+  function getPrimaryPublication(asset: IPAsset): string | null {
+    const pubs = (asset as any).metadata?.publications as { number: string; country: string }[] | undefined;
+    if (!pubs || pubs.length === 0) return null;
+    const priority = ["WO", "US", "EP"];
+    for (const code of priority) {
+      const found = pubs.find(p => p.country === code);
+      if (found) return found.number;
+    }
+    return pubs[0]?.number ?? null;
+  }
+
   // --- Selection state ---
   let selectedIds = $state(new Set<string>());
   let bulkMessage = $state<{ type: "success" | "error"; text: string } | null>(null);
@@ -718,6 +730,9 @@
                 class="block rounded-xl border border-[var(--border-color)] bg-white p-4 shadow-[var(--shadow-card)] active:shadow-[var(--shadow-card-hover)] active:scale-[0.97] transition-all animate-card-enter-mobile"
                 style="animation-delay: {i * 80}ms; transition-timing-function: var(--ease-spring);"
               >
+                {#if getPrimaryPublication(asset)}
+                  <p class="font-mono text-[11px] text-[var(--color-neutral-500)]">{getPrimaryPublication(asset)}</p>
+                {/if}
                 <p class="truncate text-sm font-medium text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</p>
                 <div class="mt-1.5 flex items-center gap-2 text-xs text-[var(--color-neutral-500)]">
                   <span>{countryFlag(asset.jurisdiction.code)}</span>
@@ -740,6 +755,7 @@
                   <th class="w-12 pb-3 pl-1 text-center align-middle">
                     <input type="checkbox" checked={allSelected} onchange={toggleSelectAll} class="rounded border-[var(--border-color)]" />
                   </th>
+                  <th class="w-40 pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub. Number</th>
                   <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("title")}>Name{sortIndicator("title")}</th>
                   <th class="w-20 pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("type")}>Type{sortIndicator("type")}</th>
                   <th class="w-12 pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] hover:text-[var(--color-neutral-600)] cursor-pointer select-none" onclick={() => toggleSort("jurisdiction")}><span title="Jurisdiction">Jur.</span>{sortIndicator("jurisdiction")}</th>
@@ -753,6 +769,13 @@
                   <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
                     <td class="w-12 py-3.5 pl-1 text-center align-top">
                       <input type="checkbox" checked={selectedIds.has(asset.id)} onchange={() => toggleSelect(asset.id)} class="mt-0.5 rounded border-[var(--border-color)]" />
+                    </td>
+                    <td class="w-40 py-3.5 pr-4">
+                      {#if getPrimaryPublication(asset)}
+                        <span class="font-mono text-xs text-[var(--color-neutral-700)]">{getPrimaryPublication(asset)}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
                     </td>
                     <td class="py-3.5 pr-6">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
