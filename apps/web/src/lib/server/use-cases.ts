@@ -46,8 +46,14 @@ import {
   computeDeadlineRiskUseCase,
   searchPriorArtUseCase,
   listPriorArtUseCase,
+  listRenewalDecisionsUseCase,
+  getRenewalDecisionUseCase,
+  makeRenewalDecisionUseCase,
+  generateRenewalDecisionsUseCase,
+  getPortfolioFinancialsUseCase,
+  projectPortfolioCostsUseCase,
 } from "@ipms/application";
-import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo } from "./repositories.js";
+import { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo, renewalFeeRepo, renewalDecisionRepo } from "./repositories.js";
 
 export const createAsset = createAssetUseCase(assetRepo);
 export const getAsset = getAssetUseCase(assetRepo);
@@ -109,3 +115,10 @@ export const computeDeadlineRisk = computeDeadlineRiskUseCase(deadlineRepo);
 
 export const searchPriorArt = searchPriorArtUseCase(assetRepo, patentSearchService, aiService, priorArtResultRepo);
 export const listPriorArt = listPriorArtUseCase(priorArtResultRepo);
+
+export const listRenewalDecisions = listRenewalDecisionsUseCase(renewalDecisionRepo, assetRepo, deadlineRepo);
+export const getRenewalDecision = getRenewalDecisionUseCase(renewalDecisionRepo);
+export const makeRenewalDecision = makeRenewalDecisionUseCase(renewalDecisionRepo);
+export const generateRenewalDecisions = generateRenewalDecisionsUseCase(deadlineRepo, assetRepo, renewalFeeRepo, renewalDecisionRepo);
+export const getPortfolioFinancials = getPortfolioFinancialsUseCase(portfolioRepo, assetRepo, renewalDecisionRepo, deadlineRepo);
+export const projectPortfolioCosts = projectPortfolioCostsUseCase(portfolioRepo, assetRepo, renewalFeeRepo);

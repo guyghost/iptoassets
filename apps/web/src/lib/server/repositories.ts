@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService, AIService, EmbeddingService, AssetEmbeddingRepository, PatentSearchService, PriorArtResultRepository } from "@ipms/application";
+import type { AssetRepository, DeadlineRepository, DocumentRepository, PortfolioRepository, StatusChangeEventRepository, UserRepository, OrganizationRepository, MembershipRepository, AuditEventRepository, NotificationRepository, InvitationRepository, EmailService, AIService, EmbeddingService, AssetEmbeddingRepository, PatentSearchService, PriorArtResultRepository, RenewalFeeRepository, RenewalDecisionRepository } from "@ipms/application";
 
 let assetRepo: AssetRepository;
 let deadlineRepo: DeadlineRepository;
@@ -18,6 +18,8 @@ let embeddingService: EmbeddingService;
 let assetEmbeddingRepo: AssetEmbeddingRepository;
 let patentSearchService: PatentSearchService;
 let priorArtResultRepo: PriorArtResultRepository;
+let renewalFeeRepo: RenewalFeeRepository;
+let renewalDecisionRepo: RenewalDecisionRepository;
 
 if (env.DATABASE_URL) {
   const { createDatabase, createPgAssetRepository, createPgDeadlineRepository, createPgDocumentRepository, createPgPortfolioRepository, createPgStatusChangeEventRepository, createPgUserRepository, createPgOrganizationRepository, createPgMembershipRepository, createPgAuditEventRepository, createPgNotificationRepository, createPgInvitationRepository } = await import("@ipms/infrastructure/postgres");
@@ -67,6 +69,10 @@ if (env.DATABASE_URL) {
   const { createPgPriorArtResultRepository } = await import("@ipms/infrastructure/postgres");
   priorArtResultRepo = createPgPriorArtResultRepository(db);
 
+  const { createPgRenewalFeeRepository, createPgRenewalDecisionRepository } = await import("@ipms/infrastructure/postgres");
+  renewalFeeRepo = createPgRenewalFeeRepository(db);
+  renewalDecisionRepo = createPgRenewalDecisionRepository(db);
+
   // Seed dev data if not already present
   const { dev } = await import("$app/environment");
   if (dev) {
@@ -99,8 +105,12 @@ if (env.DATABASE_URL) {
   patentSearchService = createNoOpPatentSearchService();
   priorArtResultRepo = createInMemoryPriorArt();
 
+  const { createInMemoryRenewalFeeRepository, createInMemoryRenewalDecisionRepository } = await import("@ipms/infrastructure");
+  renewalFeeRepo = createInMemoryRenewalFeeRepository();
+  renewalDecisionRepo = createInMemoryRenewalDecisionRepository();
+
   const { seedData } = await import("./seed.js");
   seedData();
 }
 
-export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo };
+export { assetRepo, deadlineRepo, documentRepo, portfolioRepo, statusChangeEventRepo, userRepo, orgRepo, memberRepo, auditEventRepo, notificationRepo, invitationRepo, emailService, aiService, embeddingService, assetEmbeddingRepo, patentSearchService, priorArtResultRepo, renewalFeeRepo, renewalDecisionRepo };
