@@ -167,8 +167,8 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
-                    {@const rd = renewalDecisions.get(deadline.id)}
-                    {#if deadline.type === "renewal" && rd}
+                    {#if deadline.type === "renewal" && renewalDecisions.has(deadline.id)}
+                      {@const rd = renewalDecisions.get(deadline.id)}
                       <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                         {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
                       </span>
@@ -215,8 +215,8 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
-                    {@const rd = renewalDecisions.get(deadline.id)}
-                    {#if deadline.type === "renewal" && rd}
+                    {#if deadline.type === "renewal" && renewalDecisions.has(deadline.id)}
+                      {@const rd = renewalDecisions.get(deadline.id)}
                       <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                         {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
                       </span>
@@ -263,8 +263,8 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
-                    {@const rd = renewalDecisions.get(deadline.id)}
-                    {#if deadline.type === "renewal" && rd}
+                    {#if deadline.type === "renewal" && renewalDecisions.has(deadline.id)}
+                      {@const rd = renewalDecisions.get(deadline.id)}
                       <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                         {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
                       </span>
@@ -325,8 +325,8 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
-                    {@const rd = renewalDecisions.get(deadline.id)}
-                    {#if deadline.type === "renewal" && rd}
+                    {#if deadline.type === "renewal" && renewalDecisions.has(deadline.id)}
+                      {@const rd = renewalDecisions.get(deadline.id)}
                       <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                         {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
                       </span>
