@@ -60,6 +60,19 @@
     owner: string;
     createdAt: string;
     updatedAt: string;
+    metadata?: Record<string, unknown> | null;
+  }
+
+  // Pick priority publication number: WO > US > EP > first available
+  function getPrimaryPublication(asset: Asset): string | null {
+    const pubs = asset.metadata?.publications as { number: string; country: string }[] | undefined;
+    if (!pubs || pubs.length === 0) return null;
+    const priority = ["WO", "US", "EP"];
+    for (const code of priority) {
+      const found = pubs.find(p => p.country === code);
+      if (found) return found.number;
+    }
+    return pubs[0]?.number ?? null;
   }
 
   let portfolioMetrics = $state<PortfolioMetrics | null>(null);
@@ -429,6 +442,9 @@
               {#each recentAssets as asset}
                 <a href="/assets/{asset.id}" class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0 min-h-[var(--touch-target-min)] active:bg-[var(--color-neutral-50)] transition-colors">
                   <div class="min-w-0 flex-1">
+                    {#if getPrimaryPublication(asset)}
+                      <p class="font-mono text-[11px] text-[var(--color-neutral-500)]">{getPrimaryPublication(asset)}</p>
+                    {/if}
                     <p class="truncate text-sm font-medium text-[var(--color-neutral-900)]">{cleanTitle(asset.title)}</p>
                     <div class="mt-0.5 flex items-center gap-2 text-xs text-[var(--color-neutral-400)]">
                       <span>{countryFlag(asset.jurisdiction.code)}</span>
@@ -450,9 +466,10 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
-                <th class="w-[40%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
-                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
-                <th class="w-[10%] pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
+                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub. Number</th>
+                <th class="w-[30%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
+                <th class="w-[12%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
+                <th class="w-[8%] pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
                 <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
                 <th class="w-[20%] pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Date</th>
               </tr>
@@ -461,6 +478,7 @@
               {#if loading}
                 {#each [0, 1, 2, 3, 4] as _}
                   <tr class="border-b border-[var(--border-color)] last:border-0">
+                    <td class="py-3.5 pr-4"><div class="skeleton h-4 w-24"></div></td>
                     <td class="py-3.5 pr-4"><div class="skeleton h-4 w-40"></div></td>
                     <td class="py-3.5 pr-4"><div class="skeleton h-4 w-16"></div></td>
                     <td class="py-3.5 text-center"><div class="skeleton mx-auto h-5 w-5 !rounded-full"></div></td>
@@ -470,11 +488,18 @@
                 {/each}
               {:else if recentAssets.length === 0}
                 <tr>
-                  <td colspan="5" class="py-8 text-center text-sm text-[var(--color-neutral-400)]">No assets yet</td>
+                  <td colspan="6" class="py-8 text-center text-sm text-[var(--color-neutral-400)]">No assets yet</td>
                 </tr>
               {:else}
                 {#each recentAssets as asset}
-                  <tr use:flashlight class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
+                  <tr use:flashlight class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)] align-top">
+                    <td class="py-3.5 pr-4">
+                      {#if getPrimaryPublication(asset)}
+                        <span class="font-mono text-xs text-[var(--color-neutral-700)]">{getPrimaryPublication(asset)}</span>
+                      {:else}
+                        <span class="text-xs text-[var(--color-neutral-400)]">—</span>
+                      {/if}
+                    </td>
                     <td class="py-3.5 pr-4">
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
