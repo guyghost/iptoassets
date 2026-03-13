@@ -11,6 +11,8 @@ export type {
   NotificationId,
   InvitationId,
   PriorArtResultId,
+  RenewalFeeId,
+  RenewalDecisionId,
 } from "./brand.js";
 
 export {
@@ -45,4 +47,6 @@ export {
   parseNotificationId,
   parseInvitationId,
   parsePriorArtResultId,
+  parseRenewalFeeId,
+  parseRenewalDecisionId,
 } from "./validation.js";

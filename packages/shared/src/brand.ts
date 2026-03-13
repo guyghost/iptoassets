@@ -14,3 +14,5 @@ export type AuditEventId = Brand<string, "AuditEventId">;
 export type NotificationId = Brand<string, "NotificationId">;
 export type InvitationId = Brand<string, "InvitationId">;
 export type PriorArtResultId = Brand<string, "PriorArtResultId">;
+export type RenewalFeeId = Brand<string, "RenewalFeeId">;
+export type RenewalDecisionId = Brand<string, "RenewalDecisionId">;

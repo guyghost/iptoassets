@@ -10,6 +10,8 @@ import {
   parseAuditEventId,
   parseNotificationId,
   parseInvitationId,
+  parseRenewalFeeId,
+  parseRenewalDecisionId,
 } from "./validation.js";
 
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -107,5 +109,27 @@ describe("parseInvitationId", () => {
   it("rejects invalid UUID", () => {
     const result = parseInvitationId("not-a-uuid");
     expect(result).toEqual({ ok: false, error: "Invalid InvitationId: must be UUID format" });
+  });
+});
+
+describe("parseRenewalFeeId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseRenewalFeeId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseRenewalFeeId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid RenewalFeeId: must be UUID format" });
+  });
+});
+
+describe("parseRenewalDecisionId", () => {
+  it("accepts valid UUID", () => {
+    const result = parseRenewalDecisionId(VALID_UUID);
+    expect(result).toEqual({ ok: true, value: VALID_UUID });
+  });
+  it("rejects invalid UUID", () => {
+    const result = parseRenewalDecisionId("not-a-uuid");
+    expect(result).toEqual({ ok: false, error: "Invalid RenewalDecisionId: must be UUID format" });
   });
 });

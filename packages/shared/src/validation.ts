@@ -9,6 +9,8 @@ import type {
   OrganizationId,
   PriorArtResultId,
   PortfolioId,
+  RenewalFeeId,
+  RenewalDecisionId,
   StatusChangeEventId,
   UserId,
 } from "./brand.js";
@@ -87,4 +89,16 @@ export function parsePriorArtResultId(input: string): Result<PriorArtResultId> {
   return UUID_RE.test(input)
     ? ok(input as PriorArtResultId)
     : err("Invalid PriorArtResultId: must be UUID format");
+}
+
+export function parseRenewalFeeId(input: string): Result<RenewalFeeId> {
+  return UUID_RE.test(input)
+    ? ok(input as RenewalFeeId)
+    : err("Invalid RenewalFeeId: must be UUID format");
+}
+
+export function parseRenewalDecisionId(input: string): Result<RenewalDecisionId> {
+  return UUID_RE.test(input)
+    ? ok(input as RenewalDecisionId)
+    : err("Invalid RenewalDecisionId: must be UUID format");
 }
