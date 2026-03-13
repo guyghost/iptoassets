@@ -9,6 +9,7 @@
   let activeFilter = $state("all");
   let deadlines = $state<DeadlineItem[]>([]);
   let loading = $state(true);
+  let renewalDecisions = $state<Map<string, any>>(new Map());
 
   onMount(async () => {
     try {
@@ -25,6 +26,18 @@
     } finally {
       loading = false;
     }
+
+    try {
+      const decRes = await fetch("/api/renewal-decisions");
+      if (decRes.ok) {
+        const decData = await decRes.json();
+        const map = new Map<string, any>();
+        for (const d of decData) {
+          map.set(d.deadlineId, d);
+        }
+        renewalDecisions = map;
+      }
+    } catch {}
   });
 
   let overdueItems = $derived(deadlines.filter(d => isOverdue(d)));
@@ -154,6 +167,22 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
+                    {@const rd = renewalDecisions.get(deadline.id)}
+                    {#if deadline.type === "renewal" && rd}
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
+                      </span>
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {rd.score >= 67 ? 'bg-emerald-100 text-emerald-700' : rd.score >= 34 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}">
+                        Score: {Math.round(rd.score)}
+                      </span>
+                      {#if rd.decision === "renew"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Renewed</span>
+                      {:else if rd.decision === "abandon"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Abandoned</span>
+                      {:else}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Pending</span>
+                      {/if}
+                    {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
                     <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
@@ -186,6 +215,22 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
+                    {@const rd = renewalDecisions.get(deadline.id)}
+                    {#if deadline.type === "renewal" && rd}
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
+                      </span>
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {rd.score >= 67 ? 'bg-emerald-100 text-emerald-700' : rd.score >= 34 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}">
+                        Score: {Math.round(rd.score)}
+                      </span>
+                      {#if rd.decision === "renew"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Renewed</span>
+                      {:else if rd.decision === "abandon"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Abandoned</span>
+                      {:else}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Pending</span>
+                      {/if}
+                    {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
                     <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
@@ -218,6 +263,22 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
+                    {@const rd = renewalDecisions.get(deadline.id)}
+                    {#if deadline.type === "renewal" && rd}
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
+                      </span>
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {rd.score >= 67 ? 'bg-emerald-100 text-emerald-700' : rd.score >= 34 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}">
+                        Score: {Math.round(rd.score)}
+                      </span>
+                      {#if rd.decision === "renew"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Renewed</span>
+                      {:else if rd.decision === "abandon"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Abandoned</span>
+                      {:else}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Pending</span>
+                      {/if}
+                    {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
                     <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
@@ -264,6 +325,22 @@
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
                     <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {typeColors[deadline.type].bg} {typeColors[deadline.type].text}">{typeColors[deadline.type].label}</span>
+                    {@const rd = renewalDecisions.get(deadline.id)}
+                    {#if deadline.type === "renewal" && rd}
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        {new Intl.NumberFormat("en-US", { minimumFractionDigits: 0 }).format(rd.estimatedCost)} EUR
+                      </span>
+                      <span class="inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium {rd.score >= 67 ? 'bg-emerald-100 text-emerald-700' : rd.score >= 34 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}">
+                        Score: {Math.round(rd.score)}
+                      </span>
+                      {#if rd.decision === "renew"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Renewed</span>
+                      {:else if rd.decision === "abandon"}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Abandoned</span>
+                      {:else}
+                        <span class="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Pending</span>
+                      {/if}
+                    {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
                     <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
