@@ -202,6 +202,45 @@
     D: "Cited in application",
   };
 
+  // Publication sorting
+  type PubSortField = "grantDate" | "country" | "pubDate" | "expiry" | "number";
+  let pubSortField = $state<PubSortField>("grantDate");
+  let pubSortAsc = $state(false);
+
+  function togglePubSort(field: PubSortField) {
+    if (pubSortField === field) {
+      pubSortAsc = !pubSortAsc;
+    } else {
+      pubSortField = field;
+      pubSortAsc = false;
+    }
+  }
+
+  let sortedPublications = $derived.by(() => {
+    const pubs = asset?.metadata?.publications as any[] | undefined;
+    if (!pubs || pubs.length === 0) return [];
+    const enriched = pubs.map((pub: any) => ({
+      ...pub,
+      _grantDate: pub.grantDate ?? getPublicationGrantDate(pub.number) ?? "",
+      _expiry: pub.expiry ?? getPublicationExpiry(pub.number) ?? "",
+      _pubDate: pubEventMap.get(pub.number)?.date ?? "",
+    }));
+    const dir = pubSortAsc ? 1 : -1;
+    const key = pubSortField === "number" ? "number"
+      : pubSortField === "country" ? "country"
+      : pubSortField === "pubDate" ? "_pubDate"
+      : pubSortField === "expiry" ? "_expiry"
+      : "_grantDate";
+    enriched.sort((a: any, b: any) => {
+      const va = a[key] ?? "";
+      const vb = b[key] ?? "";
+      if (va < vb) return -1 * dir;
+      if (va > vb) return 1 * dir;
+      return 0;
+    });
+    return enriched;
+  });
+
   // Expiration summary derived from publications
   let expirationSummary = $derived.by(() => {
     const pubs = asset?.metadata?.publications as any[] | undefined;
@@ -402,34 +441,46 @@
       {/if}
 
       <!-- Publications table -->
-      {#if Array.isArray(asset.metadata.publications) && asset.metadata.publications.length > 0}
+      {#if sortedPublications.length > 0}
         <div id="publications" class="mt-6 scroll-mt-6 rounded-2xl border border-[var(--border-color)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
               <svg class="h-4.5 w-4.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
             </div>
             <h2 class="text-base font-semibold text-[var(--color-neutral-900)]">Publications</h2>
-            <span class="text-xs text-[var(--color-neutral-400)]">{asset.metadata.publications.length} members</span>
+            <span class="text-xs text-[var(--color-neutral-400)]">{sortedPublications.length} members</span>
           </div>
+
+          {#snippet sortIcon(field: PubSortField)}
+            {#if pubSortField === field}
+              <svg class="ml-1 inline h-3 w-3 text-[var(--color-primary-600)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                {#if pubSortAsc}
+                  <path d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+                {:else}
+                  <path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                {/if}
+              </svg>
+            {/if}
+          {/snippet}
 
           <div class="mt-4 overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
-                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Country</th>
-                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Publication Number</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] cursor-pointer select-none hover:text-[var(--color-neutral-600)] transition-colors" onclick={() => togglePubSort("country")}>Country{@render sortIcon("country")}</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] cursor-pointer select-none hover:text-[var(--color-neutral-600)] transition-colors" onclick={() => togglePubSort("number")}>Publication Number{@render sortIcon("number")}</th>
                   <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Kind</th>
-                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub Date</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] cursor-pointer select-none hover:text-[var(--color-neutral-600)] transition-colors" onclick={() => togglePubSort("pubDate")}>Pub Date{@render sortIcon("pubDate")}</th>
                   <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Title</th>
-                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Grant Date</th>
-                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Expiry</th>
+                  <th class="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] cursor-pointer select-none hover:text-[var(--color-neutral-600)] transition-colors" onclick={() => togglePubSort("grantDate")}>Grant Date{@render sortIcon("grantDate")}</th>
+                  <th class="pb-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)] cursor-pointer select-none hover:text-[var(--color-neutral-600)] transition-colors" onclick={() => togglePubSort("expiry")}>Expiry{@render sortIcon("expiry")}</th>
                 </tr>
               </thead>
               <tbody>
-                {#each asset.metadata.publications as pub}
-                  {@const expiry = pub.expiry ?? getPublicationExpiry(pub.number)}
+                {#each sortedPublications as pub}
+                  {@const expiry = pub._expiry || undefined}
                   {@const badge = getExpiryBadge(expiry)}
-                  {@const grantDate = pub.grantDate ?? getPublicationGrantDate(pub.number)}
+                  {@const grantDate = pub._grantDate || undefined}
                   {@const pubEvent = pubEventMap.get(pub.number)}
                   <tr class="border-b border-[var(--border-color)] last:border-0">
                     <td class="py-2.5 pr-4">
