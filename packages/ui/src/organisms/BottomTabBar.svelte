@@ -29,7 +29,7 @@
   }
 </script>
 
-<nav class="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border-color)] bg-[var(--glass-bg)] backdrop-blur-[var(--backdrop-blur)] md:hidden" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+<nav class="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border-color)] bg-[var(--glass-bg)] backdrop-blur-[var(--backdrop-blur)] lg:hidden" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
   <div class="flex h-16 items-stretch justify-around">
     {#each items as item, i}
       {#if item.icon === "more"}

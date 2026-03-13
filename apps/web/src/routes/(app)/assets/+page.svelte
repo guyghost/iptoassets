@@ -509,7 +509,7 @@
   <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
 
     <!-- Page Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">IP Assets</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your intellectual property portfolio</p>
@@ -526,14 +526,14 @@
         </button>
         <button
           onclick={exportCSV}
-          class="hidden md:inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+          class="hidden lg:inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Export CSV
         </button>
         <button
           onclick={exportCSV}
-          class="inline-flex md:hidden items-center justify-center rounded-lg border border-[var(--border-color)] bg-white p-2.5 text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
+          class="inline-flex lg:hidden items-center justify-center rounded-lg border border-[var(--border-color)] bg-white p-2.5 text-[var(--color-neutral-700)] shadow-sm hover:bg-[var(--color-neutral-50)] transition-colors"
           aria-label="Export CSV"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -573,7 +573,7 @@
     </div>
 
     <!-- Dropdown Filters -->
-    <div class="mt-4 grid grid-cols-2 gap-2 md:flex md:items-center md:gap-4">
+    <div class="mt-4 grid grid-cols-2 gap-2 lg:flex lg:items-center lg:gap-4">
       <select
         class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-2 text-sm text-[var(--color-neutral-700)] outline-none focus:border-[var(--color-primary-400)] focus:ring-1 focus:ring-[var(--color-primary-400)] transition-colors"
         bind:value={selectedJurisdiction}
@@ -674,7 +674,7 @@
           </div>
         {:else}
           <!-- Mobile: card view -->
-          <div class="mt-4 flex flex-col gap-3 md:hidden">
+          <div class="mt-4 flex flex-col gap-3 lg:hidden">
             {#each sortedAssets as asset, i}
               <a
                 href="/assets/{asset.id}"
@@ -696,7 +696,7 @@
             {/each}
           </div>
 
-          <div class="mt-4 hidden overflow-x-auto md:block">
+          <div class="mt-4 hidden overflow-x-auto lg:block">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
@@ -741,7 +741,7 @@
 </div>
 
 {#if selectedIds.size > 0}
-  <div class="fixed bottom-20 md:bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 md:gap-4 max-w-[calc(100vw-2rem)] rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
+  <div class="fixed bottom-20 lg:bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 md:gap-4 max-w-[calc(100vw-2rem)] rounded-2xl border border-[var(--border-color)] bg-white px-6 py-3 shadow-xl">
     <span class="text-sm font-medium text-[var(--color-neutral-700)]">{selectedIds.size} selected</span>
 
     <div class="h-6 w-px bg-[var(--border-color)]"></div>
@@ -761,10 +761,10 @@
       >Apply</button>
     </div>
 
-    <div class="hidden md:block h-6 w-px bg-[var(--border-color)]"></div>
+    <div class="hidden lg:block h-6 w-px bg-[var(--border-color)]"></div>
 
     <!-- Add to Portfolio -->
-    <div class="hidden md:flex items-center gap-2">
+    <div class="hidden lg:flex items-center gap-2">
       <select bind:value={bulkPortfolioTarget} onfocus={loadPortfolios} class="rounded-lg border border-[var(--border-color)] bg-white px-3 py-1.5 text-sm">
         <option value="">Add to portfolio...</option>
         {#each portfolios as portfolio}
@@ -796,7 +796,7 @@
 
   <!-- Panel -->
   <div
-    class="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:right-0 z-50 w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 rounded-t-2xl md:rounded-none {drawerVisible ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}"
+    class="fixed inset-x-0 bottom-0 lg:inset-y-0 lg:inset-x-auto lg:right-0 z-50 w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 rounded-t-2xl lg:rounded-none {drawerVisible ? 'translate-y-0 lg:translate-x-0' : 'translate-y-full lg:translate-y-0 lg:translate-x-full'}"
     style="transition-timing-function: var(--ease-spring);"
   >
     <!-- Header -->

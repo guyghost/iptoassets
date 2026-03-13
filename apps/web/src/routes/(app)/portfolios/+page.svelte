@@ -96,7 +96,7 @@
 <div class="min-h-screen bg-[#f7f7f8]">
   <div class="mx-auto max-w-[1400px] px-4 md:px-6 py-8">
     <!-- Page Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Portfolios</h1>
         <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Organize and manage your intellectual property collections</p>

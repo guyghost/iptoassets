@@ -55,7 +55,7 @@
 
 <div class="min-h-screen bg-[#f7f7f8]">
   <!-- Top Navigation -->
-  <nav class="sticky top-0 z-40 border-b border-[var(--border-color)] bg-[var(--glass-bg)] backdrop-blur-[var(--backdrop-blur)] md:bg-white md:backdrop-blur-none">
+  <nav class="sticky top-0 z-40 border-b border-[var(--border-color)] bg-[var(--glass-bg)] backdrop-blur-[var(--backdrop-blur)] lg:bg-white lg:backdrop-blur-none">
     <div class="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 md:px-6">
       <!-- Left: Logo + Org -->
       <div class="flex items-center gap-3">
@@ -69,7 +69,7 @@
       </div>
 
       <!-- Center: Nav Links -->
-      <div class="hidden md:flex items-center gap-1 rounded-full bg-[var(--color-neutral-50)] p-1">
+      <div class="hidden lg:flex items-center gap-1 rounded-full bg-[var(--color-neutral-50)] p-1">
         {#each navItems as item}
           <a
             href={item.href}
@@ -126,7 +126,7 @@
   />
 
   <!-- Content -->
-  <main class="animate-page-enter pb-20 md:pb-0">
+  <main class="animate-page-enter pb-20 lg:pb-0">
     {@render children()}
   </main>
 

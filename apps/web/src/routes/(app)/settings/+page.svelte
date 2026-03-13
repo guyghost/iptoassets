@@ -20,7 +20,7 @@
   <h1 class="text-2xl font-bold text-[var(--color-neutral-900)]">Settings</h1>
   <p class="mt-1 text-sm text-[var(--color-neutral-500)]">Manage your account and preferences</p>
 
-  <div class="mt-8 flex flex-col gap-6 md:grid md:grid-cols-[220px_1fr] md:gap-8">
+  <div class="mt-8 flex flex-col gap-6 lg:grid lg:grid-cols-[220px_1fr] lg:gap-8">
     <!-- Sidebar -->
     <nav class="flex flex-col gap-1">
       {#each sections as section}

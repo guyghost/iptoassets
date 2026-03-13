@@ -319,7 +319,7 @@
       <div class="mt-5 grid grid-cols-3 gap-2 md:gap-4">
         {#if loading}
           {#each [0, 1, 2] as _}
-            <div class="rounded-xl border border-[var(--border-color)] px-3 py-3 md:px-5 md:py-4">
+            <div class="rounded-xl border border-[var(--border-color)] px-3 py-3 lg:px-5 lg:py-4">
               <div class="skeleton h-4 w-20"></div>
               <div class="skeleton mt-2 h-8 w-16"></div>
               <div class="skeleton mt-2 h-3 w-14"></div>
@@ -329,10 +329,10 @@
           {#each stats as stat, i}
             <div
               use:inView={{ delay: i * 80 }}
-              class="rounded-xl border px-3 py-3 md:px-5 md:py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
+              class="rounded-xl border px-3 py-3 lg:px-5 lg:py-4 {stat.accent ? 'border-amber-200 bg-amber-50/50' : 'border-[var(--border-color)]'}"
             >
               <p class="text-sm {stat.accent ? 'font-medium text-amber-600' : 'text-[var(--color-neutral-500)]'}">{stat.label}</p>
-              <p class="mt-1 text-2xl md:text-3xl font-bold text-[var(--color-neutral-900)]">
+              <p class="mt-1 text-2xl lg:text-3xl font-bold text-[var(--color-neutral-900)]">
                 {#if stat.value !== "\u2014"}
                   <span use:countUp={parseInt(stat.value)}></span>
                 {:else}
@@ -412,7 +412,7 @@
 
         <div class="mt-4">
           <!-- Mobile: compact list -->
-          <div class="flex flex-col md:hidden">
+          <div class="flex flex-col lg:hidden">
             {#if loading}
               {#each [0, 1, 2, 3, 4] as _}
                 <div class="flex items-center justify-between border-b border-[var(--border-color)] py-3 last:border-0">
@@ -446,7 +446,7 @@
             {/if}
           </div>
           <!-- Desktop: table -->
-          <div class="hidden md:block">
+          <div class="hidden lg:block">
           <table class="w-full">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
@@ -550,7 +550,7 @@
                   </div>
                   <span class="text-sm font-medium text-[var(--color-neutral-800)]">{deadline.title}</span>
                 </div>
-                <button class="rounded-full border border-[var(--border-color)] px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-50)] hover:text-[var(--color-neutral-800)]">
+                <button class="rounded-full border border-[var(--border-color)] px-4 py-2 lg:px-3 lg:py-1 text-xs font-medium text-[var(--color-neutral-600)] hover:bg-[var(--color-neutral-50)] hover:text-[var(--color-neutral-800)]">
                   Review
                 </button>
               </div>
