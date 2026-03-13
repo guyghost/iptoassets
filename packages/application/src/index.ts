@@ -105,3 +105,13 @@ export {
 export type { CreateInvitationUseCaseInput } from "./use-cases/invitation.js";
 
 export { searchPriorArtUseCase, listPriorArtUseCase } from "./use-cases/prior-art.js";
+
+export {
+  listRenewalDecisionsUseCase,
+  getRenewalDecisionUseCase,
+  makeRenewalDecisionUseCase,
+  generateRenewalDecisionsUseCase,
+  getPortfolioFinancialsUseCase,
+  projectPortfolioCostsUseCase,
+} from "./use-cases/renewal-decision.js";
+export type { RenewalDecisionWithAsset, PortfolioFinancials, CostProjection } from "./use-cases/renewal-decision.js";
