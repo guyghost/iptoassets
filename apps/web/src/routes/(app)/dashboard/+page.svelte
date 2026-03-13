@@ -486,12 +486,12 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
-                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub. Number</th>
-                <th class="w-[30%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
-                <th class="w-[12%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
-                <th class="w-[8%] pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
-                <th class="w-[15%] pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
-                <th class="w-[20%] pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Date</th>
+                <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Pub. Number</th>
+                <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
+                <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
+                <th class="pb-3 pr-4 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jur.</th>
+                <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
+                <th class="pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -501,7 +501,7 @@
                     <td class="py-3.5 pr-4"><div class="skeleton h-4 w-24"></div></td>
                     <td class="py-3.5 pr-4"><div class="skeleton h-4 w-40"></div></td>
                     <td class="py-3.5 pr-4"><div class="skeleton h-4 w-16"></div></td>
-                    <td class="py-3.5 text-center"><div class="skeleton mx-auto h-5 w-5 !rounded-full"></div></td>
+                    <td class="py-3.5 pr-4 text-center"><div class="skeleton mx-auto h-5 w-5 !rounded-full"></div></td>
                     <td class="py-3.5 pr-4"><div class="skeleton h-5 w-16 !rounded-full"></div></td>
                     <td class="py-3.5 text-right"><div class="skeleton ml-auto h-4 w-20"></div></td>
                   </tr>
@@ -524,7 +524,7 @@
                       <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
                     <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
-                    <td class="py-3.5 text-center">
+                    <td class="py-3.5 pr-4 text-center">
                       <span class="text-base leading-none" title={asset.jurisdiction.code}>{countryFlag(asset.jurisdiction.code)}</span>
                     </td>
                     <td class="py-3.5 pr-4">
