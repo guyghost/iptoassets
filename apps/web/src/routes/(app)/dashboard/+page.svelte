@@ -63,16 +63,36 @@
     metadata?: Record<string, unknown> | null;
   }
 
-  // Pick priority publication number: WO > US > EP > first available
+  // Pick priority publication number: WO > US > EP > first available, fallback to application number
   function getPrimaryPublication(asset: Asset): string | null {
-    const pubs = asset.metadata?.publications as { number: string; country: string }[] | undefined;
-    if (!pubs || pubs.length === 0) return null;
+    const meta = asset.metadata;
+    if (!meta) return null;
+    const pubs = meta.publications as { number: string; country: string }[] | undefined;
     const priority = ["WO", "US", "EP"];
+    if (pubs && pubs.length > 0) {
+      for (const code of priority) {
+        const found = pubs.find(p => p.country === code);
+        if (found) return found.number;
+      }
+      return pubs[0]?.number ?? null;
+    }
+    // Fallback: parse applicationData
+    const raw = String(meta.applicationData ?? "").trim();
+    if (!raw) return null;
+    const apps: { number: string; country: string }[] = [];
+    for (const line of raw.split(/\r?\n/)) {
+      const match = line.trim().match(/^(\S+)\s+/);
+      if (!match) continue;
+      const number = match[1];
+      const country = number.match(/^([A-Z]{2})/)?.[1] ?? "";
+      apps.push({ number, country });
+    }
+    if (apps.length === 0) return null;
     for (const code of priority) {
-      const found = pubs.find(p => p.country === code);
+      const found = apps.find(a => a.country === code);
       if (found) return found.number;
     }
-    return pubs[0]?.number ?? null;
+    return apps[0]?.number ?? null;
   }
 
   let portfolioMetrics = $state<PortfolioMetrics | null>(null);
