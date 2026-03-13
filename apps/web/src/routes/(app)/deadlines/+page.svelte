@@ -149,7 +149,7 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedOverdue as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-red-400 pl-4">
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-b-0 border-l-2 border-l-red-400 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
@@ -181,7 +181,7 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedWeek as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 border-l-2 border-l-amber-400 pl-4">
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-b-0 border-l-2 border-l-amber-400 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
@@ -213,7 +213,7 @@
 
           <div class="mt-4 flex flex-col">
             {#each groupedUpcoming as deadline}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4">
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-b-0 border-l-2 border-l-blue-400 pl-4">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
@@ -257,9 +257,9 @@
           <div class="mt-4 flex flex-col">
             {#each filteredDeadlines as deadline}
               {@const days = getDaysUntil(deadline.dueDate)}
-              {@const borderColor = days < 0 ? 'border-l-2 border-l-red-400' : days <= 6 ? 'border-l-2 border-l-amber-400' : ''}
+              {@const borderColor = days < 0 ? 'border-l-2 border-l-red-400' : days <= 6 ? 'border-l-2 border-l-amber-400' : 'border-l-2 border-l-blue-400'}
               {@const dateColor = days < 0 ? 'text-red-600' : days <= 6 ? 'text-amber-600' : 'text-[var(--color-neutral-500)]'}
-              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-0 pl-4 {borderColor}">
+              <div class="flex items-center gap-4 border-b border-[var(--border-color)] py-3.5 last:border-b-0 pl-4 {borderColor}">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-[var(--color-neutral-900)]">{deadline.title}</span>
