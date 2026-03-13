@@ -17,6 +17,8 @@ import type {
   DocumentStatus,
   Jurisdiction,
   PriorArtResultId,
+  RenewalFeeId,
+  RenewalDecisionId,
 } from "@ipms/shared";
 
 export interface IPAsset {
@@ -205,4 +207,42 @@ export interface PriorArtResult {
   readonly relevanceReasoning: string;
   readonly source: "uspto";
   readonly searchedAt: Date;
+}
+
+export const DECISION_STATUSES = ["pending", "renew", "abandon"] as const;
+export type DecisionStatus = (typeof DECISION_STATUSES)[number];
+
+export interface ScoreBreakdown {
+  readonly costScore: number;
+  readonly citationScore: number;
+  readonly coverageScore: number;
+  readonly ageScore: number;
+}
+
+export interface RenewalFee {
+  readonly id: RenewalFeeId;
+  readonly jurisdictionCode: string;
+  readonly year: number;
+  readonly officialFee: number;
+  readonly typicalAgentFee: number | null;
+  readonly currency: string;
+  readonly officialFeeLocal: number;
+  readonly updatedAt: Date;
+}
+
+export interface RenewalDecision {
+  readonly id: RenewalDecisionId;
+  readonly deadlineId: DeadlineId;
+  readonly assetId: AssetId;
+  readonly organizationId: OrganizationId;
+  readonly estimatedCost: number;
+  readonly costOverride: number | null;
+  readonly score: number;
+  readonly scoreBreakdown: ScoreBreakdown;
+  readonly decision: DecisionStatus;
+  readonly decidedBy: string | null;
+  readonly decidedAt: Date | null;
+  readonly notes: string | null;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 }
