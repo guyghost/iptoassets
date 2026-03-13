@@ -615,22 +615,24 @@
       />
     </div>
 
-    <!-- Filter Pills -->
-    <div class="mt-4 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-      {#each filters as filter}
-        <button
-          class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors {activeTypeFilter === filter.id
-            ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
-            : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
-          onclick={() => (activeTypeFilter = filter.id)}
-        >
-          {filter.label}
-        </button>
-      {/each}
-    </div>
+    <!-- Filters -->
+    <div class="mt-5 flex flex-wrap items-center gap-3">
+      <!-- Type Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+        {#each filters as filter}
+          <button
+            class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {activeTypeFilter === filter.id
+              ? 'border-[var(--color-neutral-900)] bg-white text-[var(--color-neutral-900)] shadow-sm'
+              : 'border-[var(--border-color)] bg-white/60 text-[var(--color-neutral-500)] hover:bg-white hover:text-[var(--color-neutral-700)]'}"
+            onclick={() => (activeTypeFilter = filter.id)}
+          >
+            {filter.label}
+          </button>
+        {/each}
+      </div>
 
-    <!-- Dropdown Filters -->
-    <div class="mt-4 flex flex-wrap items-center gap-2 lg:gap-3">
+      <div class="h-4 w-px bg-[var(--border-color)]"></div>
+
       <!-- Status Dropdown -->
       <select
         class="rounded-full border border-[var(--border-color)] bg-white px-3 py-1 text-xs font-medium text-[var(--color-neutral-600)] shadow-sm outline-none transition-colors hover:border-[var(--color-neutral-400)] focus:border-[var(--color-neutral-900)]"
@@ -647,7 +649,7 @@
         bind:value={activeJurisdiction}
       >
         {#each jurisdictionFilters as filter}
-          <option value={filter.id}>{filter.label}</option>
+          <option value={filter.id}>{filter.id === "all" ? "All regions" : filter.label}</option>
         {/each}
       </select>
 

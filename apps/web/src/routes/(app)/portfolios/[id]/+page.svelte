@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
-  import { statusConfig, typeLabels, formatDate, countryFlag } from "../../../../features/assets/helpers";
+  import { statusConfig, typeLabels, formatDate, countryFlag, cleanTitle } from "../../../../features/assets/helpers";
 
   interface Portfolio {
     id: string;
@@ -223,18 +223,18 @@
             <table class="w-full">
               <thead>
                 <tr class="border-b border-[var(--border-color)]">
-                  <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
-                  <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
-                  <th class="pb-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
-                  <th class="pb-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
+                  <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Name</th>
+                  <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Type</th>
+                  <th class="pb-3 pr-4 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Jurisdiction</th>
+                  <th class="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Status</th>
                   <th class="pb-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-neutral-400)]">Filing Date</th>
                 </tr>
               </thead>
               <tbody>
                 {#each portfolioAssets as asset}
-                  <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)]">
+                  <tr class="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--color-neutral-50)] align-top">
                     <td class="py-3.5 pr-4">
-                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{asset.title}</a>
+                      <a href="/assets/{asset.id}" class="text-sm font-medium text-[var(--color-neutral-900)] hover:text-[var(--color-primary-600)]">{cleanTitle(asset.title)}</a>
                     </td>
                     <td class="py-3.5 pr-4 text-sm text-[var(--color-neutral-500)]">{typeLabels[asset.type] ?? asset.type}</td>
                     <td class="py-3.5 text-center">

@@ -185,7 +185,7 @@
                     {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
+                    <a href="/assets/{deadline.assetId}" class="truncate max-w-[250px] inline-block hover:text-[var(--color-primary-600)] hover:underline" title={deadline.assetName}>{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -233,7 +233,7 @@
                     {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
+                    <a href="/assets/{deadline.assetId}" class="truncate max-w-[250px] inline-block hover:text-[var(--color-primary-600)] hover:underline" title={deadline.assetName}>{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -281,7 +281,7 @@
                     {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
+                    <a href="/assets/{deadline.assetId}" class="truncate max-w-[250px] inline-block hover:text-[var(--color-primary-600)] hover:underline" title={deadline.assetName}>{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
@@ -343,7 +343,7 @@
                     {/if}
                   </div>
                   <div class="mt-1 flex items-center gap-3 text-xs text-[var(--color-neutral-400)]">
-                    <a href="/assets/{deadline.assetId}" class="hover:text-[var(--color-primary-600)] hover:underline">{deadline.assetName}</a>
+                    <a href="/assets/{deadline.assetId}" class="truncate max-w-[250px] inline-block hover:text-[var(--color-primary-600)] hover:underline" title={deadline.assetName}>{deadline.assetName}</a>
                     <span>-</span>
                     <span>{formatDate(deadline.dueDate)}</span>
                   </div>
