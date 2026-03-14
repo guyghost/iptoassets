@@ -5,5 +5,4 @@ export const load: PageServerLoad = async (event) => {
   if (event.locals.betterAuthUser) {
     throw redirect(303, "/dashboard");
   }
-  throw redirect(303, "/login");
 };
